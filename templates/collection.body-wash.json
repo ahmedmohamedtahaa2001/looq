@@ -1,0 +1,16 @@
+{
+  "order": [
+    "main"
+  ],
+  "sections": {
+    "main": {
+      "settings": {
+        "hero_filename": "looq-hero-bw.jpg",
+        "marquee_phrase_a": "also called yours",
+        "marquee_phrase_b": "also called shower gel",
+        "products_per_page": 12
+      },
+      "type": "looq-collection-type"
+    }
+  }
+}

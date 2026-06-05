@@ -1,0 +1,88 @@
+{%- comment -%}
+  LOOQ — Newsletter section
+  STAY (black) AHEAD (orange) OF THE (black) VIBE (black) — 4-line headline,
+  body text, name + email fields, JOIN THE MOVEMENT orange button, fine print.
+{%- endcomment -%}
+
+<section class="looq-newsletter" data-section-id="{{ section.id }}">
+  <div class="looq-newsletter__inner">
+    <h2 class="looq-newsletter__headline">
+      <span class="looq-newsletter__line">{{ section.settings.line_1 | default: 'STAY' }}</span>
+      <span class="looq-newsletter__line looq-newsletter__line--accent">{{ section.settings.line_2 | default: 'AHEAD' }}</span>
+      <span class="looq-newsletter__line">{{ section.settings.line_3 | default: 'OF THE' }}</span>
+      <span class="looq-newsletter__line">{{ section.settings.line_4 | default: 'VIBE' }}</span>
+    </h2>
+
+    <p class="looq-newsletter__lede">{{ section.settings.lede | default: 'New drops. Exclusive deals. No spam.' }}</p>
+
+    {% form 'customer', class: 'looq-newsletter__form' %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <label class="looq-newsletter__field">
+        <input type="text" name="contact[first_name]" placeholder="Your Name" autocomplete="given-name">
+      </label>
+      <label class="looq-newsletter__field">
+        <input type="email" name="contact[email]" placeholder="Your Email" required autocomplete="email">
+      </label>
+      <button type="submit" class="looq-newsletter__submit">{{ section.settings.cta_label | default: 'JOIN THE MOVEMENT' }}</button>
+    {% endform %}
+
+    <p class="looq-newsletter__footnote">{{ section.settings.footnote | default: 'No filters. No spam. Unsubscribe anytime.' }}</p>
+  </div>
+</section>
+
+{% stylesheet %}
+.looq-newsletter { width:100%; margin:0 auto; background:#fff; padding:36px 0 24px; }
+.looq-newsletter__inner { padding-inline:20px; }
+.looq-newsletter__headline {
+  margin:0 0 16px; padding:0;
+  font-family:var(--font-display); font-weight:950;
+  font-size:60px; line-height:0.95; color:#1e1e1e;
+  text-transform:uppercase;
+}
+.looq-newsletter__line { display:block; }
+.looq-newsletter__line--accent { color:#ff5c00; }
+.looq-newsletter__lede {
+  margin:0 0 16px; padding:0;
+  font-family:var(--font-body); font-weight:400;
+  font-size:13px; line-height:25px; color:#1e1e1e;
+}
+.looq-newsletter__form { display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+.looq-newsletter__field input {
+  display:block; width:100%; height:41px; padding:0 16px;
+  background:#d9d9d9; border:0;
+  font-family:var(--font-body); font-weight:400;
+  font-size:14px; color:#1e1e1e;
+}
+.looq-newsletter__field input::placeholder { color:#1e1e1e; opacity:0.85; }
+.looq-newsletter__submit {
+  display:flex; align-items:center; justify-content:center;
+  width:100%; height:41px; border:0; cursor:pointer;
+  background:#ff5c00; color:#fff;
+  font-family:var(--font-body); font-weight:400;
+  font-size:13px; letter-spacing:3.96px; text-transform:uppercase;
+}
+.looq-newsletter__submit:hover { filter:brightness(1.08); }
+.looq-newsletter__footnote {
+  margin:8px 0 0; padding:0;
+  font-family:var(--font-body); font-weight:400;
+  font-size:13px; line-height:25px; color:#1e1e1e;
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "tag": "section",
+  "class": "section--looq-newsletter",
+  "settings": [
+    { "type": "text", "id": "line_1", "label": "Headline 1", "default": "STAY" },
+    { "type": "text", "id": "line_2", "label": "Headline 2 (orange accent)", "default": "AHEAD" },
+    { "type": "text", "id": "line_3", "label": "Headline 3", "default": "OF THE" },
+    { "type": "text", "id": "line_4", "label": "Headline 4", "default": "VIBE" },
+    { "type": "text", "id": "lede", "label": "Lede", "default": "New drops. Exclusive deals. No spam." },
+    { "type": "text", "id": "cta_label", "label": "CTA label", "default": "JOIN THE MOVEMENT" },
+    { "type": "text", "id": "footnote", "label": "Footnote", "default": "No filters. No spam. Unsubscribe anytime." }
+  ],
+  "presets": [{ "name": "Newsletter", "category": "LOOQ" }]
+}
+{% endschema %}

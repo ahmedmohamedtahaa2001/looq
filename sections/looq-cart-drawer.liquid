@@ -1,0 +1,680 @@
+{%- comment -%}
+  LOOQ — Cart drawer
+  Slides in from the right, dimmed overlay behind. Opens when:
+    - User clicks the header cart icon (intercepted; navigation prevented)
+    - Any product ADD TO CART form is submitted (intercepted; AJAX add + open)
+  Renders client-side from /cart.js — markup below is the empty shell.
+  Source: WhatsApp Image #55 (Salma's Figma export).
+{%- endcomment -%}
+
+{%- comment -%} Smell Check modal is global — opens from any [data-smell-check-open] button {%- endcomment -%}
+{% render 'looq-smell-check' %}
+
+<aside class="looq-cart" id="looq-cart" aria-hidden="true" aria-label="Cart">
+  <div class="looq-cart__backdrop" data-cart-close></div>
+
+  <div class="looq-cart__sheet" role="document">
+    <header class="looq-cart__head">
+      <a class="looq-cart__add-more" href="/collections/all" data-cart-close-on-click>
+        <span class="looq-cart__plus" aria-hidden="true">+</span> Add More Items
+      </a>
+      <button type="button" class="looq-cart__close" data-cart-close aria-label="Close cart">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M1 1l12 12M13 1L1 13" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <div class="looq-cart__body" data-cart-items>
+      {%- comment -%} Items rendered client-side from /cart.js; this is the empty state. {%- endcomment -%}
+      <div class="looq-cart__empty" data-cart-empty>
+        <p>Your cart is feeling empty.</p>
+        <a href="/collections/all" class="looq-cart__empty-cta" data-cart-close-on-click>Shop the goods</a>
+      </div>
+    </div>
+
+    <footer class="looq-cart__foot" data-cart-foot hidden>
+      <div class="looq-cart__totals">
+        <span class="looq-cart__count">
+          <span data-cart-count-label>Selected Items</span> (<span data-cart-count>0</span>)
+        </span>
+        <span class="looq-cart__total">
+          Total: <strong data-cart-total>LE 0</strong>
+        </span>
+      </div>
+      <a href="/checkout" class="looq-cart__checkout" data-cart-checkout>
+        Checkout
+      </a>
+    </footer>
+  </div>
+</aside>
+
+{%- comment -%} Hidden item template — cloned by JS for each cart line {%- endcomment -%}
+<template id="looq-cart-item-template">
+  <article class="looq-cart__item" data-cart-line>
+    <a class="looq-cart__thumb" data-cart-link>
+      <img data-cart-img alt="" loading="lazy">
+    </a>
+    <div class="looq-cart__meta">
+      <span class="looq-cart__title" data-cart-title></span>
+      <span class="looq-cart__scent" data-cart-scent hidden>
+        <span class="looq-cart__scent-dot" data-cart-scent-dot></span>
+        <span data-cart-scent-name></span>
+      </span>
+      <div class="looq-cart__qty">
+        <button type="button" class="looq-cart__qty-btn" data-cart-decrease aria-label="Decrease quantity">−</button>
+        <span class="looq-cart__qty-val" data-cart-qty>1</span>
+        <button type="button" class="looq-cart__qty-btn" data-cart-increase aria-label="Increase quantity">+</button>
+      </div>
+    </div>
+    <span class="looq-cart__price" data-cart-line-price></span>
+  </article>
+</template>
+
+{% stylesheet %}
+/* Container & overlay */
+.looq-cart { position:fixed; inset:0; z-index:1200; display:none; }
+.looq-cart[aria-hidden="false"] { display:block; }
+.looq-cart__backdrop {
+  position:absolute; inset:0;
+  background:rgba(0,0,0,0.4);
+  opacity:0; transition:opacity 240ms ease;
+}
+.looq-cart[aria-hidden="false"] .looq-cart__backdrop { opacity:1; }
+
+/* Sheet — slides from right */
+.looq-cart__sheet {
+  position:absolute; top:0; right:0; height:100%;
+  width:88vw; max-width:390px;
+  background:#eaeaea; color:#1e1e1e;
+  display:flex; flex-direction:column;
+  transform:translateX(100%); transition:transform 280ms cubic-bezier(.22,1,.36,1);
+  box-shadow:-8px 0 32px rgba(0,0,0,0.18);
+  overflow:hidden;
+}
+.looq-cart[aria-hidden="false"] .looq-cart__sheet { transform:translateX(0); }
+
+/* Head */
+.looq-cart__head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 16px 12px;
+  flex-shrink:0;
+}
+.looq-cart__add-more {
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--font-body, sans-serif);
+  font-weight:600; font-size:13px; color:#1e1e1e;
+  text-decoration:none;
+}
+.looq-cart__add-more:hover { color:#ff5c00; }
+.looq-cart__plus {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:18px; height:18px;
+  border:1.5px solid #1e1e1e; border-radius:4px;
+  font-weight:900; font-size:12px; line-height:1;
+}
+.looq-cart__close {
+  width:32px; height:32px; padding:0; border:0; background:transparent;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+}
+
+/* Body */
+.looq-cart__body {
+  flex:1; overflow-y:auto;
+  padding:0 16px;
+  background:#f4f4f4;
+}
+.looq-cart__empty {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:60px 20px;
+  color:rgba(30,30,30,0.7);
+}
+.looq-cart__empty p { margin:0 0 16px; font-size:15px; }
+.looq-cart__empty-cta {
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 20px;
+  background:#1e1e1e; color:#fff; text-decoration:none;
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight:400; font-size:13px; letter-spacing:3.5px;
+  text-transform:uppercase; border-radius:8px;
+}
+
+/* Item */
+.looq-cart__item {
+  display:flex; align-items:center; gap:12px;
+  padding:16px 0;
+  border-bottom:1px solid rgba(30,30,30,0.1);
+}
+.looq-cart__item:last-child { border-bottom:0; }
+.looq-cart__thumb {
+  flex-shrink:0;
+  width:78px; height:78px;
+  background:#fff;
+  border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+.looq-cart__thumb img {
+  max-width:100%; max-height:100%; object-fit:contain;
+}
+.looq-cart__meta {
+  flex:1; min-width:0;
+  display:flex; flex-direction:column; gap:6px;
+}
+.looq-cart__title {
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight:900; font-size:14px; line-height:1.1;
+  color:#1e1e1e;
+  text-transform:uppercase;
+}
+.looq-cart__scent {
+  display:inline-flex; align-items:center; gap:5px;
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight:400; font-size:10px; letter-spacing:1.5px;
+  color:rgba(30,30,30,0.65);
+  text-transform:uppercase;
+}
+.looq-cart__scent-dot {
+  display:inline-block; width:8px; height:8px; border-radius:50%;
+  background:var(--scent-color, #1e1e1e);
+}
+.looq-cart__qty {
+  display:inline-flex; align-items:center; gap:0;
+  background:#e0e0e0;
+  border-radius:6px;
+  padding:2px;
+  width:fit-content;
+  margin-top:2px;
+}
+.looq-cart__qty-btn {
+  width:24px; height:24px; padding:0; border:0; background:transparent;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight:900; font-size:14px; line-height:1;
+  color:#1e1e1e; cursor:pointer;
+  border-radius:4px; transition:background 120ms ease;
+}
+.looq-cart__qty-btn:hover { background:rgba(255,255,255,0.6); }
+.looq-cart__qty-val {
+  min-width:24px; padding:0 4px; text-align:center;
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight:900; font-size:13px;
+}
+.looq-cart__price {
+  flex-shrink:0;
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight:900; font-size:18px; line-height:1;
+  color:#1e1e1e;
+  white-space:nowrap;
+}
+
+/* Inlined-gallery shared styles. Used by looq-product-single/bundle/bathtub
+   templates. Lives in the cart drawer section because that section renders
+   on every page (loaded via header-group.json), so the CSS bundle gets these
+   rules without needing each product section to duplicate them. */
+.looq-gallery { position: relative; width: 100%; height: 430px; background: #fff; }
+.looq-gallery__track {
+  display: flex; width: 100%; height: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.looq-gallery__track::-webkit-scrollbar { display: none; }
+.looq-gallery__slide {
+  flex: 0 0 100%; width: 100%; height: 100%;
+  scroll-snap-align: start;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;  /* full-bleed — image fills the slide edge-to-edge per user spec */
+  box-sizing: border-box;
+}
+.looq-gallery__slide img {
+  width: 100%; height: 100%;
+  object-fit: cover;        /* fill slide; crop at edges if aspect mismatch */
+  object-position: center;
+}
+.looq-gallery__dots {
+  position: absolute; left: 50%; bottom: 12px;
+  transform: translateX(-50%);
+  display: flex; gap: 6px; z-index: 2;
+}
+.looq-gallery__dot {
+  width: 7px; height: 7px; padding: 0;
+  border: 0; border-radius: 50%;
+  background: rgba(30, 30, 30, 0.25);
+  cursor: pointer;
+  transition: background 200ms ease, transform 200ms ease;
+}
+.looq-gallery__dot.is-active { background: #1e1e1e; transform: scale(1.3); }
+
+/* Footer (sticky) */
+.looq-cart__foot {
+  flex-shrink:0;
+  padding:18px 16px;
+  background:#fff;
+  border-top:1px solid rgba(30,30,30,0.1);
+  display:flex; flex-direction:column; gap:14px;
+}
+.looq-cart__totals {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px;
+}
+.looq-cart__count {
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight:900; font-size:12px; letter-spacing:1.5px;
+  color:#ff5c00; text-transform:uppercase;
+}
+.looq-cart__total {
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight:400; font-size:14px;
+  color:#1e1e1e;
+}
+.looq-cart__total strong {
+  font-weight:900; font-size:20px; color:#ff5c00;
+  margin-left:6px;
+}
+.looq-cart__checkout {
+  display:inline-flex; align-items:center; justify-content:center;
+  height:50px;
+  background:#1e1e1e; color:#fff; text-decoration:none;
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight:400; font-size:16px;
+  letter-spacing:6.08px; text-transform:uppercase;
+  border-radius:8px;
+  transition:filter 160ms ease;
+}
+.looq-cart__checkout:hover { filter:brightness(1.12); }
+{% endstylesheet %}
+
+<script>
+(function(){
+  // Cart drawer controller — vanilla JS, no framework deps.
+  // Listens for:
+  //   - clicks on a[href="/cart"] or [data-cart-open] → opens drawer
+  //   - clicks on [data-cart-close] or backdrop → closes
+  //   - submit on product forms (form[action$="/cart/add"]) → AJAX add + open
+  //   - +/- buttons inside drawer → POST /cart/change.js
+  // Re-renders drawer body from /cart.js after any state change.
+
+  var drawer = document.getElementById('looq-cart');
+  if (!drawer) return;
+  var sheet = drawer.querySelector('.looq-cart__sheet');
+  var body = drawer.querySelector('[data-cart-items]');
+  var foot = drawer.querySelector('[data-cart-foot]');
+  var emptyEl = drawer.querySelector('[data-cart-empty]');
+  var countEl = drawer.querySelector('[data-cart-count]');
+  var totalEl = drawer.querySelector('[data-cart-total]');
+  var template = document.getElementById('looq-cart-item-template');
+
+  // Scent metaobject → swatch color map (mirrored from product sections).
+  var SCENT_COLORS = {
+    'vanilla-breeze':   '#ebd35d',
+    'velvet-rush':      '#6749c4',
+    'strawberry-fluff': '#ed3ea3',
+    'gummy-yummy':      '#61dddb'
+  };
+
+  function moneyFmt(cents) {
+    return 'LE ' + Math.round(cents / 100);
+  }
+
+  function scentFromVariant(item) {
+    // item.options is an array of variant option values (e.g. ["Vanilla Breeze"]).
+    // Match against known scent slugs.
+    var opts = (item.options || []).concat([item.variant_title || '']);
+    for (var i = 0; i < opts.length; i++) {
+      var slug = String(opts[i]).toLowerCase().replace(/\s+/g, '-');
+      if (SCENT_COLORS[slug]) return { slug: slug, name: opts[i] };
+    }
+    // Fallback: detect scent from product handle (e.g. "bodi-wosh-vanilla-breeze").
+    var h = (item.handle || '').toLowerCase();
+    for (var slug2 in SCENT_COLORS) {
+      if (h.indexOf(slug2) !== -1) return { slug: slug2, name: slug2.replace(/-/g, ' ').replace(/\b\w/g, function(c){return c.toUpperCase();}) };
+    }
+    return null;
+  }
+
+  function displayTitleFor(item) {
+    // Mirror the product-card-grid handle-based title mapping (server-side
+    // resolution can't be reused here since the cart is JS).
+    var h = (item.handle || '').toLowerCase();
+    if (h.indexOf('bodi-wosh-set') === 0) {
+      if (h.indexOf('of-3') !== -1) return 'BÖDI WÖSH SET OF 3';
+      if (h.indexOf('of-2') !== -1) return 'BÖDI WÖSH SET OF 2';
+      return 'BÖDI WÖSH SET';
+    }
+    if (h.indexOf('bodi-loshn-set') === 0) {
+      if (h.indexOf('of-3') !== -1) return 'BÖDI LÖSHN SET OF 3';
+      if (h.indexOf('of-2') !== -1) return 'BÖDI LÖSHN SET OF 2';
+      return 'BÖDI LÖSHN SET';
+    }
+    if (h.indexOf('hand-wosh-set') === 0) {
+      if (h.indexOf('of-3') !== -1) return 'HĀND WÖSH SET OF 3';
+      if (h.indexOf('of-2') !== -1) return 'HĀND WÖSH SET OF 2';
+    }
+    if (h === 'hand-wosh-bodi-loshn-set') return 'HĀND WÖSH & BÖDI LÖSHN SET';
+    if (h === 'bodi-set') return 'THE FÜLL SET';
+    if (h === 'the-bathtub-set') return 'THE BATHTUB SET';
+    if (h === 'the-mini-tub') return 'THE BATHTUB';
+    if (h.indexOf('bodi-wosh') === 0) return 'BÖDI WÖSH';
+    if (h.indexOf('bodi-loshn') === 0) return 'BÖDI LÖSHN';
+    if (h.indexOf('hand-wosh') === 0) return 'HĀND WÖSH';
+    if (h.indexOf('hand-krem') === 0) return 'HĀND KREM';
+    return (item.product_title || item.title || '').toUpperCase();
+  }
+
+  function renderItem(item) {
+    var frag = template.content.cloneNode(true);
+    var article = frag.querySelector('.looq-cart__item');
+    article.dataset.key = item.key;
+
+    var link = frag.querySelector('[data-cart-link]');
+    link.href = item.url;
+    var img = frag.querySelector('[data-cart-img]');
+    img.src = item.image || item.featured_image && item.featured_image.url;
+    img.alt = item.product_title || item.title;
+
+    frag.querySelector('[data-cart-title]').textContent = displayTitleFor(item);
+
+    var scent = scentFromVariant(item);
+    var scentWrap = frag.querySelector('[data-cart-scent]');
+    if (scent) {
+      scentWrap.hidden = false;
+      var dot = frag.querySelector('[data-cart-scent-dot]');
+      dot.style.setProperty('--scent-color', SCENT_COLORS[scent.slug]);
+      frag.querySelector('[data-cart-scent-name]').textContent = scent.name;
+    }
+
+    frag.querySelector('[data-cart-qty]').textContent = item.quantity;
+    frag.querySelector('[data-cart-line-price]').textContent = moneyFmt(item.final_line_price || item.line_price);
+    return frag;
+  }
+
+  function render(cart) {
+    body.innerHTML = '';
+    if (!cart.items || cart.items.length === 0) {
+      var emptyClone = emptyEl.cloneNode(true);
+      body.appendChild(emptyClone);
+      foot.hidden = true;
+      return;
+    }
+    cart.items.forEach(function(item) {
+      body.appendChild(renderItem(item));
+    });
+    foot.hidden = false;
+    countEl.textContent = cart.item_count;
+    totalEl.textContent = moneyFmt(cart.total_price);
+  }
+
+  function fetchCart() {
+    return fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
+      .then(function(r){ return r.json(); })
+      .then(function(cart){ render(cart); return cart; });
+  }
+
+  function changeLine(key, qty) {
+    return fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ id: key, quantity: qty })
+    }).then(function(r){ return r.json(); }).then(function(cart){ render(cart); return cart; });
+  }
+
+  function open() {
+    drawer.setAttribute('aria-hidden', 'false');
+    document.documentElement.style.overflow = 'hidden';
+    fetchCart();
+  }
+  function close() {
+    drawer.setAttribute('aria-hidden', 'true');
+    document.documentElement.style.overflow = '';
+  }
+
+  // Cart icon — intercept navigation to /cart
+  document.addEventListener('click', function(e){
+    var trigger = e.target.closest('a[href="/cart"], [data-cart-open]');
+    if (trigger) {
+      e.preventDefault();
+      open();
+      return;
+    }
+    var closer = e.target.closest('[data-cart-close], [data-cart-close-on-click]');
+    if (closer) {
+      if (closer.hasAttribute('data-cart-close-on-click')) {
+        // Allow navigation, close after a tick so backdrop doesn't flash
+        setTimeout(close, 50);
+      } else {
+        close();
+      }
+      return;
+    }
+  });
+
+  // +/- quantity buttons (delegated)
+  body.addEventListener('click', function(e){
+    var line = e.target.closest('[data-cart-line]');
+    if (!line) return;
+    var key = line.dataset.key;
+    var qtyEl = line.querySelector('[data-cart-qty]');
+    var qty = parseInt(qtyEl.textContent, 10) || 1;
+    if (e.target.closest('[data-cart-increase]')) {
+      changeLine(key, qty + 1);
+    } else if (e.target.closest('[data-cart-decrease]')) {
+      changeLine(key, Math.max(0, qty - 1));
+    }
+  });
+
+  // Intercept Add To Cart submits
+  document.addEventListener('submit', function(e){
+    var form = e.target;
+    if (!(form.matches && form.matches('form[action*="/cart/add"]'))) return;
+    e.preventDefault();
+    var fd = new FormData(form);
+    fetch('/cart/add.js', { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } })
+      .then(function(r){ return r.json(); })
+      .then(function(){ open(); });
+  });
+
+  // Product-card cart icon: AJAX-add the variant from data-variant-id.
+  // Click is delegated so it works for cards rendered async too.
+  // stopPropagation + preventDefault keeps the wrapping <a> link from
+  // navigating to the product page when the user clicks the cart icon.
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('[data-add-to-cart][data-variant-id]');
+    if (!btn) return;
+    var variantId = btn.getAttribute('data-variant-id');
+    if (!variantId) return;
+    e.preventDefault();
+    e.stopPropagation();
+    var body = new URLSearchParams({ id: variantId, quantity: '1' });
+    fetch('/cart/add.js', {
+      method: 'POST',
+      body: body,
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' }
+    })
+      .then(function(r){ return r.json(); })
+      .then(function(){ open(); });
+  });
+
+  // Esc to close
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && drawer.getAttribute('aria-hidden') === 'false') close();
+  });
+
+  // ──────────────────────────────────────────────────────────────
+  // Side-effect: footer auto-link (lives in the cart drawer section
+  // because that section synced reliably while the footer.liquid
+  // change is stuck in the Shopify GitHub integration backlog).
+  // Wraps `<p class="looq-footer__item">Terms of Service</p>` style
+  // plain-text entries with their canonical /policies/* / /pages/*
+  // anchors so they become clickable.
+  // ──────────────────────────────────────────────────────────────
+  var FOOTER_LINKS = {
+    /* Policies now point to custom Figma-matched /pages/* templates
+       (looq-policy-page section) instead of Shopify's stock /policies/*
+       admin-config-driven templates. Same URLs visible to users; we get
+       full control over the design. */
+    'terms of service':  '/pages/terms-of-service',
+    'shipping policy':   '/pages/shipping-policy',
+    'privacy policy':    '/pages/privacy-policy',
+    'refund policy':     '/pages/refund-policy',
+    'our story':         '/pages/our-story',
+    'faq':               '/pages/faq'
+  };
+  // These open the menu drawer + jump to a sub-panel instead of navigating to a page.
+  // Business → opens drawer + shows BUSINESS sub-menu (LOOQ Creators / Retailers / etc.)
+  // Connect  → opens drawer + shows CONNECT sub-menu (Support / FAQ / Contact / etc.)
+  var FOOTER_DRAWER_PANELS = {
+    'business': 'business',
+    'connect':  'connect'
+  };
+  function openDrawerSubPanel(panelName) {
+    var trigger = document.querySelector('[data-menu-trigger]');
+    if (trigger) trigger.click();
+    // showPanel reset happens inside the drawer's openMenu; jump to the sub-panel
+    // on the next tick so it runs after openMenu's showPanel('main').
+    setTimeout(function(){
+      var subBtn = document.querySelector('[data-menu-open="' + panelName + '"]');
+      if (subBtn) subBtn.click();
+    }, 30);
+  }
+  function autoLinkFooter() {
+    var items = document.querySelectorAll('.looq-footer__item');
+    items.forEach(function(p){
+      // Skip if already converted
+      if (p.querySelector('a') || p.querySelector('button')) return;
+      var text = p.textContent.trim();
+      var lower = text.toLowerCase();
+
+      // Drawer-trigger items (Business, Connect)
+      if (FOOTER_DRAWER_PANELS[lower]) {
+        var panel = FOOTER_DRAWER_PANELS[lower];
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'looq-footer__link';
+        btn.textContent = text;
+        // Inherit the same styling as a link
+        btn.style.cssText = 'color:inherit;background:transparent;border:0;padding:0;font:inherit;cursor:pointer;text-align:left;';
+        btn.addEventListener('click', function(e){
+          e.preventDefault();
+          openDrawerSubPanel(panel);
+        });
+        p.textContent = '';
+        p.appendChild(btn);
+        return;
+      }
+
+      // Plain page/policy/email links
+      var href = FOOTER_LINKS[lower];
+      if (!href && text.indexOf('@') !== -1) {
+        href = 'mailto:' + text;
+      }
+      if (!href) return;
+      var a = document.createElement('a');
+      a.href = href;
+      a.className = 'looq-footer__link';
+      a.textContent = text;
+      a.style.color = 'inherit';
+      a.style.textDecoration = 'none';
+      p.textContent = '';
+      p.appendChild(a);
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', autoLinkFooter);
+  } else {
+    autoLinkFooter();
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // Inlined-gallery controller. Lives here for the same reason as
+  // the gallery CSS above — runs globally so any product page with
+  // multiple images gets the swipe + dots behavior.
+  // ──────────────────────────────────────────────────────────────
+  function initGalleries() {
+    document.querySelectorAll('[data-gallery]:not([data-gallery-init])').forEach(function(gallery){
+      gallery.setAttribute('data-gallery-init', '1');
+      var track = gallery.querySelector('[data-gallery-track]');
+      var dots = gallery.querySelectorAll('[data-gallery-dot]');
+      var slides = gallery.querySelectorAll('[data-gallery-slide]');
+      if (!track || dots.length === 0) return;
+      dots.forEach(function(dot){
+        dot.addEventListener('click', function(){
+          var i = parseInt(dot.dataset.galleryDot, 10);
+          var slide = slides[i];
+          if (slide) track.scrollTo({ left: slide.offsetLeft, behavior: 'smooth' });
+        });
+      });
+      var ticking = false;
+      track.addEventListener('scroll', function(){
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function(){
+          var w = track.clientWidth;
+          var idx = Math.round(track.scrollLeft / w);
+          dots.forEach(function(d, i){ d.classList.toggle('is-active', i === idx); });
+          ticking = false;
+        });
+      });
+
+      // Mouse + pointer drag-to-swipe for desktop. Touch already works
+      // natively via scroll-snap-type; this fills the desktop gap so
+      // mouse users can drag horizontally the same way mobile users swipe.
+      var isDown = false, startX = 0, startScroll = 0, lastX = 0, lastT = 0, velocity = 0;
+      track.addEventListener('pointerdown', function(e){
+        if (e.pointerType === 'touch') return;  // let native touch handle it
+        isDown = true;
+        startX = e.clientX;
+        startScroll = track.scrollLeft;
+        lastX = e.clientX;
+        lastT = performance.now();
+        track.style.scrollBehavior = 'auto';
+        track.style.cursor = 'grabbing';
+        track.setPointerCapture(e.pointerId);
+      });
+      track.addEventListener('pointermove', function(e){
+        if (!isDown) return;
+        var dx = e.clientX - startX;
+        track.scrollLeft = startScroll - dx;
+        var now = performance.now();
+        velocity = (e.clientX - lastX) / Math.max(1, now - lastT);
+        lastX = e.clientX;
+        lastT = now;
+      });
+      function endDrag(e){
+        if (!isDown) return;
+        isDown = false;
+        track.style.cursor = '';
+        track.style.scrollBehavior = '';
+        // Snap to nearest slide; if user flicked fast, advance one slide in fling direction
+        var w = track.clientWidth;
+        var idx = Math.round(track.scrollLeft / w);
+        if (Math.abs(velocity) > 0.5) {
+          idx += velocity < 0 ? 1 : -1;
+        }
+        idx = Math.max(0, Math.min(slides.length - 1, idx));
+        var slide = slides[idx];
+        if (slide) track.scrollTo({ left: slide.offsetLeft, behavior: 'smooth' });
+      }
+      track.addEventListener('pointerup', endDrag);
+      track.addEventListener('pointercancel', endDrag);
+      track.addEventListener('pointerleave', endDrag);
+      // Visual affordance: grab cursor when hovering
+      track.style.cursor = 'grab';
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGalleries);
+  } else {
+    initGalleries();
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Cart drawer",
+  "tag": "aside",
+  "settings": [],
+  "presets": [{ "name": "Cart drawer", "category": "LOOQ" }]
+}
+{% endschema %}

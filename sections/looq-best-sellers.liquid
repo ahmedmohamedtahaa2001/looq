@@ -1,0 +1,271 @@
+{%- comment -%}
+  LOOQ — Best Sellers section
+  Y-range in Figma page frame: 2229..2968 (~739 px)
+  Frame node 34:379. White background, purple eyebrow + split-color headline.
+  Three horizontal cards with photos that overflow the card top edge.
+  All sizes / colors match Figma exactly except ingredient line (5px → 8px).
+{%- endcomment -%}
+
+<section class="looq-bestsellers" data-section-id="{{ section.id }}">
+  <div class="looq-bestsellers__inner">
+    <p class="looq-bestsellers__eyebrow">{{ section.settings.eyebrow | default: 'QUICK PICKS' }}</p>
+
+    <div class="looq-bestsellers__top">
+      <h2 class="looq-bestsellers__headline">
+        <span class="looq-bestsellers__headline-1">{{ section.settings.headline_part1 | default: 'BEST' }}</span>
+        <span class="looq-bestsellers__headline-2">{{ section.settings.headline_part2 | default: 'SELLERS.' }}</span>
+      </h2>
+      <a class="looq-bestsellers__see-all" href="{{ section.settings.see_all_url | default: '/pages/best-sellers' }}">
+        {{ section.settings.see_all_label | default: 'SEE ALL' }}
+        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+
+    <div class="looq-bestsellers__list" role="list">
+      {%- assign live_collection = section.settings.collection -%}
+      {%- if live_collection != blank and live_collection.products.size > 0 -%}
+        {%- for product in live_collection.products limit: 3 -%}
+          <div role="listitem">{% render 'looq-product-card-feature', product: product %}</div>
+        {%- endfor -%}
+      {%- else -%}
+        {%- comment -%} Ordered ascending by price per user request. Bödi Set replaced with Bödi Wösh Set of 3 (Bathtub Set is large/premium, not a "quick pick"). {%- endcomment -%}
+        <div role="listitem">{% render 'looq-product-card-feature', card_t1: 'THE WÖSH', card_t2: 'SET',  card_price: 'LE 290',  card_image: 'looq-bs-product-3.png', card_ingredients: 'BÖDI WÖSH,HĀND WÖSH', card_url: '/products/hand-wosh-bodi-loshn-set' %}</div>
+        <div role="listitem">{% render 'looq-product-card-feature', card_t1: 'BÖDI WÖSH', card_t2: 'SET OF 3', card_price: 'LE 400', card_image: 'looq-bs-product-3.png', card_ingredients: 'VANILLA,VELVET,STRAWBERRY,GUMMY', card_url: '/products/bodi-wosh-set-of-3' %}</div>
+        <div role="listitem">{% render 'looq-product-card-feature', card_t1: 'THE FÜLL', card_t2: 'SET',  card_price: 'LE 450',  card_image: 'looq-bs-product-2.png', card_ingredients: 'BÖDI WÖSH,HĀND WÖSH,BÖDI LÖSHN', card_url: '/products/bodi-set' %}</div>
+      {%- endif -%}
+    </div>
+
+    <h2 class="looq-bestsellers__pyv">
+      <span>{{ section.settings.pyv_part1 | default: 'PICK' }}</span>
+      <span>{{ section.settings.pyv_part2 | default: 'YOUR VIBE.' }}</span>
+    </h2>
+  </div>
+</section>
+
+{% stylesheet %}
+.looq-bestsellers {
+  position: relative;
+  width: 100%; margin: 0 auto;
+  background: #ffffff;
+  padding: 28px 0 36px;
+  overflow: hidden;
+}
+.looq-bestsellers__inner {
+  position: relative;
+  padding-inline: 17px;
+}
+
+.looq-bestsellers__eyebrow {
+  /* Figma: 12px PP Radio Grotesk Regular, line-height 25px, letter-spacing 3.96px, color #6749c4 */
+  margin: 0 0 26px; padding: 0;
+  font-family: var(--font-body, 'PP Radio Grotesk', sans-serif);
+  font-weight: 400;
+  font-size: 12px; line-height: 25px;
+  letter-spacing: 3.96px;
+  color: #6749c4;
+  text-transform: uppercase;
+}
+
+.looq-bestsellers__top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 30px;
+}
+.looq-bestsellers__headline {
+  /* Figma: 40px ABC Repro Ultra, leading-none, BEST=#292828, SELLERS.=#6749c4 */
+  margin: 0; padding: 0;
+  font-family: var(--font-display, 'ABC Repro Ultra', sans-serif);
+  font-weight: 950;
+  font-size: 40px; line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.looq-bestsellers__see-all {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-bottom: 6px;     /* baseline-align with the headline's lower line */
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 900; font-size: 11px; letter-spacing: 2.5px;
+  color: #6749c4;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.looq-bestsellers__see-all:hover { color: #1e1e1e; }
+.looq-bestsellers__see-all svg { flex-shrink: 0; }
+.looq-bestsellers__headline-1 { color: #292828; display: block; }
+.looq-bestsellers__headline-2 { color: #6749c4; display: block; }
+
+.looq-bestsellers__list {
+  display: flex; flex-direction: column;
+  align-items: center;   /* center each [role="listitem"] within the parent */
+  gap: 26px;       /* Extra gap because photos overflow card top */
+  margin: 18px 0 38px;
+}
+
+.looq-bestsellers__list [role="listitem"] {
+  width: 100%; max-width: 354px;   /* match the card width so it sits centered */
+}
+
+/* ─── Card ───────────────────────────────────────────────── */
+.product-card-feature {
+  /* Figma baseline: 354×138. Switched to `min-height` so longer product
+     titles (HĀND WÖSH & BÖDI LÖSHN SET) can grow the card vertically
+     instead of overflowing. Short titles still render at the original
+     138px height. */
+  position: relative;
+  display: block;
+  width: 100%; max-width: 354px;
+  min-height: 138px;
+  padding-bottom: 50px;       /* reserve space for absolutely-positioned price + actions */
+  background: rgba(103, 73, 196, 0.13);
+  text-decoration: none;
+  color: #1e1e1e;
+  /* NO overflow:hidden — photos must escape the top edge */
+}
+
+.product-card-feature__media {
+  /* Photo container at x=28, y=156 in frame, card top y=168. Photo overflows
+     above card by 12 px. Width 104, height 130 in Figma. We mirror those. */
+  position: absolute;
+  left: 12px;
+  top: -12px;
+  width: 104px;
+  height: 130px;
+  display: flex; align-items: center; justify-content: center;
+}
+.product-card-feature__media img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+}
+
+.product-card-feature__info {
+  /* Figma title at left=150 y=204 (relative card top=36). */
+  position: absolute;
+  left: 134px;
+  top: 36px;
+  right: 16px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.product-card-feature__title {
+  /* Figma: PP Radio Grotesk Black 24px, leading-none, #1e1e1e */
+  margin: 0; padding: 0;
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.05;
+  color: #1e1e1e;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  /* Long product titles (e.g. "HĀND WÖSH & BÖDI LÖSHN SET") wrap inside
+     the card instead of overflowing the right edge. Slight font-size drop
+     22px (was 24px) keeps the visual rhythm with the rest of the card. */
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+.product-card-feature__title-line {
+  display: block;
+  white-space: normal;
+}
+.product-card-feature__variants {
+  /* Dots row, own line below the title. Stays inside the card on any
+     product-name length. */
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+.product-card-feature__dot {
+  display: inline-block;
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.product-card-feature__ingredients {
+  /* Figma says 5px — practical floor is 8px for legibility on real devices */
+  margin: 0; padding: 0;
+  font-family: var(--font-body, 'PP Radio Grotesk', sans-serif);
+  font-weight: 400;
+  font-size: 8px;
+  line-height: 1.2;
+  color: rgba(30, 30, 30, 0.58);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.product-card-feature__sep {
+  display: inline-block;
+  margin: 0 5px;
+  font-size: 6px;
+  vertical-align: middle;
+  color: rgba(30, 30, 30, 0.55);
+}
+
+.product-card-feature__price {
+  /* Figma: at x=45 y=277 (card top=168, so 109 from top). 20px PP Black */
+  position: absolute;
+  left: 29px;
+  bottom: 16px;
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 900;
+  font-size: 20px;
+  line-height: 1;
+  color: #1e1e1e;
+}
+
+.product-card-feature__actions {
+  /* Figma: at x=304 y=276, bottom-right of card */
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  display: flex; flex-direction: row;
+  gap: 10px;
+}
+.product-card-feature__action {
+  /* The action was originally a <span>; switched to a <button> so it
+     can take data-add-to-cart and fire the cart AJAX. These resets
+     undo browser default button styling (border, padding, bg) so it
+     looks identical to the icon-only original. */
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 23px; height: 23px;
+  background: transparent; border: 0; padding: 0; margin: 0;
+  color: #1e1e1e;
+  cursor: pointer;
+}
+.product-card-feature__action .icon { width: 21px; height: 21px; }
+
+/* ─── Trailing PICK YOUR VIBE ─── */
+.looq-bestsellers__pyv {
+  /* Figma: 36px ABC Repro Ultra, color #6749c4 */
+  margin: 0; padding: 0;
+  font-family: var(--font-display, 'ABC Repro Ultra', sans-serif);
+  font-weight: 950;
+  font-size: 36px; line-height: 1;
+  color: #6749c4;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.looq-bestsellers__pyv span { display: block; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Best Sellers",
+  "tag": "section",
+  "class": "section--looq-bestsellers",
+  "settings": [
+    { "type": "header", "content": "Eyebrow + headline" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "QUICK PICKS" },
+    { "type": "text", "id": "headline_part1", "label": "Headline line 1", "default": "BEST" },
+    { "type": "text", "id": "headline_part2", "label": "Headline line 2", "default": "SELLERS." },
+    { "type": "header", "content": "Products" },
+    { "type": "collection", "id": "collection", "label": "Best-sellers collection (overrides demo)" },
+    { "type": "header", "content": "Trailing PICK YOUR VIBE" },
+    { "type": "text", "id": "pyv_part1", "label": "Line 1", "default": "PICK" },
+    { "type": "text", "id": "pyv_part2", "label": "Line 2", "default": "YOUR VIBE." }
+  ],
+  "presets": [{ "name": "Best Sellers", "category": "LOOQ" }]
+}
+{% endschema %}

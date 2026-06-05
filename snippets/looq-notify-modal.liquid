@@ -1,0 +1,178 @@
+{%- comment -%}
+  Notify-me modal — opens when a product is sold-out and the shopper
+  clicks "Notify me when available". Submits via Shopify's built-in
+  Customer Contact form so the request lands as a customer in Admin
+  tagged `notify-back-in-stock`, with the product title + variant id
+  captured in additional fields (visible in the Customer detail page).
+
+  Inputs:
+    - product (required)
+    - current_variant (required) — the currently-selected variant (may
+      change as the shopper picks scents; the form's hidden Variant ID
+      input updates from the page's [data-variant-id-input] on open).
+
+  Trigger: any element with [data-notify-open]
+  Close:   any element with [data-notify-close] OR Escape key
+{%- endcomment -%}
+
+<div class="looq-notify" id="looq-notify-{{ product.id }}" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Notify me when available">
+  <div class="looq-notify__backdrop" data-notify-close></div>
+  <div class="looq-notify__sheet" role="document">
+    <button type="button" class="looq-notify__close" data-notify-close aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M2 2l12 12M14 2L2 14"/>
+      </svg>
+    </button>
+
+    {%- form 'customer', class: 'looq-notify__form' -%}
+      <input type="hidden" name="contact[tags]" value="notify-back-in-stock">
+      <input type="hidden" name="contact[Product]" value="{{ product.title | escape }}">
+      <input type="hidden" name="contact[Variant ID]" value="{{ current_variant.id }}" data-notify-variant>
+
+      {%- if form.posted_successfully? -%}
+        <p class="looq-notify__success">Thanks — we'll email you when this scent is back in stock.</p>
+      {%- else -%}
+        <h3 class="looq-notify__title">Notify me when available</h3>
+        <p class="looq-notify__lede">Get a single email the moment <strong>{{ product.title }}</strong> is back. No spam.</p>
+
+        {%- if form.errors -%}
+          <p class="looq-notify__error">{{ form.errors | default_errors }}</p>
+        {%- endif -%}
+
+        <label class="looq-notify__field" for="looq-notify-email-{{ product.id }}">
+          <span class="visually-hidden">Email address</span>
+          <input id="looq-notify-email-{{ product.id }}" type="email" name="contact[email]" placeholder="Your email" required autocomplete="email">
+        </label>
+
+        <button type="submit" class="looq-notify__submit">Notify me</button>
+      {%- endif -%}
+    {%- endform -%}
+  </div>
+</div>
+
+{% stylesheet %}
+.looq-notify {
+  position: fixed; inset: 0; z-index: 100000;
+  display: none;
+}
+.looq-notify[aria-hidden="false"] { display: block; }
+.looq-notify__backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: block !important;
+}
+.looq-notify__sheet {
+  position: relative;
+  max-width: 460px;
+  margin: 12vh auto 0;
+  background: #fff;
+  padding: 32px 28px 28px;
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+}
+.looq-notify__close {
+  position: absolute; top: 12px; right: 12px;
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; padding: 0; cursor: pointer;
+  color: #1e1e1e;
+}
+.looq-notify__title {
+  margin: 0 0 8px; padding: 0;
+  font-family: var(--font-display, 'ABC Repro Ultra', sans-serif);
+  font-weight: 950;
+  font-size: 22px; line-height: 1.1;
+  text-transform: uppercase;
+  color: #1e1e1e;
+}
+.looq-notify__lede {
+  margin: 0 0 20px; padding: 0;
+  font-family: var(--font-body, 'PP Radio Grotesk', sans-serif);
+  font-size: 14px; line-height: 1.5; color: rgba(30,30,30,0.75);
+}
+.looq-notify__lede strong { color: #1e1e1e; font-weight: 900; }
+.looq-notify__field { display: block; margin: 0 0 14px; }
+.looq-notify__field input {
+  width: 100%; box-sizing: border-box;
+  padding: 14px 16px;
+  font-family: var(--font-body); font-size: 15px;
+  border: 1px solid rgba(30,30,30,0.18); border-radius: 8px;
+  background: #fff; color: #1e1e1e;
+}
+.looq-notify__field input:focus {
+  outline: 2px solid #6749c4; outline-offset: 1px;
+}
+.looq-notify__submit {
+  width: 100%; padding: 14px 16px;
+  background: #1e1e1e; color: #fff;
+  border: 0; cursor: pointer;
+  font-family: var(--font-product); font-weight: 900;
+  font-size: 14px; letter-spacing: 3px; text-transform: uppercase;
+}
+.looq-notify__submit:hover { filter: brightness(1.1); }
+.looq-notify__success {
+  margin: 16px 0 0; padding: 14px 16px;
+  background: rgba(62, 180, 179, 0.12);
+  border: 1px solid #3eb4b3;
+  border-radius: 8px;
+  font-family: var(--font-body); font-size: 14px; line-height: 1.4;
+  color: #1e1e1e;
+}
+.looq-notify__error {
+  margin: 0 0 14px; padding: 12px 14px;
+  background: rgba(237, 62, 163, 0.08);
+  border: 1px solid #ed3ea3;
+  border-radius: 6px;
+  font-size: 13px; color: #1e1e1e;
+}
+{% endstylesheet %}
+
+<script>
+  (function(){
+    var modal = document.getElementById('looq-notify-{{ product.id }}');
+    if (!modal) return;
+    var variantInput = modal.querySelector('[data-notify-variant]');
+
+    // Open: any [data-notify-open] on the page targeting this product.
+    // We accept any data-notify-open click and sync the variant ID
+    // from the form's hidden variant input ([data-variant-id-input])
+    // before opening, so the email captures the LATEST variant chosen
+    // by the shopper.
+    document.addEventListener('click', function(e){
+      var opener = e.target.closest && e.target.closest('[data-notify-open]');
+      if (!opener) return;
+      // Only respond if this opener is for this product's modal.
+      // We scope by checking the closest .looq-product matches.
+      var section = opener.closest('.looq-product');
+      if (section) {
+        var hiddenVar = section.querySelector('[data-variant-id-input]');
+        if (hiddenVar && variantInput) variantInput.value = hiddenVar.value;
+      }
+      e.preventDefault();
+      modal.setAttribute('aria-hidden', 'false');
+      document.documentElement.style.overflow = 'hidden';
+    });
+
+    // Close: backdrop click, X button, Escape key
+    modal.addEventListener('click', function(e){
+      if (e.target.closest('[data-notify-close]')) {
+        e.preventDefault();
+        modal.setAttribute('aria-hidden', 'true');
+        document.documentElement.style.overflow = '';
+      }
+    });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') {
+        modal.setAttribute('aria-hidden', 'true');
+        document.documentElement.style.overflow = '';
+      }
+    });
+
+    // If the page reloaded with form posted successfully, auto-open the
+    // modal so the shopper sees the confirmation. (Liquid {% form %}
+    // round-trips: posted_successfully? gets baked into HTML on next render.)
+    {%- if form.posted_successfully? -%}
+      modal.setAttribute('aria-hidden', 'false');
+    {%- endif -%}
+  })();
+</script>

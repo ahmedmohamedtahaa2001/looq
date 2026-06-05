@@ -1,0 +1,83 @@
+{%- comment -%}
+  LOOQ — Retailers page (Figma 76:504, 390 × 844)
+  Pattern B: blue hero + body + bottom marquee.
+{%- endcomment -%}
+
+<section class="looq-page looq-page--retailers" data-section-id="{{ section.id }}">
+  <div class="looq-page__hero">
+    <div class="looq-page__watermark" aria-hidden="true">{% render 'looq-infinity' %}</div>
+    <h1 class="looq-page__title">RETAILERS</h1>
+  </div>
+
+  <div class="looq-page__body">
+    <h2 class="looq-page__heading">Stock <mark>LOOQ.</mark><br>Sell with<br><mark>confidence.</mark></h2>
+
+    <p>Bulk buying for small <mark>pharmacies, supermarkets, and retail stores</mark>.</p>
+    <p>We work with pharmacies, supermarkets, and retail stores that want to offer LOOQ products to their customers, both <mark>in-store and online.</mark></p>
+    <p>Retail partners can buy <mark>LOOQ</mark> products in bulk at wholesale prices designed to support healthy margins and consistent brand quality.</p>
+
+    <p class="looq-page__cta-text">Submit your details to start selling LOOQ in your store.</p>
+  </div>
+
+  <div class="looq-page__marquee" aria-hidden="true">
+    <div class="looq-page__marquee-track">
+      {%- for i in (1..16) -%}
+        <span class="looq-page__marquee-text">also called yours</span>
+        <img class="looq-page__marquee-icon" src="{{ 'looq-marquee-icon.png' | asset_url }}" width="12" height="6" alt="">
+        <span class="looq-page__marquee-text">retailers</span>
+        <img class="looq-page__marquee-icon" src="{{ 'looq-marquee-icon.png' | asset_url }}" width="12" height="6" alt="">
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {% render 'looq-business-form', form_type: 'retailers' %}
+</section>
+
+{% stylesheet %}
+.looq-page { width:100%; max-width:390px; margin:0 auto; background:#fff; }
+.looq-page--retailers { --page-accent:#3559ef; }
+.looq-page__hero { position:relative; overflow:hidden; }
+.looq-page__watermark {
+  position:absolute; right:-40%; top:50%; transform:translateY(-50%);
+  width:420px; height:190px; pointer-events:none; user-select:none;
+  color: rgba(0, 0, 0, 0.12);
+}
+.looq-page__hero { width:100%; height:200px; background:var(--page-accent);
+  display:flex; align-items:center;
+  padding:77px 19px 0; }
+.looq-page__title { margin:0; padding:0;
+  font-family:var(--font-display, 'ABC Repro Ultra', sans-serif); font-weight:950;
+  font-size:58px; white-space:nowrap; line-height:1; color:#fff; text-transform:uppercase; letter-spacing:-1px; }
+.looq-page__body { padding:22px 19px 36px; }
+.looq-page__heading { margin:0 0 24px; padding:0;
+  font-family:var(--font-display, 'ABC Repro Ultra', sans-serif); font-weight:950;
+  font-size:32px; line-height:1; color:#1e1e1e; text-transform:uppercase; }
+.looq-page__heading mark { background:transparent; color:var(--page-accent); }
+.looq-page__body p { margin:0 0 16px; padding:0;
+  font-family:var(--font-body); font-weight:400;
+  font-size:13px; line-height:25px; color:#1e1e1e; }
+.looq-page__body p mark { background:transparent; color:var(--page-accent); }
+.looq-page__cta-text { font-family:var(--font-product) !important; font-weight:900 !important;
+  color:var(--page-accent) !important; margin-top:24px !important; }
+
+.looq-page__marquee { width:100%; height:25px; background:var(--page-accent);
+  border-top:1px solid rgba(0,0,0,0.3); border-bottom:1px solid rgba(0,0,0,0.3);
+  overflow:hidden; display:flex; align-items:center; }
+.looq-page__marquee-track { display:inline-flex; align-items:center;
+  gap:33px; padding-inline:33px; height:100%; white-space:nowrap;
+  animation:looq-page-marquee 28s linear infinite; }
+.looq-page__marquee-text { font-family:var(--font-italic-display); font-style:italic;
+  font-weight:200; font-size:12px; line-height:1; color:#fff; flex-shrink:0; }
+.looq-page__marquee-icon { display:block; width:12px; height:6px; aspect-ratio:2/1;
+  flex-shrink:0; filter:brightness(0) invert(1); }
+@keyframes looq-page-marquee { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+.looq-page__title { white-space:nowrap; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "LOOQ Retailers",
+  "settings": [],
+  "presets": [{ "name": "LOOQ Retailers", "category": "LOOQ" }]
+}
+{% endschema %}

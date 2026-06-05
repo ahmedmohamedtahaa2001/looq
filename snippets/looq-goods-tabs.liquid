@@ -1,0 +1,89 @@
+{%- comment -%}
+  LOOQ — Goods tabs (BŌDI WŌSH / BŌDI LŌSHN / HĀND WŌSH)
+
+  Renders the 3-tab nav + 3 stacked panels of products. CSS toggles which
+  panel is visible via the .is-active modifier. Vanilla custom element
+  <looq-goods-tabs> handles tap-to-switch — no swipe, no animation.
+
+  Used by:
+    - sections/looq-the-goods.liquid       (home, limit=6)
+    - sections/looq-collection-tabs.liquid (collection page, limit=12)
+
+  Inputs:
+    bw_collection / bl_collection / hw_collection — Shopify Collection objects
+    limit (int, default 6)                        — products per panel
+    default_tab ('bw'|'bl'|'hw', default 'bw')    — which tab is active on load
+{%- endcomment -%}
+
+{%- assign limit = limit | default: 6 -%}
+{%- assign default_tab = default_tab | default: 'bw' -%}
+
+{%- comment -%}
+  Resolve each collection setting to a live Collection object. JSON-template
+  collection settings can come through as raw handle strings (Liquid only
+  auto-resolves them to Collection objects when they were set via theme
+  editor). The `.handle | default: value` trick:
+    - Collection object → .handle returns "body-wash"
+    - String "body-wash" → .handle returns nil, default: falls through to
+      the string itself
+  Either way, `collections[handle]` returns the live object.
+{%- endcomment -%}
+{%- assign bw_handle = bw_collection.handle | default: bw_collection -%}
+{%- assign bl_handle = bl_collection.handle | default: bl_collection -%}
+{%- assign hw_handle = hw_collection.handle | default: hw_collection -%}
+{%- assign bw_col = collections[bw_handle] -%}
+{%- assign bl_col = collections[bl_handle] -%}
+{%- assign hw_col = collections[hw_handle] -%}
+
+<looq-goods-tabs class="looq-goods-tabs" data-default-tab="{{ default_tab }}">
+  <div class="looq-goods-tabs__nav" role="tablist" aria-label="Product categories">
+    <button type="button" class="looq-goods-tabs__tab{% if default_tab == 'bw' %} is-active{% endif %}" role="tab"
+            aria-selected="{% if default_tab == 'bw' %}true{% else %}false{% endif %}" data-target="bw">
+      <span>BÖDI</span><span>WÖSH</span>
+    </button>
+    <button type="button" class="looq-goods-tabs__tab{% if default_tab == 'bl' %} is-active{% endif %}" role="tab"
+            aria-selected="{% if default_tab == 'bl' %}true{% else %}false{% endif %}" data-target="bl">
+      <span>BÖDI</span><span>LÖSHN</span>
+    </button>
+    <button type="button" class="looq-goods-tabs__tab{% if default_tab == 'hw' %} is-active{% endif %}" role="tab"
+            aria-selected="{% if default_tab == 'hw' %}true{% else %}false{% endif %}" data-target="hw">
+      <span>HĀND</span><span>WÖSH</span>
+    </button>
+  </div>
+
+  <hr class="looq-goods-tabs__divider" aria-hidden="true">
+
+  <div class="looq-goods-tabs__panels">
+    {%- comment -%} Sort each tab's product list ascending by price so cheapest single → bundles last. {%- endcomment -%}
+    <div class="looq-goods-tabs__panel{% if default_tab == 'bw' %} is-active{% endif %}" data-id="bw" role="tabpanel" aria-label="Bödi Wösh">
+      {%- if bw_col != blank and bw_col.products.size > 0 -%}
+        {%- assign bw_sorted = bw_col.products | sort: 'price' -%}
+        {%- for product in bw_sorted limit: limit -%}
+          {% render 'looq-product-card-grid', product: product %}
+        {%- endfor -%}
+      {%- else -%}
+        <p class="looq-goods-tabs__empty">No products yet in this collection.</p>
+      {%- endif -%}
+    </div>
+    <div class="looq-goods-tabs__panel{% if default_tab == 'bl' %} is-active{% endif %}" data-id="bl" role="tabpanel" aria-label="Bödi Löshn">
+      {%- if bl_col != blank and bl_col.products.size > 0 -%}
+        {%- assign bl_sorted = bl_col.products | sort: 'price' -%}
+        {%- for product in bl_sorted limit: limit -%}
+          {% render 'looq-product-card-grid', product: product %}
+        {%- endfor -%}
+      {%- else -%}
+        <p class="looq-goods-tabs__empty">No products yet in this collection.</p>
+      {%- endif -%}
+    </div>
+    <div class="looq-goods-tabs__panel{% if default_tab == 'hw' %} is-active{% endif %}" data-id="hw" role="tabpanel" aria-label="Hānd Wösh">
+      {%- if hw_col != blank and hw_col.products.size > 0 -%}
+        {%- assign hw_sorted = hw_col.products | sort: 'price' -%}
+        {%- for product in hw_sorted limit: limit -%}
+          {% render 'looq-product-card-grid', product: product %}
+        {%- endfor -%}
+      {%- else -%}
+        <p class="looq-goods-tabs__empty">No products yet in this collection.</p>
+      {%- endif -%}
+    </div>
+  </div>
+</looq-goods-tabs>

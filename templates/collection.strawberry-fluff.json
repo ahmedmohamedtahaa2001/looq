@@ -1,0 +1,13 @@
+{
+  "order": [
+    "main"
+  ],
+  "sections": {
+    "main": {
+      "settings": {
+        "products_per_page": 12
+      },
+      "type": "looq-collection-scent"
+    }
+  }
+}

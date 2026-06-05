@@ -1,0 +1,227 @@
+{%- comment -%}
+  LOOQ — Hero section (3-slide auto-fade slider + marquee + lower stage)
+  Y-range in Figma page frame: -1..1229
+  Slides cycle every 6s (2s visible per slide, 0.3s crossfade).
+{%- endcomment -%}
+
+<section class="looq-hero" data-section-id="{{ section.id }}">
+
+  {%- comment -%} Header is now global (sections/looq-header.liquid via header-group). {%- endcomment -%}
+
+  {%- comment -%} Slider stage (3 fading slides) === {%- endcomment -%}
+  <div class="looq-hero__slider" role="region" aria-roledescription="carousel" aria-label="Hero">
+
+    {%- comment -%} ── Slide 1: ALSO CALLED YOURS ── {%- endcomment -%}
+    <div class="looq-hero__slide looq-hero__slide--1">
+      <picture>
+        <source media="(min-width: 1024px)" srcset="{{ 'looq-hero-desktop-1.jpg' | asset_url }}">
+        <img class="looq-hero__photo" src="{{ 'looq-hero-photo.png' | asset_url }}"
+             alt="LOOQ hero — woman holding HĀND WÖSH" width="390" height="845"
+             loading="eager" fetchpriority="high">
+      </picture>
+      <h1 class="looq-hero__headline-1">
+        <span class="looq-hero__line looq-hero__line--accent">ALSO</span>
+        <span class="looq-hero__line looq-hero__line--accent">CALLED</span>
+        <span class="looq-hero__line">YOURS</span>
+      </h1>
+      <a class="looq-hero__btn looq-hero__btn--dark" href="{{ section.settings.shop_url | default: '/collections/all' }}">
+        {{ section.settings.shop_label | default: 'SHOP NOW' }}
+      </a>
+    </div>
+
+    {%- comment -%} ── Slide 2: MĀDE TÖ FEEL ── {%- endcomment -%}
+    <div class="looq-hero__slide looq-hero__slide--2">
+      <picture>
+        <source media="(min-width: 1024px)" srcset="{{ 'looq-hero-desktop-2.jpg' | asset_url }}">
+        <img class="looq-hero__photo" src="{{ 'looq-hero-photo-2.png' | asset_url }}"
+             alt="LOOQ hero — joy" width="390" height="844" loading="lazy">
+      </picture>
+      <h1 class="looq-hero__headline-1">
+        <span class="looq-hero__line looq-hero__line--accent">MĀDE</span>
+        <span class="looq-hero__line"><span class="looq-hero__line--accent">TÖ </span>FEEL.</span>
+      </h1>
+      <p class="looq-hero__subline">also called yours</p>
+      <a class="looq-hero__btn looq-hero__btn--dark" href="{{ section.settings.shop_url | default: '/collections/all' }}">
+        {{ section.settings.shop_label | default: 'SHOP NOW' }}
+      </a>
+    </div>
+
+    {%- comment -%} ── Slide 3: DÖN'T BLEND IN ── {%- endcomment -%}
+    <div class="looq-hero__slide looq-hero__slide--3">
+      <picture>
+        <source media="(min-width: 1024px)" srcset="{{ 'looq-hero-desktop-3.jpg' | asset_url }}">
+        <img class="looq-hero__photo" src="{{ 'looq-hero-photo-3.png' | asset_url }}"
+             alt="LOOQ hero — three faces" width="390" height="843" loading="lazy">
+      </picture>
+      <h1 class="looq-hero__headline-1">
+        <span class="looq-hero__line looq-hero__line--accent">DÖN&rsquo;T</span>
+        <span class="looq-hero__line"><span>BLEND</span><span class="looq-hero__line--accent"> IN.</span></span>
+      </h1>
+      <p class="looq-hero__subline">also called yours</p>
+      <a class="looq-hero__btn looq-hero__btn--dark" href="{{ section.settings.shop_url | default: '/collections/all' }}">
+        {{ section.settings.shop_label | default: 'SHOP NOW' }}
+      </a>
+    </div>
+  </div>
+
+  {%- comment -%} Marquee bar {%- endcomment -%}
+  <div class="looq-hero__marquee" role="presentation" aria-hidden="true">
+    <div class="looq-hero__marquee-track">
+      {%- for i in (1..22) -%}
+        <span class="looq-hero__marquee-text">{{ section.settings.marquee_text | default: 'also called yours' }}</span>
+        {% render 'looq-marquee-ornament' %}
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {%- comment -%} Lower stage (REFUSING TO FIT IN) {%- endcomment -%}
+  <div class="looq-hero__bottom">
+    <img class="looq-hero__lower-bg" src="{{ 'looq-hero-lower-bg.png' | asset_url }}" alt="" aria-hidden="true">
+    <h2 class="looq-hero__headline-2">
+      <span class="looq-hero__line">REFUSING</span>
+      <span class="looq-hero__line"><span>TO </span><span class="looq-hero__line--accent">FIT</span><span> IN.</span></span>
+    </h2>
+    <p class="looq-hero__body">
+      {{- section.settings.body_html | default: '<span class="hl">LOOQ</span> was created to <span class="hl">flip the beauty script.</span> We don&rsquo;t follow trends, <span class="hl">we twist them.</span><br>We&rsquo;re here to amplify <span class="hl">what&rsquo;s already fire.</span>' -}}
+    </p>
+    <a class="looq-hero__btn looq-hero__btn--accent" href="{{ section.settings.story_url | default: '/pages/our-story' }}">
+      {{ section.settings.story_label | default: 'OUR STORY' }}
+    </a>
+  </div>
+
+</section>
+
+{% stylesheet %}
+.looq-hero { position:relative; width:100%; margin:0 auto;
+  background:var(--color-bg, #000); font-family:var(--font-body); color:var(--color-fg, #fff); overflow:hidden; }
+
+.looq-hero__nav { position:absolute; top:27px; left:23px; right:23px; height:51px;
+  z-index:10; display:flex; align-items:center; justify-content:space-between; pointer-events:auto; }
+.looq-hero__nav-btn:first-child img { width:27px; height:27px; }
+.looq-hero__logo img { width:51px; height:51px; display:block; }
+.looq-hero__nav-btn:last-child img { width:33px; height:33px; }
+
+/* ── Slider stage ────────────────────────────────────────── */
+.looq-hero__slider { position:relative; width:100%; height:845px; overflow:hidden; }
+.looq-hero__slide {
+  position:absolute; inset:0;
+  opacity:0;
+  animation: looq-hero-fade 12s infinite ease-in-out;
+}
+.looq-hero__slide--1 { animation-delay:0s; }
+.looq-hero__slide--2 { animation-delay:4s; }
+.looq-hero__slide--3 { animation-delay:8s; }
+@keyframes looq-hero-fade {
+  0%   { opacity:0; }
+  5%   { opacity:1; }
+  33%  { opacity:1; }
+  38%  { opacity:0; }
+  100% { opacity:0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .looq-hero__slide { animation:none; }
+  .looq-hero__slide--1 { opacity:1; }
+}
+
+.looq-hero__photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1; }
+
+.looq-hero__headline-1 {
+  position:absolute; top:639px; left:16px; right:16px; margin:0; padding:0; z-index:3;
+  font-family:var(--font-display); font-weight:950;
+  font-size:var(--fs-display-mega, 40px); line-height:var(--lh-display, 1);
+  color:var(--color-fg, #fff); text-transform:uppercase; white-space:nowrap;
+}
+.looq-hero__line { display:block; }
+.looq-hero__line--accent { color:var(--color-accent, #edfc4d); }
+
+.looq-hero__subline {
+  /* Size matches the SHOP NOW button (12px) so they read as a paired
+     pair below the headline rather than one looking bigger. */
+  position:absolute; top:733px; left:16px; right:16px; margin:0; padding:0; z-index:3;
+  font-family:var(--font-italic-display); font-style:italic; font-weight:200;
+  font-size:12px; line-height:1; color:var(--color-fg, #fff);
+}
+
+.looq-hero__btn {
+  position:absolute; z-index:3;
+  display:inline-flex; align-items:center; justify-content:center;
+  height:30px; padding:0;
+  font-family:var(--font-body); font-weight:400; font-size:var(--fs-button, 12px); line-height:1;
+  letter-spacing:var(--tracking-button, 3.96px); text-transform:uppercase; text-decoration:none;
+  border:0; cursor:pointer; transition:filter 160ms ease;
+}
+.looq-hero__btn:hover { filter:brightness(1.08); }
+.looq-hero__slide .looq-hero__btn--dark {
+  top:775px; left:16px; width:155px;
+  background:var(--color-btn-dark, rgba(11,57,25,0.66));
+  color:var(--color-cta-faded, rgba(255,255,255,0.7));
+}
+
+/* ── Marquee ──────────────────────────────────────────────── */
+.looq-hero__marquee {
+  position:relative; width:100%; height:25px;
+  background:var(--color-accent, #edfc4d);
+  border-top:1px solid var(--color-near-black, #1e1e1f);
+  border-bottom:1px solid var(--color-near-black, #1e1e1f);
+  overflow:hidden; z-index:5;
+}
+.looq-hero__marquee-track {
+  position:absolute; top:0; left:0;
+  display:inline-flex; align-items:center;
+  gap:33px; padding-inline:33px; height:100%; white-space:nowrap;
+  animation: looq-marquee-scroll 45s linear infinite;
+  will-change:transform;
+}
+.looq-hero__marquee-text {
+  font-family:var(--font-italic-display); font-style:italic; font-weight:200;
+  font-size:12px; line-height:1; color:var(--color-near-black, #1e1e1f); flex-shrink:0;
+}
+.looq-hero__marquee-arrow { display:block; width:12px; height:6px; aspect-ratio:2/1; flex-shrink:0; }
+@keyframes looq-marquee-scroll { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+@media (prefers-reduced-motion: reduce) { .looq-hero__marquee-track { animation:none; } }
+
+/* ── Lower stage ──────────────────────────────────────────── */
+.looq-hero__bottom { position:relative; width:100%; height:363px; overflow:hidden; background:var(--color-bg, #000); }
+.looq-hero__lower-bg {
+  position:absolute; top:0.33%; left:0.1%;
+  width:97.56%; height:234.44%; max-width:none; z-index:1;
+}
+.looq-hero__headline-2 {
+  position:absolute; top:85px; left:16px; right:16px; margin:0; padding:0; z-index:3;
+  font-family:var(--font-display); font-weight:950;
+  font-size:var(--fs-display-mega, 40px); line-height:var(--lh-display, 1);
+  color:var(--color-fg, #fff); white-space:nowrap;
+}
+.looq-hero__body {
+  position:absolute; top:191px; left:16px; right:16px; margin:0; padding:0; z-index:3;
+  font-family:var(--font-body); font-weight:400;
+  font-size:var(--fs-body, 13px); line-height:var(--lh-body, 25px);
+  color:var(--color-body, #c4c4c4);
+}
+.looq-hero__body .hl { color:var(--color-accent, #edfc4d); }
+.looq-hero__bottom .looq-hero__btn--accent {
+  top:297px; left:16px; width:133px;
+  background:var(--color-btn-accent, rgba(237,252,77,0.54));
+  color:var(--color-on-accent, rgba(0,0,0,0.69));
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "LOOQ Hero",
+  "tag": "section",
+  "class": "section--looq-hero",
+  "settings": [
+    { "type": "header", "content": "Marquee" },
+    { "type": "text", "id": "marquee_text", "label": "Phrase (loops)", "default": "also called yours" },
+    { "type": "header", "content": "Buttons" },
+    { "type": "text", "id": "shop_label", "label": "Shop button label", "default": "SHOP NOW" },
+    { "type": "url",  "id": "shop_url",   "label": "Shop button link" },
+    { "type": "text", "id": "story_label", "label": "Our Story button label", "default": "OUR STORY" },
+    { "type": "url",  "id": "story_url",   "label": "Our Story button link" },
+    { "type": "header", "content": "Body paragraph" },
+    { "type": "richtext", "id": "body_html", "label": "Lower body (use 'hl' class on highlights)" }
+  ],
+  "presets": [{ "name": "LOOQ Hero", "category": "LOOQ" }]
+}
+{% endschema %}

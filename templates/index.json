@@ -1,0 +1,349 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "looq-hero",
+      "settings": {
+        "marquee_text": "also called yours",
+        "shop_label": "SHOP NOW",
+        "shop_url": "",
+        "story_label": "OUR STORY",
+        "story_url": "",
+        "body_html": ""
+      }
+    },
+    "the-goods": {
+      "type": "looq-the-goods",
+      "settings": {
+        "headline_part1": "THE",
+        "headline_part2": "GOODS.",
+        "see_all_label": "SEE ALL",
+        "see_all_url": "shopify://collections/all",
+        "limit": 6,
+        "collection_bw": "shopify://collections/body-wash",
+        "collection_bl": "shopify://collections/body-lotion",
+        "collection_hw": "shopify://collections/hand-wash"
+      }
+    },
+    "best-sellers": {
+      "type": "looq-best-sellers",
+      "settings": {
+        "eyebrow": "QUICK PICKS",
+        "headline_part1": "BEST",
+        "headline_part2": "SELLERS.",
+        "collection": "best-sellers",
+        "pyv_part1": "PICK",
+        "pyv_part2": "YOUR VIBE."
+      }
+    },
+    "pick-vibe": {
+      "type": "looq-pick-your-vibe",
+      "blocks": {
+        "b1": {
+          "type": "stripe",
+          "settings": {
+            "title": "STRAWBERRY FLUFF",
+            "description": "Sweet, playful, electric. Happiness in a bottle",
+            "color": "#ed3ea3",
+            "url": "shopify://collections/strawberry-fluff"
+          }
+        },
+        "b2": {
+          "type": "stripe",
+          "settings": {
+            "title": "VANILLA BREEZE",
+            "description": "Warm, creamy, soft. Like a deep exhale.",
+            "color": "#dec85c",
+            "url": "shopify://collections/vanilla-breeze"
+          }
+        },
+        "b3": {
+          "type": "stripe",
+          "settings": {
+            "title": "GUMMY YUMMY",
+            "description": "Fun, fruity, unexpected. The one no one saw coming",
+            "color": "#7ed4cc",
+            "url": "shopify://collections/gummy-yummy"
+          }
+        },
+        "b4": {
+          "type": "stripe",
+          "settings": {
+            "title": "VELVET RUSH",
+            "description": "Rich, smooth, addictive. Your skin will thank you.",
+            "color": "#6749c4",
+            "url": "shopify://collections/velvet-rush"
+          }
+        }
+      },
+      "block_order": [
+        "b1",
+        "b2",
+        "b3",
+        "b4"
+      ],
+      "settings": {
+        "show_headline": false,
+        "headline_1": "PICK",
+        "headline_2": "YOUR VIBE."
+      }
+    },
+    "dealz": {
+      "type": "looq-dealz-stealz",
+      "blocks": {
+        "b1": {
+          "type": "pill",
+          "settings": {
+            "label": "BÖDI WÖSH",
+            "color": "#ed3ea3",
+            "url": "shopify://collections/body-wash"
+          }
+        },
+        "b2": {
+          "type": "pill",
+          "settings": {
+            "label": "HĀND WÖSH",
+            "color": "#6749c4",
+            "url": "shopify://collections/hand-wash"
+          }
+        },
+        "b3": {
+          "type": "pill",
+          "settings": {
+            "label": "BÖDI LÖSHN",
+            "color": "#ed3ea3",
+            "url": "shopify://collections/body-lotion"
+          }
+        }
+      },
+      "block_order": [
+        "b1",
+        "b2",
+        "b3"
+      ],
+      "settings": {
+        "eyebrow": "THE BUNDLES",
+        "headline_1": "DEALZ &",
+        "headline_2": "STEALZ.",
+        "subhead": "BUNDLE UP. PAY LESS. SMELL MORE.",
+        "body": "",
+        "price": "FROM LE 450",
+        "signature": "also called yours",
+        "cta_label": "SHOP NOW",
+        "cta_url": ""
+      }
+    },
+    "bundles": {
+      "type": "looq-bundles",
+      "blocks": {
+        "b1": {
+          "type": "bundle",
+          "settings": {
+            "style": "featured",
+            "product_handle": "the-bathtub-set",
+            "badge": "BEST VALUE",
+            "title": "THE BĀTHTUB SET",
+            "subtitle": "BÖDI WÖSH • HĀND WÖSH • BÖDI LÖSHN",
+            "price": "LE 1200",
+            "compare_at": "LE 1800",
+            "image_default": "looq-bundle-product-1.png",
+            "url": "shopify://products/the-bathtub-set?variant=Large"
+          }
+        },
+        "b2": {
+          "type": "bundle",
+          "settings": {
+            "style": "default",
+            "product_handle": "the-bodi-set-copy",
+            "badge": "",
+            "title": "THE MINI BĀTHTUB SET",
+            "subtitle": "BÖDI WÖSH • BÖDI LÖSHN",
+            "price": "LE 1200",
+            "compare_at": "LE 1500",
+            "image_default": "looq-bundle-product-2.png",
+            "url": "shopify://products/the-bathtub-set?variant=Small"
+          }
+        },
+        "b3": {
+          "type": "bundle",
+          "settings": {
+            "style": "default",
+            "product_handle": "the-mini-tub",
+            "badge": "",
+            "title": "THE BĀTHTUB",
+            "subtitle": "STORAGE AREA • SMALL • LARGE",
+            "price": "LE 800",
+            "compare_at": "",
+            "image_default": "looq-bundle-product-3.png",
+            "url": "shopify://products/the-mini-tub"
+          }
+        }
+      },
+      "block_order": [
+        "b1",
+        "b2",
+        "b3"
+      ],
+      "settings": {}
+    },
+    "the-vibe": {
+      "type": "looq-the-vibe",
+      "blocks": {
+        "b1": {
+          "type": "vibe",
+          "settings": {
+            "word": "DISRUPTIVE",
+            "description": "Breaks the rules without asking for permission.",
+            "color": "#ffafd1"
+          }
+        },
+        "b2": {
+          "type": "vibe",
+          "settings": {
+            "word": "YOUTHFUL",
+            "description": "Driven by energy, curiosity, and fearless self-expression.",
+            "color": "#edfc4d"
+          }
+        },
+        "b3": {
+          "type": "vibe",
+          "settings": {
+            "word": "UNEXPECTED",
+            "description": "Always turns left, when others turn right.",
+            "color": "#ffffff"
+          }
+        }
+      },
+      "block_order": [
+        "b1",
+        "b2",
+        "b3"
+      ],
+      "settings": {
+        "headline_1": "THE",
+        "headline_2": "VIBE."
+      }
+    },
+    "ugc-videos": {
+      "type": "looq-ugc-videos",
+      "blocks": {
+        "b1": {
+          "type": "video",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/vp/53a7443d55ee48eeba3949aecbef320f/53a7443d55ee48eeba3949aecbef320f.SD-480p-0.9Mbps-84524050.mp4",
+            "poster": "https://cdn.shopify.com/s/files/1/0662/3635/0573/files/IMG_0571.jpg?v=1779259830",
+            "loop": false,
+            "product": "gid://shopify/product/8047371255917",
+            "product_handle": "bodi-loshn-set-of-3",
+            "scent_dots": "vanilla,velvet,strawberry,gummy",
+            "rating": 5
+          }
+        },
+        "b2": {
+          "type": "video",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/vp/0ea43c6bdc684d9e840b173d4433f291/0ea43c6bdc684d9e840b173d4433f291.SD-480p-0.9Mbps-84524055.mp4",
+            "poster": "https://cdn.shopify.com/s/files/1/0662/3635/0573/files/IMG_1137.jpg?v=1779259832",
+            "loop": false,
+            "product": "",
+            "product_handle": "hand-wosh-set-of-2",
+            "scent_dots": "vanilla,velvet,strawberry,gummy",
+            "rating": 5
+          }
+        },
+        "b3": {
+          "type": "video",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/vp/73f43e4e5d7d47bf9bd84920ccd448a4/73f43e4e5d7d47bf9bd84920ccd448a4.SD-480p-0.9Mbps-84524057.mp4",
+            "poster": "https://cdn.shopify.com/s/files/1/0662/3635/0573/files/IMG_3004.jpg?v=1779259834",
+            "loop": false,
+            "product": "gid://shopify/product/8047371485293",
+            "product_handle": "bodi-wosh-set-of-3",
+            "scent_dots": "vanilla,velvet,strawberry,gummy",
+            "rating": 5
+          }
+        },
+        "b4": {
+          "type": "video",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/vp/92982d7ad92d48778fc4fdef8c9d461f/92982d7ad92d48778fc4fdef8c9d461f.SD-480p-0.9Mbps-84524064.mp4",
+            "poster": "https://cdn.shopify.com/s/files/1/0662/3635/0573/files/IMG_5099.jpg?v=1779259836",
+            "loop": false,
+            "product": "gid://shopify/product/8047374827629",
+            "product_handle": "bodi-set",
+            "scent_dots": "vanilla,velvet,strawberry,gummy",
+            "rating": 5
+          }
+        },
+        "b5": {
+          "type": "video",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/vp/a2b70dac973842d4bb6a3de6d8432ab2/a2b70dac973842d4bb6a3de6d8432ab2.SD-480p-0.9Mbps-84524071.mp4",
+            "poster": "https://cdn.shopify.com/s/files/1/0662/3635/0573/files/IMG_8249.jpg?v=1779259839",
+            "loop": false,
+            "product": "gid://shopify/product/8047373418605",
+            "product_handle": "bodi-loshn-set-of-2",
+            "scent_dots": "vanilla,velvet,strawberry,gummy",
+            "rating": 5
+          }
+        },
+        "b6": {
+          "type": "video",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/vp/79c9cbeb61434707bb663c213023375f/79c9cbeb61434707bb663c213023375f.SD-480p-0.9Mbps-84524078.mp4",
+            "poster": "https://cdn.shopify.com/s/files/1/0662/3635/0573/files/looq_reel.jpg?v=1779259841",
+            "loop": false,
+            "product": "gid://shopify/product/8047374401645",
+            "product_handle": "hand-wosh-bodi-loshn-set",
+            "scent_dots": "vanilla,velvet,strawberry,gummy",
+            "rating": 5
+          }
+        }
+      },
+      "block_order": [
+        "b1",
+        "b2",
+        "b3",
+        "b4",
+        "b5",
+        "b6"
+      ],
+      "settings": {
+        "title_brand": "LOOQ",
+        "title_rest": "IN REAL LIFE",
+        "tagline": "Real people. Real routines. Real good smells."
+      }
+    },
+    "newsletter": {
+      "type": "looq-newsletter",
+      "settings": {
+        "line_1": "STAY",
+        "line_2": "AHEAD",
+        "line_3": "OF THE",
+        "line_4": "VIBE",
+        "lede": "New drops. Exclusive deals. No spam.",
+        "cta_label": "JOIN THE MOVEMENT",
+        "footnote": "No filters. No spam. Unsubscribe anytime."
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "the-goods",
+    "best-sellers",
+    "pick-vibe",
+    "dealz",
+    "bundles",
+    "the-vibe",
+    "ugc-videos",
+    "newsletter"
+  ]
+}

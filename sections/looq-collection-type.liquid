@@ -1,0 +1,213 @@
+{%- comment -%}
+  LOOQ — Per-type collection page (BÖDI WÖSH / BÖDI LÖSHN / HĀND WÖSH / HĀND KREM)
+  Figma references: 8:41 (BW), 10:32 (BL), 10:33 (HW)
+
+  Layout:
+    1. Hero photo (390×202) full-width, with title overlay in light pink + back arrow
+    2. Pink #ffbee4 marquee strip (italic blue text + infinity icons)
+    3. Blue #3559ef body, 2-col grid of products from collection.products
+
+  All 3 type pages use this same section — hero image and marquee phrases
+  are set per-template.
+{%- endcomment -%}
+
+{%- assign limit = section.settings.products_per_page | default: 12 -%}
+{%- comment -%}
+  Hero asset auto-resolution per collection.handle, falling back to the
+  section setting if one is configured in admin. Keeps each /collections/X
+  using its matching banner without merchandiser config.
+{%- endcomment -%}
+{%- assign hero_file = section.settings.hero_filename -%}
+{%- if hero_file == blank -%}
+  {%- case collection.handle -%}
+    {%- when 'body-wash' -%}{%- assign hero_file = 'looq-hero-bw.jpg' -%}
+    {%- when 'body-lotion' -%}{%- assign hero_file = 'looq-hero-bl.jpg' -%}
+    {%- when 'hand-wash' -%}{%- assign hero_file = 'looq-hero-hw.jpg' -%}
+    {%- when 'hand-cream' -%}{%- assign hero_file = 'looq-hero-hk.jpg' -%}
+  {%- endcase -%}
+{%- endif -%}
+{%- assign marq_a = section.settings.marquee_phrase_a | default: 'also called yours' -%}
+{%- assign marq_b = section.settings.marquee_phrase_b | default: 'also called yours' -%}
+
+{%- comment -%} LOOQ-branded display title — overrides Shopify collection.title {%- endcomment -%}
+{%- assign display_title = collection.title | upcase -%}
+{%- case collection.handle -%}
+  {%- when 'body-wash' -%}{%- assign display_title = 'BÖDI WÖSH' -%}
+  {%- when 'body-lotion' -%}{%- assign display_title = 'BÖDI LÖSHN' -%}
+  {%- when 'hand-wash' -%}{%- assign display_title = 'HĀND WÖSH' -%}
+  {%- when 'hand-cream' -%}{%- assign display_title = 'HĀND KREM' -%}
+{%- endcase -%}
+
+<section class="looq-collection-type" data-section-id="{{ section.id }}">
+  <header class="looq-collection-type__hero">
+    {%- if hero_file != blank -%}
+      <img class="looq-collection-type__hero-img"
+           src="{{ hero_file | asset_url }}"
+           alt="" width="390" height="202" loading="eager">
+    {%- endif -%}
+    <a class="looq-collection-type__back" href="{{ routes.root_url }}" aria-label="Back to home">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+        <path d="M9 3l-4 4 4 4"/>
+      </svg>
+    </a>
+    <h1 class="looq-collection-type__title">
+      {%- assign words = display_title | split: ' ' -%}
+      {%- for word in words -%}<span>{{ word }}</span>{%- endfor -%}
+    </h1>
+  </header>
+
+  <div class="looq-collection-type__marquee" aria-hidden="true">
+    <div class="looq-collection-type__marquee-track">
+      {%- for i in (1..10) -%}
+        <span class="looq-collection-type__marquee-text">{{ marq_a }}</span>
+        <img class="looq-collection-type__marquee-icon" src="{{ 'looq-marquee-icon.png' | asset_url }}" width="12" height="6" alt="">
+        <span class="looq-collection-type__marquee-text">{{ marq_b }}</span>
+        <img class="looq-collection-type__marquee-icon" src="{{ 'looq-marquee-icon.png' | asset_url }}" width="12" height="6" alt="">
+      {%- endfor -%}
+    </div>
+  </div>
+
+  <div class="looq-collection-type__body">
+    <div class="looq-collection-type__grid">
+      {%- paginate collection.products by limit -%}
+        {%- comment -%} Sort current page by price ascending (cheapest → bundles last) {%- endcomment -%}
+        {%- assign sorted_products = collection.products | sort: 'price' -%}
+        {%- for product in sorted_products -%}
+          {% render 'looq-product-card-grid', product: product %}
+        {%- endfor -%}
+
+        {%- if paginate.pages > 1 -%}
+          {%- assign current_str = paginate.current_page | append: '' -%}
+          <nav class="looq-goods-pagination" aria-label="Pagination">
+            {%- for part in paginate.parts -%}
+              {%- if part.is_link -%}
+                <a class="looq-goods-pagination__link" href="{{ part.url }}">{{ part.title }}</a>
+              {%- elsif part.title == current_str -%}
+                <span class="looq-goods-pagination__link is-active" aria-current="page">{{ part.title }}</span>
+              {%- else -%}
+                <span class="looq-goods-pagination__link">{{ part.title }}</span>
+              {%- endif -%}
+            {%- endfor -%}
+          </nav>
+        {%- endif -%}
+      {%- endpaginate -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+.looq-collection-type {
+  /* Section spans the full viewport width so the hero + marquee are
+     edge-to-edge on any device. The product grid below is constrained
+     to 390px via .looq-collection-type__body. */
+  position: relative;
+  width: 100%; margin: 0 auto;
+  background: #3559ef;
+  min-height: 100vh;
+}
+.looq-collection-type__body {
+  width: 100%; max-width: 390px; margin: 0 auto;
+}
+
+.looq-collection-type__hero {
+  /* Mobile: bumped from 200 → 270 so a 2-line, clamp(40-72px) title at
+     bottom:18 doesn't overlap the back arrow at top:87. Hero source image
+     is 926×476 but stretched to cover via object-fit:cover. */
+  position: relative; width: 100%; height: 270px;
+  overflow: hidden;
+  background: #6749c4;
+}
+@media (min-width: 768px) {
+  .looq-collection-type__hero { height: 340px; }
+}
+@media (min-width: 1024px) {
+  .looq-collection-type__hero { height: 420px; }
+}
+.looq-collection-type__hero-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  /* Wider hero assets (e.g. looq-hero-bw.jpg is 926×476, both subjects sit
+     in the upper-center) — anchor to top-center so the back-arrow + title
+     overlay doesn't push the faces off-screen. */
+  object-position: center top;
+}
+.looq-collection-type__back {
+  position: absolute; left: 19px; top: 87px; z-index: 2;  /* 77px header + 10px gap */
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 23px; height: 23px;
+}
+.looq-collection-type__title {
+  /* Title sits at the bottom-left of the hero. Font fluid via clamp() so
+     it scales up alongside the hero on tablet/desktop without manual
+     overrides per breakpoint. 40px floor fits cleanly in the 200px mobile
+     hero alongside the 87px header overlay clearance + back arrow. */
+  position: absolute; left: 21px; bottom: 18px; z-index: 2;
+  margin: 0; padding: 0;
+  font-family: var(--font-display, 'ABC Repro Ultra', sans-serif);
+  font-weight: 950;
+  font-size: clamp(40px, 13vw, 72px); line-height: 0.92;
+  color: #ffcaf8; text-transform: uppercase;
+}
+.looq-collection-type__title span { display: block; }
+
+.looq-collection-type__marquee {
+  width: 100%; height: 29px;
+  background: #ffbee4;
+  border-top: 1px solid rgba(45, 50, 178, 0.3);
+  border-bottom: 1px solid rgba(45, 50, 178, 0.3);
+  overflow: hidden; display: flex; align-items: center;
+}
+.looq-collection-type__marquee-track {
+  display: inline-flex; align-items: center;
+  gap: 33px; padding-inline: 33px;
+  height: 100%; white-space: nowrap;
+  animation: looq-collection-type-marquee 28s linear infinite;
+}
+.looq-collection-type__marquee-text {
+  font-family: var(--font-italic-display, 'Migra Italic', serif);
+  font-style: italic; font-weight: 200;
+  font-size: 12px; line-height: 1; color: #3559ef;
+  flex-shrink: 0;
+}
+.looq-collection-type__marquee-icon {
+  display: block; width: 12px; height: 6px; aspect-ratio: 2/1;
+  flex-shrink: 0;
+  /* Tint icon blue to match marquee text color */
+  filter: brightness(0) saturate(100%) invert(28%) sepia(99%) saturate(2200%) hue-rotate(220deg);
+}
+@keyframes looq-collection-type-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.looq-collection-type__body {
+  padding: 38px 19px 80px;
+}
+.looq-collection-type__grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 11px;
+  width: 100%;
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "LOOQ Collection Type",
+  "tag": "section",
+  "class": "section--looq-collection-type",
+  "settings": [
+    { "type": "header", "content": "Hero" },
+    { "type": "text", "id": "hero_filename", "label": "Hero photo asset filename", "default": "looq-hero-bw.jpg", "info": "Place file in theme assets/ folder. e.g. looq-hero-bw.jpg" },
+    { "type": "header", "content": "Marquee strip" },
+    { "type": "text", "id": "marquee_phrase_a", "label": "Phrase A", "default": "also called yours" },
+    { "type": "text", "id": "marquee_phrase_b", "label": "Phrase B", "default": "also called yours" },
+    { "type": "header", "content": "Products" },
+    { "type": "range", "id": "products_per_page", "label": "Products per page", "min": 6, "max": 24, "step": 2, "default": 12 }
+  ],
+  "presets": [
+    { "name": "LOOQ Collection Type", "category": "LOOQ" }
+  ]
+}
+{% endschema %}
+
+{%- comment -%} resync 1778146806 {%- endcomment -%}

@@ -1,0 +1,359 @@
+{%- comment -%}
+  LOOQ — Menu drawer (main menu + The Goods sub-menu)
+  Pixel-matched to Figma nodes 10:34 (main) and 99:1427 (Goods).
+  Renders globally via header-group.json. Hidden until [data-menu-trigger] click.
+{%- endcomment -%}
+
+<div class="looq-menu" id="looq-menu" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Site menu" data-section-id="{{ section.id }}">
+  <div class="looq-menu__backdrop" data-menu-close></div>
+
+  <div class="looq-menu__sheet" role="document">
+    {%- comment -%} Top photo + marquee + close X (shared across both panels) {%- endcomment -%}
+    {%- if section.settings.image != blank -%}
+      {%- assign menu_photo_url = section.settings.image | image_url: width: 800 -%}
+    {%- else -%}
+      {%- assign menu_photo_url = 'looq-menu-photo.jpg' | asset_url -%}
+    {%- endif -%}
+    <div class="looq-menu__top" style="background-image:url('{{ menu_photo_url }}')">
+      <button type="button" class="looq-menu__close" data-menu-close aria-label="Close menu">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M1 1l12 12M13 1L1 13" stroke="#1e1e1f" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="looq-menu__marquee" aria-hidden="true">
+      <div class="looq-menu__marquee-track">
+        {%- for i in (1..16) -%}
+          <span class="looq-menu__marquee-text">also called yours</span>
+          <img class="looq-menu__marquee-arrow" src="{{ 'looq-marquee-icon.png' | asset_url }}" width="12" height="6" alt="" aria-hidden="true">
+        {%- endfor -%}
+      </div>
+    </div>
+
+    {%- comment -%} Panel 1: Main menu {%- endcomment -%}
+    <nav class="looq-menu__panel looq-menu__panel--main" data-panel="main" data-active="true" aria-label="Main">
+      <ul class="looq-menu__list" role="list">
+        <li><a href="{{ routes.root_url }}" class="looq-menu__link">HOME</a></li>
+        <li><a href="/pages/our-story" class="looq-menu__link">OUR STORY</a></li>
+        <li><button type="button" class="looq-menu__link looq-menu__link--has-sub" data-menu-open="goods">
+          THE GOODS
+          <svg class="looq-menu__chev" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 3l4 4-4 4"/></svg>
+        </button></li>
+        <li><a href="/pages/dealz-stealz" class="looq-menu__link">DEALZ &amp; STEALZ</a></li>
+        <li><button type="button" class="looq-menu__link looq-menu__link--has-sub" data-menu-open="business">BUSINESS
+          <svg class="looq-menu__chev" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 3l4 4-4 4"/></svg>
+        </button></li>
+        <li><button type="button" class="looq-menu__link looq-menu__link--has-sub" data-menu-open="connect">CONNECT
+          <svg class="looq-menu__chev" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 3l4 4-4 4"/></svg>
+        </button></li>
+      </ul>
+
+      <div class="looq-menu__foot">
+        <ul class="looq-menu__social" role="list">
+          <li><a href="https://www.instagram.com/looqcosmetics" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#fff"/></svg></a></li>
+          <li><a href="https://www.facebook.com/share/14bRbY1vs3i/?mibextid=wwXlfr" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M13 22v-8h3l1-4h-4V7.5c0-1.2.4-2 2-2h2V2.1C16.6 2 15.4 2 14.3 2 11.4 2 9.6 3.8 9.6 6.9V10H6v4h3.6v8H13z"/></svg></a></li>
+          <li><a href="https://www.tiktok.com/@looqcosmetics" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M19 7.5a5.5 5.5 0 01-4-1.7v9.4a5.5 5.5 0 11-5.5-5.5c.3 0 .6 0 .9.1v2.7a2.8 2.8 0 102 2.7V2h2.6a5.5 5.5 0 004 4v1.5z"/></svg></a></li>
+        </ul>
+        <p class="looq-menu__tagline">also called yours</p>
+      </div>
+    </nav>
+
+    {%- comment -%} Panel 2: The Goods sub-menu {%- endcomment -%}
+    <nav class="looq-menu__panel looq-menu__panel--goods" data-panel="goods" aria-label="The Goods">
+      <button type="button" class="looq-menu__back" data-menu-back aria-label="Back to main menu">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M11 4L6 9l5 5"/>
+        </svg>
+        <span class="looq-menu__back-label">Back</span>
+      </button>
+      <p class="looq-menu__eyebrow">THE GOODS</p>
+      <ul class="looq-menu__products" role="list">
+        <li>
+          <a href="/collections/hand-wash" class="looq-menu__product">
+            <span class="looq-menu__dot" style="background:#edfc4d"></span>
+            <span class="looq-menu__product-name">HĀND WÖSH</span>
+            <span class="looq-menu__product-tagline">just hand wash</span>
+          </a>
+        </li>
+        <li>
+          <a href="/collections/body-wash" class="looq-menu__product">
+            <span class="looq-menu__dot" style="background:#ff5c00"></span>
+            <span class="looq-menu__product-name">BÖDI WÖSH</span>
+            <span class="looq-menu__product-tagline">also called shower gel</span>
+          </a>
+        </li>
+        <li>
+          <a href="/collections/body-lotion" class="looq-menu__product">
+            <span class="looq-menu__dot" style="background:#2f50d9"></span>
+            <span class="looq-menu__product-name">BÖDI LÖSHN</span>
+            <span class="looq-menu__product-tagline">body lotion for real</span>
+          </a>
+        </li>
+      </ul>
+
+      <p class="looq-menu__eyebrow looq-menu__eyebrow--vibe">PICK YOUR VIBE</p>
+      <div class="looq-menu__chips">
+        <a class="looq-menu__chip" href="/collections/strawberry-fluff" style="background:#ed3ea3; color:#fff">STRAWBERRY FLUFF</a>
+        <a class="looq-menu__chip" href="/collections/vanilla-breeze"   style="background:#edfc4d; color:#1e1e1f">VANILLA BREEZE</a>
+        <a class="looq-menu__chip" href="/collections/gummy-yummy"      style="background:#3eb4b3; color:#fff">GUMMY YUMMY</a>
+        <a class="looq-menu__chip" href="/collections/velvet-rush"      style="background:#6749c4; color:#fff">VELVET RUSH</a>
+      </div>
+
+      <div class="looq-menu__foot">
+        <ul class="looq-menu__social" role="list">
+          <li><a href="https://www.instagram.com/looqcosmetics" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#fff"/></svg></a></li>
+          <li><a href="https://www.facebook.com/share/14bRbY1vs3i/?mibextid=wwXlfr" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M13 22v-8h3l1-4h-4V7.5c0-1.2.4-2 2-2h2V2.1C16.6 2 15.4 2 14.3 2 11.4 2 9.6 3.8 9.6 6.9V10H6v4h3.6v8H13z"/></svg></a></li>
+          <li><a href="https://www.tiktok.com/@looqcosmetics" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M19 7.5a5.5 5.5 0 01-4-1.7v9.4a5.5 5.5 0 11-5.5-5.5c.3 0 .6 0 .9.1v2.7a2.8 2.8 0 102 2.7V2h2.6a5.5 5.5 0 004 4v1.5z"/></svg></a></li>
+        </ul>
+        <p class="looq-menu__tagline">also called yours</p>
+      </div>
+    </nav>
+
+    {%- comment -%} Panel 3: Business sub-menu {%- endcomment -%}
+    <nav class="looq-menu__panel looq-menu__panel--business" data-panel="business" aria-label="Business">
+      <button type="button" class="looq-menu__back" data-menu-back aria-label="Back to main menu">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M11 4L6 9l5 5"/>
+        </svg>
+        <span class="looq-menu__back-label">Back</span>
+      </button>
+      <p class="looq-menu__eyebrow">BUSINESS</p>
+      <ul class="looq-menu__list looq-menu__list--sub" role="list">
+        <li><a href="/pages/looq-creators" class="looq-menu__link">LOOQ CREATORS</a></li>
+        <li><a href="/pages/retailers" class="looq-menu__link">RETAILERS</a></li>
+        <li><a href="/pages/affiliates" class="looq-menu__link">AFFILIATES</a></li>
+        <li><a href="/pages/distribution" class="looq-menu__link">DISTRIBUTION</a></li>
+      </ul>
+      <div class="looq-menu__foot">
+        <ul class="looq-menu__social" role="list">
+          <li><a href="https://www.instagram.com/looqcosmetics" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#fff"/></svg></a></li>
+          <li><a href="https://www.facebook.com/share/14bRbY1vs3i/?mibextid=wwXlfr" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M13 22v-8h3l1-4h-4V7.5c0-1.2.4-2 2-2h2V2.1C16.6 2 15.4 2 14.3 2 11.4 2 9.6 3.8 9.6 6.9V10H6v4h3.6v8H13z"/></svg></a></li>
+          <li><a href="https://www.tiktok.com/@looqcosmetics" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M19 7.5a5.5 5.5 0 01-4-1.7v9.4a5.5 5.5 0 11-5.5-5.5c.3 0 .6 0 .9.1v2.7a2.8 2.8 0 102 2.7V2h2.6a5.5 5.5 0 004 4v1.5z"/></svg></a></li>
+        </ul>
+        <p class="looq-menu__tagline">also called yours</p>
+      </div>
+    </nav>
+
+    {%- comment -%} Panel 4: Connect sub-menu {%- endcomment -%}
+    <nav class="looq-menu__panel looq-menu__panel--connect" data-panel="connect" aria-label="Connect">
+      <button type="button" class="looq-menu__back" data-menu-back aria-label="Back to main menu">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M11 4L6 9l5 5"/>
+        </svg>
+        <span class="looq-menu__back-label">Back</span>
+      </button>
+      <p class="looq-menu__eyebrow">CONNECT</p>
+      <ul class="looq-menu__list looq-menu__list--sub" role="list">
+        <li><a href="/pages/support" class="looq-menu__link">SUPPORT</a></li>
+        <li><a href="/pages/faq" class="looq-menu__link">FAQ</a></li>
+        <li><a href="/pages/contact-us" class="looq-menu__link">CONTACT US</a></li>
+      </ul>
+      <div class="looq-menu__foot">
+        <ul class="looq-menu__social" role="list">
+          <li><a href="https://www.instagram.com/looqcosmetics" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#fff"/></svg></a></li>
+          <li><a href="https://www.facebook.com/share/14bRbY1vs3i/?mibextid=wwXlfr" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M13 22v-8h3l1-4h-4V7.5c0-1.2.4-2 2-2h2V2.1C16.6 2 15.4 2 14.3 2 11.4 2 9.6 3.8 9.6 6.9V10H6v4h3.6v8H13z"/></svg></a></li>
+          <li><a href="https://www.tiktok.com/@looqcosmetics" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M19 7.5a5.5 5.5 0 01-4-1.7v9.4a5.5 5.5 0 11-5.5-5.5c.3 0 .6 0 .9.1v2.7a2.8 2.8 0 102 2.7V2h2.6a5.5 5.5 0 004 4v1.5z"/></svg></a></li>
+        </ul>
+        <p class="looq-menu__tagline">also called yours</p>
+      </div>
+    </nav>
+  </div>
+</div>
+
+{% stylesheet %}
+/* All values match Figma node 10:34 exactly. */
+.looq-menu { position:fixed; inset:0; z-index:1000; display:none; }
+.looq-menu[aria-hidden="false"] { display:block; }
+/* !important beats Shopify Dawn's `div:empty { display:none }` rule
+   (specificity 0,0,1,1 = type+pseudo). The empty backdrop div has no
+   children, so the auto-hide rule was winning by specificity. The
+   drawer needs the backdrop visible to show the overlay + capture
+   outside-click close. */
+.looq-menu__backdrop { display:block !important; position:absolute; inset:0; background:rgba(0,0,0,0.6); }
+.looq-menu__sheet {
+  position:relative;
+  width:77vw; max-width:302px; height:100%;
+  margin:0; background:rgba(30, 30, 30, 0.95); color:#fff; overflow-y:auto;
+  display:flex; flex-direction:column;
+  transform:translateX(-100%); transition:transform 240ms ease;
+}
+.looq-menu[aria-hidden="false"] .looq-menu__sheet { transform:translateX(0); }
+
+/* Top photo (216) + marquee (25) per Figma */
+.looq-menu__top { position:relative; width:100%; height:216px; flex-shrink:0; overflow:hidden;
+  background-size:cover; background-position:center; background-repeat:no-repeat; }
+.looq-menu__top::after { content:''; position:absolute; inset:0; pointer-events:none;
+  background:rgba(0,0,0,0.15); }
+.looq-menu__close {
+  position:absolute; top:7px; right:6px; z-index:3;
+  width:24px; height:24px; padding:0; border:0;
+  background:rgba(237, 252, 77, 0.9);
+  border-radius:4px;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+}
+.looq-menu__marquee {
+  width:100%; height:25px; flex-shrink:0;
+  background:#edfc4d;
+  border-top:1px solid #1e1e1e; border-bottom:1px solid #1e1e1e;
+  overflow:hidden; display:flex; align-items:center;
+}
+.looq-menu__marquee-track { display:inline-flex; align-items:center;
+  gap:33px; padding-inline:33px; height:100%; white-space:nowrap;
+  animation:looq-menu-marquee 45s linear infinite; }
+.looq-menu__marquee-text { font-family:var(--font-italic-display, 'Migra Italic', serif);
+  font-style:italic; font-weight:200; font-size:12px; line-height:1; color:#1e1e1f; flex-shrink:0; }
+.looq-menu__marquee-arrow { display:block; width:12px; height:6px; aspect-ratio:2/1; flex-shrink:0; }
+@keyframes looq-menu-marquee { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+
+/* Panels */
+.looq-menu__panel { display:none; flex-direction:column; flex-grow:1;
+  padding:21px 24px 24px; }
+.looq-menu__panel[data-active="true"] { display:flex; }
+
+/* Back arrow for sub-panels — top-left, mirrors the X close at top-right.
+   Hover/focus subtly brightens the chevron + label so the affordance reads. */
+.looq-menu__back {
+  display:inline-flex; align-items:center; gap:8px;
+  margin:0 0 16px; padding:6px 0;
+  background:transparent; border:0;
+  color:rgba(255,255,255,0.85);
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight:400; font-size:13px; letter-spacing:1.5px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:color 160ms ease;
+  align-self:flex-start;
+}
+.looq-menu__back:hover, .looq-menu__back:focus-visible { color:#fff; outline:none; }
+.looq-menu__back svg { flex-shrink:0; }
+
+/* Main menu list — all white per Figma; no yellow on resting/hover/visited */
+.looq-menu__list { list-style:none; margin:0; padding:0; flex-grow:1;
+  display:flex; flex-direction:column; gap:34px; }
+.looq-menu__list li { margin:0; }
+.looq-menu__link {
+  display:flex; align-items:center; justify-content:space-between;
+  width:100%; padding:0; background:transparent; border:0; text-align:left;
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight:900; font-size:20px; line-height:1;
+  color:#fff !important;  /* override prior :hover/:focus yellow rule + any visited stylesheet */
+  text-transform:uppercase; text-decoration:none; cursor:pointer;
+}
+.looq-menu__link:hover, .looq-menu__link:focus, .looq-menu__link:visited {
+  color:#fff !important; outline:none; text-decoration:none;
+}
+.looq-menu__link:active {
+  color:#edfc4d !important;  /* "nothing should be yellow except when clicked" — :active is the click state */
+}
+.looq-menu__chev { color:#fff; flex-shrink:0; }
+
+/* Goods sub-menu */
+.looq-menu__eyebrow { margin:0 0 18px; padding:0;
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif); font-weight:400;
+  font-size:11px; line-height:1; letter-spacing:2px; color:rgba(255,255,255,0.6);
+  text-transform:uppercase; }
+.looq-menu__eyebrow--vibe { margin-top:36px; }
+.looq-menu__products { list-style:none; margin:0 0 0; padding:0;
+  display:flex; flex-direction:column; gap:38px; }
+.looq-menu__product { display:grid; grid-template-columns:auto 1fr auto; align-items:center;
+  gap:14px; color:#fff; text-decoration:none; }
+.looq-menu__product:hover, .looq-menu__product:focus { text-decoration:none; }
+.looq-menu__dot { display:inline-block; width:10px; height:10px; border-radius:50%;
+  flex-shrink:0; }
+.looq-menu__product-name { font-family:var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight:900; font-size:14px; letter-spacing:2px; text-transform:uppercase;
+  color:#fff; }
+.looq-menu__product-tagline { font-family:var(--font-italic-display, 'Migra Italic', serif);
+  font-style:italic; font-weight:200; font-size:13px; color:rgba(255,255,255,0.65);
+  white-space:nowrap; text-align:right; }
+.looq-menu__chips { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.looq-menu__chip { display:inline-flex; align-items:center; justify-content:center;
+  height:26px; padding:0 12px;
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif); font-weight:900;
+  font-size:8px; letter-spacing:1.5px; text-transform:uppercase;
+  text-decoration:none; }
+.looq-menu__chip:hover, .looq-menu__chip:focus { text-decoration:none; }
+
+/* Footer (shared by both panels) — Figma: social icons 26×26 at left:21 top:546 from
+   panel top, tagline at left:21 top:580 (= 8px below socials) */
+.looq-menu__foot { margin-top:auto; padding-top:32px; }
+.looq-menu__social { list-style:none; margin:0 0 8px; padding:0;
+  display:inline-flex; gap:4px; align-items:center; }
+.looq-menu__social a { display:inline-flex; align-items:center; justify-content:center;
+  width:26px; height:26px; }
+.looq-menu__tagline { margin:0; padding:0;
+  font-family:var(--font-italic-display, 'Migra Italic', serif); font-style:italic;
+  font-weight:200; font-size:14px; line-height:1; color:rgba(255,255,255,0.71); }
+{% endstylesheet %}
+
+<script>
+  (function() {
+    var menu = document.getElementById('looq-menu');
+    if (!menu) return;
+    var sheet = menu.querySelector('.looq-menu__sheet');
+    var triggers = document.querySelectorAll('[data-menu-trigger]');
+    var closers = menu.querySelectorAll('[data-menu-close]');
+    var subOpeners = menu.querySelectorAll('[data-menu-open]');
+    var backers = menu.querySelectorAll('[data-menu-back]');
+    var panels = menu.querySelectorAll('.looq-menu__panel');
+
+    function openMenu(panelName) {
+      menu.setAttribute('aria-hidden', 'false');
+      document.documentElement.style.overflow = 'hidden';
+      triggers.forEach(function(t) { t.setAttribute('aria-expanded', 'true'); });
+      showPanel(panelName || 'main');
+    }
+    function closeMenu() {
+      menu.setAttribute('aria-hidden', 'true');
+      document.documentElement.style.overflow = '';
+      triggers.forEach(function(t) { t.setAttribute('aria-expanded', 'false'); });
+    }
+    function showPanel(name) {
+      panels.forEach(function(p) {
+        p.setAttribute('data-active', p.getAttribute('data-panel') === name ? 'true' : 'false');
+      });
+      if (sheet) sheet.scrollTop = 0;
+    }
+    // EVENT DELEGATION for triggers + closers. The drawer's <script> runs
+    // when header-group renders -- BEFORE the footer is in the DOM. A
+    // direct querySelectorAll('[data-menu-trigger]') would only find the
+    // burger button and miss the footer Business/Connect buttons. Listening
+    // on document instead works for ANY trigger added to the DOM at any
+    // time, including async-rendered footer content.
+    document.addEventListener('click', function(e) {
+      var trigger = e.target.closest('[data-menu-trigger]');
+      if (trigger) {
+        e.preventDefault();
+        var panel = trigger.getAttribute('data-menu-open-panel');
+        openMenu(panel);
+        return;
+      }
+      // Backdrop / X close button -- only if click is inside the menu container
+      if (menu.contains(e.target)) {
+        var closer = e.target.closest('[data-menu-close]');
+        if (closer) {
+          e.preventDefault();
+          closeMenu();
+        }
+      }
+    });
+    subOpeners.forEach(function(o) {
+      o.addEventListener('click', function(e) { e.preventDefault(); showPanel(o.getAttribute('data-menu-open')); });
+    });
+    backers.forEach(function(b) {
+      b.addEventListener('click', function(e) { e.preventDefault(); showPanel('main'); });
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && menu.getAttribute('aria-hidden') === 'false') closeMenu();
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "LOOQ Menu Drawer",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Top photo (drawer banner)" }
+  ]
+}
+{% endschema %}

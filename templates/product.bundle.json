@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "looq-product-bundle",
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

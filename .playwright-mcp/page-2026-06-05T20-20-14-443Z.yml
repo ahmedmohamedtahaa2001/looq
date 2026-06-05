@@ -1,0 +1,105 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - heading "LOOQ IN REAL LIFE" [level=2] [ref=e4]:
+      - generic [ref=e5]: LOOQ
+      - generic [ref=e6]: IN REAL LIFE
+    - paragraph [ref=e7]: Real people. Real routines. Real good smells.
+  - generic [ref=e8]:
+    - generic [ref=e9]:
+      - article [ref=e10]:
+        - generic [ref=e11]:
+          - button "Play video" [ref=e13] [cursor=pointer]:
+            - img [ref=e14]
+          - button "Toggle sound":
+            - img
+        - 'link "BÖDI LÖSHN SET OF 3 Rating: 5 out of 5" [ref=e17] [cursor=pointer]':
+          - /url: https://looqcosmetics.com/products/bodi-loshn-set-of-3
+          - generic [ref=e18]: BÖDI LÖSHN SET OF 3
+          - 'generic "Rating: 5 out of 5" [ref=e24]':
+            - img [ref=e25]
+            - img [ref=e27]
+            - img [ref=e29]
+            - img [ref=e31]
+            - img [ref=e33]
+      - article [ref=e35]:
+        - generic [ref=e36]:
+          - button "Play video" [ref=e38] [cursor=pointer]:
+            - img [ref=e39]
+          - button "Toggle sound":
+            - img
+        - 'link "HĀND WÖSH SET OF 2 Rating: 5 out of 5" [ref=e42] [cursor=pointer]':
+          - /url: https://looqcosmetics.com/products/hand-wosh-set-of-2
+          - generic [ref=e43]: HĀND WÖSH SET OF 2
+          - 'generic "Rating: 5 out of 5" [ref=e49]':
+            - img [ref=e50]
+            - img [ref=e52]
+            - img [ref=e54]
+            - img [ref=e56]
+            - img [ref=e58]
+      - article [ref=e60]:
+        - generic [ref=e61]:
+          - button "Play video" [ref=e63] [cursor=pointer]:
+            - img [ref=e64]
+          - button "Toggle sound":
+            - img
+        - 'link "BÖDI WÖSH SET OF 3 Rating: 5 out of 5" [ref=e67] [cursor=pointer]':
+          - /url: https://looqcosmetics.com/products/bodi-wosh-set-of-3
+          - generic [ref=e68]: BÖDI WÖSH SET OF 3
+          - 'generic "Rating: 5 out of 5" [ref=e74]':
+            - img [ref=e75]
+            - img [ref=e77]
+            - img [ref=e79]
+            - img [ref=e81]
+            - img [ref=e83]
+      - article [ref=e85]:
+        - generic [ref=e86]:
+          - button "Play video" [ref=e88] [cursor=pointer]:
+            - img [ref=e89]
+          - button "Toggle sound":
+            - img
+        - 'link "THE FÜLL SET Rating: 5 out of 5" [ref=e92] [cursor=pointer]':
+          - /url: https://looqcosmetics.com/products/bodi-set
+          - generic [ref=e93]: THE FÜLL SET
+          - 'generic "Rating: 5 out of 5" [ref=e99]':
+            - img [ref=e100]
+            - img [ref=e102]
+            - img [ref=e104]
+            - img [ref=e106]
+            - img [ref=e108]
+      - article [ref=e110]:
+        - generic [ref=e111]:
+          - button "Play video" [ref=e113] [cursor=pointer]:
+            - img [ref=e114]
+          - button "Toggle sound":
+            - img
+        - 'link "BÖDI LÖSHN SET OF 2 Rating: 5 out of 5" [ref=e117] [cursor=pointer]':
+          - /url: https://looqcosmetics.com/products/bodi-loshn-set-of-2
+          - generic [ref=e118]: BÖDI LÖSHN SET OF 2
+          - 'generic "Rating: 5 out of 5" [ref=e124]':
+            - img [ref=e125]
+            - img [ref=e127]
+            - img [ref=e129]
+            - img [ref=e131]
+            - img [ref=e133]
+      - article [ref=e135]:
+        - generic [ref=e136]:
+          - button "Play video" [ref=e138] [cursor=pointer]:
+            - img [ref=e139]
+          - button "Toggle sound":
+            - img
+        - 'link "HĀND WÖSH & BÖDI LÖSHN SET Rating: 5 out of 5" [ref=e142] [cursor=pointer]':
+          - /url: https://looqcosmetics.com/products/hand-wosh-bodi-loshn-set
+          - generic [ref=e143]: HĀND WÖSH & BÖDI LÖSHN SET
+          - 'generic "Rating: 5 out of 5" [ref=e149]':
+            - img [ref=e150]
+            - img [ref=e152]
+            - img [ref=e154]
+            - img [ref=e156]
+            - img [ref=e158]
+    - tablist "Video carousel pagination" [ref=e160]:
+      - tab "Slide 1" [ref=e161] [cursor=pointer]
+      - tab "Slide 2" [ref=e162] [cursor=pointer]
+      - tab "Slide 3" [ref=e163] [cursor=pointer]
+      - tab "Slide 4" [ref=e164] [cursor=pointer]
+      - tab "Slide 5" [ref=e165] [cursor=pointer]
+      - tab "Slide 6" [ref=e166] [cursor=pointer]

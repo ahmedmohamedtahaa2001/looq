@@ -1,0 +1,106 @@
+{%- comment -%}
+  LOOQ — Dealz & Stealz listing page
+  Figma reference: 'The Goods: All Page 1' layout (112:2433) re-skinned with
+  big purple 'DEALZ & STEALZ' title and a 2-col grid of bundle products.
+
+  Source collection: pulls products from the `dealz` collection
+  (existing smart collection containing all the bundle SKUs).
+  Renders each via the standard looq-product-card-grid snippet so the
+  card design matches the rest of the site.
+{%- endcomment -%}
+
+{%- assign collection_handle = section.settings.collection_handle | default: 'dealz' -%}
+{%- assign dealz_collection = collections[collection_handle] -%}
+
+<section class="looq-dealz-page" data-section-id="{{ section.id }}">
+  <header class="looq-dealz-page__hero">
+    <a class="looq-dealz-page__back" href="javascript:history.back()" aria-label="Back">
+      <svg width="23" height="23" viewBox="0 0 23 23" fill="none" stroke="#6749c4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 6l-6 5.5L14 17"/>
+      </svg>
+    </a>
+    <h1 class="looq-dealz-page__title">
+      <span>{{ section.settings.title_line_1 | default: 'DEALZ &' }}</span>
+      <span>{{ section.settings.title_line_2 | default: 'STEALZ' }}</span>
+    </h1>
+  </header>
+
+  <div class="looq-dealz-page__body">
+    <div class="looq-dealz-page__grid">
+      {%- if dealz_collection != blank and dealz_collection.products.size > 0 -%}
+        {%- assign sorted = dealz_collection.products | sort: 'price' -%}
+        {%- for product in sorted -%}
+          {% render 'looq-product-card-grid', product: product %}
+        {%- endfor -%}
+      {%- else -%}
+        <p class="looq-dealz-page__empty">No bundles yet — check back soon.</p>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+.looq-dealz-page {
+  width: 100%; max-width: 390px; margin: 0 auto;
+  background: #fff;
+  container-type: inline-size;
+}
+
+.looq-dealz-page__hero {
+  position: relative;
+  padding: 87px 21px 24px;    /* 87 = 77px header overlay clearance + 10px breathing room */
+}
+.looq-dealz-page__back {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 23px; height: 23px;
+  margin-bottom: 18px;
+}
+.looq-dealz-page__title {
+  margin: 0; padding: 0;
+  font-family: var(--font-display, 'ABC Repro Ultra', sans-serif);
+  font-weight: 950;
+  font-size: clamp(36px, 11cqw, 45px);
+  line-height: 0.95;
+  color: #6749c4;   /* LOOQ purple — matches the home Dealz section headline */
+  text-transform: uppercase;
+}
+.looq-dealz-page__title span { display: block; white-space: nowrap; }
+
+.looq-dealz-page__body {
+  padding: 8px 19px 40px;
+}
+.looq-dealz-page__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+/* Dealz cards show only product name + price — bundle items don't need
+   the scent/set subtitle row that scent-product cards use. Per user
+   feedback ("just esm el product w el price"). */
+.looq-dealz-page .product-card-grid__subtitle { display: none !important; }
+
+.looq-dealz-page__empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 16px;
+  color: rgba(30, 30, 30, 0.6);
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-size: 14px;
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Dealz & Stealz page",
+  "tag": "section",
+  "class": "section--looq-dealz-page",
+  "settings": [
+    { "type": "text", "id": "title_line_1", "label": "Title line 1", "default": "DEALZ &" },
+    { "type": "text", "id": "title_line_2", "label": "Title line 2", "default": "STEALZ" },
+    { "type": "text", "id": "collection_handle", "label": "Source collection handle",
+      "default": "dealz",
+      "info": "Smart collection containing all bundle products." }
+  ],
+  "presets": [{ "name": "Dealz & Stealz page", "category": "LOOQ" }]
+}
+{% endschema %}

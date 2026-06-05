@@ -1,0 +1,441 @@
+{%- comment -%}
+  LOOQ — Bundle product page (Figma: Full Set, Wösh Set, BW Set of 2/3, etc.)
+  Layout: white top half (image + back arrow), pink #ffd6e0 bottom half (info + multi-row scent matrix + price + ADD TO CART).
+
+  Special same-scent rule (Image #35):
+    When all selected scent options resolve to the SAME scent (e.g. user picks Vanilla in every row),
+    title flips from black "BÖDI WÖSH SET OF 3" → scent-colored "VANILLA BREEZE SET" (in scent's card_title_color).
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- comment -%} Subtitle: try "tagline" first (matches single template + Admin label), fall back to "subtitle" {%- endcomment -%}
+{%- assign subtitle_meta = product.metafields.custom.tagline -%}
+{%- if subtitle_meta == blank -%}
+  {%- assign subtitle_meta = product.metafields.custom.subtitle -%}
+{%- endif -%}
+{%- assign set_size = product.metafields.custom.set_size -%}
+
+{%- comment -%}
+  Default title text — Shopify product title with " - {variant}" suffix
+  stripped, then upcased. "BÖDI WÖSH SET OF 3" comes through clean;
+  any "Foo - Bar" pattern shortens to "Foo".
+{%- endcomment -%}
+{%- assign default_title = product.title | split: ' - ' | first | upcase -%}
+
+{%- comment -%} Subtitle: custom.subtitle if set; else "SET OF N"; else type list {%- endcomment -%}
+{%- if subtitle_meta != blank -%}
+  {%- assign subtitle = subtitle_meta -%}
+{%- elsif set_size != blank -%}
+  {%- assign subtitle = 'SET OF ' | append: set_size -%}
+{%- else -%}
+  {%- assign subtitle = '' -%}
+{%- endif -%}
+
+<section class="looq-product looq-product--bundle" data-section-id="{{ section.id }}">
+  {%- assign parent_collection = product.collections | first -%}
+  <nav class="looq-product__crumbs" aria-label="Breadcrumb">
+    <a href="{{ routes.root_url }}">HOME</a>
+    {%- if parent_collection != blank -%}
+      <span class="looq-product__crumb-sep" aria-hidden="true">›</span>
+      <a href="{{ parent_collection.url }}">{{ parent_collection.title | upcase }}</a>
+    {%- endif -%}
+    <span class="looq-product__crumb-sep" aria-hidden="true">›</span>
+    <span class="looq-product__crumb-current" aria-current="page">{{ default_title | upcase }}</span>
+  </nav>
+
+  <div class="looq-product__media">
+    <a class="looq-product__back" href="javascript:history.back()" aria-label="Back">
+      <svg width="23" height="23" viewBox="0 0 23 23" fill="none" stroke="#3559ef" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 6l-6 5.5L14 17"/>
+      </svg>
+    </a>
+
+    {%- comment -%} Desktop-only vertical stack of all product.images. {%- endcomment -%}
+    <div class="looq-product__stack" aria-hidden="true">
+      {%- for img in product.images -%}
+        <img src="{{ img | image_url: width: 1200 }}"
+             alt="{{ img.alt | default: default_title | escape }}"
+             loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
+      {%- endfor -%}
+    </div>
+    {%- comment -%} Gallery inlined — see looq-product-single for sync-issue context. {%- endcomment -%}
+    {%- if product.images.size > 1 -%}
+      <div class="looq-gallery" data-gallery>
+        <div class="looq-gallery__track" data-gallery-track>
+          {%- for img in product.images -%}
+            <div class="looq-gallery__slide" data-gallery-slide>
+              <img src="{{ img | image_url: width: 800 }}"
+                   alt="{{ img.alt | default: default_title | escape }}"
+                   loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
+            </div>
+          {%- endfor -%}
+        </div>
+        <div class="looq-gallery__dots" role="tablist" aria-label="Product images">
+          {%- for img in product.images -%}
+            <button type="button" class="looq-gallery__dot{% if forloop.first %} is-active{% endif %}"
+                    data-gallery-dot="{{ forloop.index0 }}"
+                    role="tab" aria-label="View image {{ forloop.index }}"></button>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- elsif product.featured_image != blank -%}
+      <img class="looq-product__image"
+           src="{{ product.featured_image | image_url: width: 800 }}"
+           alt="{{ product.featured_image.alt | default: product.title | escape }}"
+           width="800" height="800" loading="eager">
+    {%- endif -%}
+  </div>
+
+  <div class="looq-product__info">
+    <span class="looq-product__tab" aria-hidden="true"></span>
+
+    <h1 class="looq-product__title">{{ default_title }}</h1>
+    {%- if subtitle != blank -%}
+      <p class="looq-product__subtitle" data-default-subtitle="{{ subtitle | escape }}">{{ subtitle }}</p>
+    {%- endif -%}
+
+    <form method="post" action="{{ routes.cart_add_url }}" id="ProductForm-{{ section.id }}" class="looq-product__form" novalidate>
+      <input type="hidden" name="form_type" value="product">
+      <input type="hidden" name="utf8" value="✓">
+
+      {%- if product.has_only_default_variant == false -%}
+        <div class="looq-product__choose-scent">
+          <span class="looq-product__choose-scent-label">CHOOSE YOUR SCENT</span>
+          <button type="button" class="looq-info-btn" data-smell-check-open aria-label="Open scent cheat sheet">
+            <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <circle cx="9" cy="9" r="7.5"/>
+              <path d="M9 6h0.01" stroke-width="2" stroke-linecap="round"/>
+              <path d="M9 9v4" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="looq-product__bundle-grid">
+          {%- for option in product.options_with_values -%}
+            {%- comment -%}
+              Row type label comes directly from the Shopify option NAME
+              (e.g. 'BÖDI WÖSH Scent' → 'BÖDI WÖSH'). Each bundle product
+              defines its options with the type prefix, so this is the
+              single source of truth — no per-handle hardcoded mapping
+              needed. Handles arbitrary bundle compositions automatically.
+            {%- endcomment -%}
+            {%- assign type_label = option.name | upcase | replace: ' SCENT', '' | strip -%}
+            <div class="looq-product__bundle-row">
+              {%- if type_label != blank -%}
+                <span class="looq-product__bundle-type-label">{{ type_label }}</span>
+              {%- endif -%}
+              <div class="looq-product__bundle-row-inner">
+              <fieldset class="looq-product__scents">
+                <legend class="visually-hidden">{{ option.name }}</legend>
+                {%- for value in option.values -%}
+                  {%- assign scent_handle = value | handleize -%}
+                  {%- assign sw = '#1e1e1e' -%}
+                  {%- case scent_handle -%}
+                    {%- when 'vanilla-breeze' -%}{%- assign sw = '#ebd35d' -%}
+                    {%- when 'velvet-rush' -%}{%- assign sw = '#6749c4' -%}
+                    {%- when 'strawberry-fluff' -%}{%- assign sw = '#ed3ea3' -%}
+                    {%- when 'gummy-yummy' -%}{%- assign sw = '#61dddb' -%}
+                  {%- endcase -%}
+                  {%- assign input_id = 'opt-' | append: section.id | append: '-' | append: forloop.parentloop.index | append: '-' | append: forloop.index -%}
+                  <input type="radio"
+                         name="options[{{ option.name }}]"
+                         value="{{ value | escape }}"
+                         id="{{ input_id }}"
+                         data-variant-radio
+                         data-scent-handle="{{ scent_handle }}"
+                         {% if option.selected_value == value %}checked{% endif %}>
+                  <label for="{{ input_id }}" style="--swatch: {{ sw }};" aria-label="{{ value }}">
+                    <span class="looq-product__scent-swatch"></span>
+                  </label>
+                {%- endfor -%}
+              </fieldset>
+              {%- comment -%}
+                Active scent label — JS updates this on radio change
+                (see row-labels listener below).
+              {%- endcomment -%}
+              <span class="looq-product__bundle-row-label" data-bundle-row-label>{{ option.selected_value | upcase }}</span>
+              </div>{%- comment -%} closes .looq-product__bundle-row-inner {%- endcomment -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id-input>
+
+      <div class="looq-product__price-row">
+        <span class="looq-product__price" data-price>LE {{ current_variant.price | divided_by: 100.0 | round: 0 }}</span>
+        <span class="looq-product__compare" data-compare hidden></span>
+      </div>
+
+      <div class="looq-product__cta-row">
+        {%- if current_variant.available -%}
+          <button type="submit" class="looq-product__atc" name="add">ADD TO CART</button>
+        {%- else -%}
+          <button type="button" class="looq-product__atc looq-product__atc--notify" data-notify-open>
+            NOTIFY ME WHEN AVAILABLE
+          </button>
+        {%- endif -%}
+      </div>
+    </form>
+    {%- comment -%} TODO: re-enable once Shopify sync picks up the new snippet
+      {% render 'looq-notify-modal', product: product, current_variant: current_variant %}
+    {%- endcomment -%}
+
+    {%- comment -%}
+      DESKTOP COPY -- inside .looq-product__info for the sticky right column.
+      Mobile copy sits as a sibling after </section> below.
+    {%- endcomment -%}
+    <div class="looq-product__accordion-desktop">
+      {% render 'looq-product-accordion', product: product %}
+    </div>
+  </div>
+
+  <script type="application/json" data-variant-data>{{ product.variants | json }}</script>
+  <script type="application/json" data-scent-tokens>
+    {
+      "vanilla-breeze":   { "swatch": "#ebd35d", "title": "#2f50d9", "name": "VANILLA BREEZE" },
+      "velvet-rush":      { "swatch": "#6749c4", "title": "#6749c4", "name": "VELVET RUSH" },
+      "strawberry-fluff": { "swatch": "#ed3ea3", "title": "#ed3ea3", "name": "STRAWBERRY FLUFF" },
+      "gummy-yummy":      { "swatch": "#61dddb", "title": "#3eb4b3", "name": "GUMMY YUMMY" }
+    }
+  </script>
+</section>
+
+{%- comment -%} MOBILE COPY of the accordion -- sibling after </section>. {%- endcomment -%}
+<div class="looq-product__accordion-mobile">
+  {% render 'looq-product-accordion', product: product %}
+</div>
+
+{% stylesheet %}
+/* Mirrors single template's Figma-exact values (translucent pink, asymmetric padding,
+   PP Radio Grotesk Black 32px title, etc.) */
+.looq-product--bundle {
+  width: 100%; max-width: 390px; margin: 0 auto;
+  background: rgba(255, 190, 228, 0.66);
+}
+/* Breadcrumbs + desktop image stack hidden on mobile (desktop snippet
+   reveals them and hides the mobile carousel). */
+.looq-product--bundle .looq-product__crumbs,
+.looq-product--bundle .looq-product__stack { display: none; }
+/* Accordion is rendered twice -- the desktop copy (inside info) is hidden
+   on mobile; mobile shows the sibling copy that matches the prior layout. */
+.looq-product__accordion-desktop { display: none; }
+.looq-product--bundle .looq-product__media {
+  position: relative; background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  width: 100%;
+  height: 430px;
+  /* Override base rule's aspect-ratio: 1/1 (used by bathtub) so the
+     430px height doesn't force a 430px width on the 390px section. */
+  aspect-ratio: auto;
+  padding: 24px 19px;
+  box-sizing: border-box;
+}
+.looq-product--bundle .looq-product__back {
+  position: absolute; left: 13px; top: 87px; z-index: 2;  /* below 77px header */
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 23px; height: 23px;
+}
+.looq-product--bundle .looq-product__image { max-width: 80%; max-height: 100%; object-fit: contain; }
+
+.looq-product--bundle .looq-product__info {
+  position: relative;
+  background: rgba(255, 190, 228, 0.66);
+  padding: 37px 26px 39px 17px;
+  min-height: 414px;
+  display: flex; flex-direction: column;
+}
+.looq-product--bundle .looq-product__tab {
+  position: absolute; left: 173px; top: 8px;
+  width: 44px; height: 6px; background: #3559ef;
+  border-radius: 17px;
+}
+
+.looq-product--bundle .looq-product__title {
+  display: block;
+  margin: 0 0 6px; padding: 0;
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 900; font-size: 32px; line-height: 1;
+  color: #1e1e1e; text-transform: uppercase;
+}
+.looq-product--bundle .looq-product__subtitle {
+  margin: 0 0 24px; padding: 0;
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 400; font-size: 11px; line-height: 1.4;
+  color: #1e1e1e; opacity: 0.62; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.looq-product--bundle .looq-product__choose-scent {
+  display: flex; align-items: center; gap: 4px;
+  margin: 0 0 14px;
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 900; font-size: 13px; line-height: 1;
+  color: #1e1e1e;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.looq-product--bundle .looq-product__bundle-grid {
+  display: flex; flex-direction: column; gap: 18px; margin: 0 0 24px;
+}
+.looq-product--bundle .looq-product__bundle-row {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.looq-product--bundle .looq-product__bundle-type-label {
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 900; font-size: 13px; line-height: 1;
+  color: #1e1e1e;
+  text-transform: uppercase;
+}
+.looq-product--bundle .looq-product__bundle-row-inner {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.looq-product--bundle .looq-product__scents {
+  display: inline-flex; gap: 10px; padding: 0; margin: 0;
+  border: 0;
+}
+.looq-product--bundle .looq-product__scents input { display: none; }
+.looq-product--bundle .looq-product__scents label {
+  display: inline-block;
+  cursor: pointer;
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 0; padding: 0;
+  box-sizing: border-box;
+  position: relative;
+}
+.looq-product--bundle .looq-product__scent-swatch {
+  display: block;
+  width: 100%; height: 100%;
+  border-radius: 50%; background: var(--swatch);
+}
+/* Active state: thin black ring directly on the swatch, no padding/inset */
+.looq-product--bundle .looq-product__scents input:checked + label .looq-product__scent-swatch {
+  box-shadow: inset 0 0 0 2px #1e1e1e;
+}
+.looq-product--bundle .looq-product__bundle-row-label {
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 400; font-size: 10px; line-height: 1;
+  color: rgba(30, 30, 30, 0.55);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  text-align: right; flex-shrink: 0;
+}
+
+.looq-product--bundle .looq-product__price-row { display: flex; align-items: baseline; gap: 12px; margin: 0 0 23px; }
+.looq-product--bundle .looq-product__price {
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 900; font-size: 32px; line-height: 1; color: #1e1e1e;
+}
+.looq-product--bundle .looq-product__compare {
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 700; font-size: 22px; line-height: 1;
+  color: #ff5c00; text-decoration: line-through;
+}
+.looq-product--bundle .looq-product__compare[hidden] { display: none; }
+
+.looq-product--bundle .looq-product__cta-row {
+  display: flex; gap: 10px; margin-top: 0; align-items: stretch;
+}
+.looq-product--bundle .looq-product__wishlist {
+  width: 50px; height: 47px;
+  border: 0; background: #1e1e1e;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; padding: 0;
+}
+.looq-product--bundle .looq-product__wishlist svg { stroke: #fff; }
+.looq-product--bundle .looq-product__atc {
+  flex: 1;
+  background: #1e1e1e;
+  /* ADD TO CART text — Figma spec applies across all product pages */
+  color: #FFF;
+  font-family: 'PP Radio Grotesk', sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: 6.08px;
+  text-transform: uppercase;
+  border: 0; padding: 0 16px; height: 47px; cursor: pointer;
+}
+.looq-product--bundle .looq-product__atc[disabled] { opacity: 0.6; cursor: not-allowed; }
+{% endstylesheet %}
+
+{% javascript %}
+// Row labels reflect the currently-selected scent in each row.
+// Replaces the previous static "FIRST"/"SECOND"/"THIRD" labels with the
+// scent's name (e.g. "VANILLA BREEZE"). Initial render is handled
+// server-side via option.selected_value; this updates on radio change.
+document.querySelectorAll('.looq-product--bundle').forEach(function(section){
+  if (section.dataset.bundleRowLabelsInit) return;
+  section.dataset.bundleRowLabelsInit = '1';
+  section.addEventListener('change', function(e){
+    var radio = e.target.closest('[data-variant-radio]');
+    if (!radio) return;
+    var row = radio.closest('.looq-product__bundle-row');
+    if (!row) return;
+    var label = row.querySelector('[data-bundle-row-label]');
+    if (label) label.textContent = (radio.value || '').toUpperCase();
+  });
+});
+
+if (!customElements.get('looq-bundle-radios')) {
+  class LooqBundleRadios extends HTMLElement {
+    connectedCallback() {
+      this.section = this.closest('section[data-section-id]') || this.closest('section');
+      if (!this.section) return;
+      this.idInput = this.section.querySelector('[data-variant-id-input]');
+      this.priceEl = this.section.querySelector('[data-price]');
+      this.compareEl = this.section.querySelector('[data-compare]');
+      this.atc = this.section.querySelector('.looq-product__atc');
+      try {
+        this.variants = JSON.parse(this.section.querySelector('[data-variant-data]').textContent);
+      } catch (e) { this.variants = []; }
+      this.section.addEventListener('change', (e) => {
+        if (e.target.matches('[data-variant-radio]')) this.update();
+      });
+    }
+    update() {
+      const radios = this.section.querySelectorAll('[data-variant-radio]:checked');
+      const selected = Array.from(radios).map(r => r.value);
+      const variant = this.variants.find(v => {
+        const opts = [v.option1, v.option2, v.option3].filter(Boolean);
+        return JSON.stringify(opts) === JSON.stringify(selected);
+      });
+      if (!variant) return;
+      if (this.idInput) this.idInput.value = variant.id;
+      // Shopify product.variants | json puts price in cents; divide by 100 for display
+      if (this.priceEl) this.priceEl.textContent = 'LE ' + Math.round(parseFloat(variant.price) / 100);
+      if (this.compareEl) {
+        const cmp = parseFloat(variant.compare_at_price || 0);
+        if (cmp > parseFloat(variant.price)) {
+          this.compareEl.textContent = 'LE ' + Math.round(cmp / 100);
+          this.compareEl.removeAttribute('hidden');
+        } else {
+          this.compareEl.setAttribute('hidden', '');
+        }
+      }
+      if (this.atc) {
+        if (variant.available) { this.atc.removeAttribute('disabled'); this.atc.textContent = 'ADD TO CART'; }
+        else { this.atc.setAttribute('disabled', ''); this.atc.textContent = 'SOLD OUT'; }
+      }
+    }
+  }
+  customElements.define('looq-bundle-radios', LooqBundleRadios);
+  document.querySelectorAll('.looq-product--bundle').forEach(s => {
+    if (!s.querySelector('looq-bundle-radios')) {
+      s.appendChild(document.createElement('looq-bundle-radios'));
+    }
+  });
+}
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "LOOQ Product — Bundle",
+  "tag": "section",
+  "class": "section--looq-product-bundle",
+  "settings": [],
+  "presets": [
+    { "name": "LOOQ Product Bundle", "category": "LOOQ" }
+  ]
+}
+{% endschema %}

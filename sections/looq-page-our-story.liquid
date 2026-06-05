@@ -1,0 +1,77 @@
+{%- comment -%}
+  LOOQ — Our Story page (Figma 115:4572, 390 × 843)
+  Pattern C: blue background + photo overlay + yellow display headlines + body.
+{%- endcomment -%}
+
+<section class="looq-page looq-page--story" data-section-id="{{ section.id }}"
+         style="--story-photo:url('{{ 'looq-our-story-bg.jpg' | asset_url }}');">
+  <div class="looq-page__photo-bg" aria-hidden="true"></div>
+
+  <div class="looq-page__inner">
+    <a href="{{ routes.root_url }}" class="looq-page__back" aria-label="Back to home">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+        <path d="M9 3l-4 4 4 4"/>
+      </svg>
+    </a>
+
+    <h1 class="looq-page__title">OUR<br>STORY</h1>
+
+    <p class="looq-page__lede"><strong>LOOQ is not just a cosmetics brand<br>— it's a movement.</strong></p>
+
+    <div class="looq-page__copy">
+      <p>We're a youth culture movement built on <mark>expression, confidence, and real identity.</mark></p>
+      <p><mark>LOOQ</mark> was created with a simple belief: <mark>beauty should feel personal, expressive, and real.</mark> Born in Cairo and inspired by youth culture and everyday rituals, <mark>LOOQ</mark> began as an idea to turn ordinary beauty routines into <mark>moments of confidence, fun, and self-expression.</mark></p>
+    </div>
+
+    <h2 class="looq-page__title looq-page__title--mid">THE LOOQ<br>MINDSET</h2>
+
+    <div class="looq-page__copy">
+      <p>We believe in <mark>authenticity over perfection</mark> and <mark>bold self-expression</mark> without filters or rules.</p>
+      <p>Built on freshness, color, fun, and confidence, <mark>LOOQ</mark> creates clean, cruelty-free, high-quality beauty essentials <mark>designed for everyone.</mark></p>
+      <p>Our approach blends expressive design with safe, joyful formulations, turning everyday beauty into a <mark>lifestyle experience rather than a routine.</mark></p>
+      <p><mark>LOOQ</mark> does things differently—because our users do.</p>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+/* Higher specificity (.looq-page.looq-page--story) so this beats the
+   `.looq-page { background:#fff }` rules from the other 7 page sections
+   that get bundled into the same global stylesheet. */
+.looq-page.looq-page--story { position:relative; width:100%; max-width:390px;
+  margin:0 auto; min-height:100vh; background:#3559ef; color:#fff;
+  overflow:hidden; }
+/* display:block overrides Dawn's `div:empty { display:none }` rule
+   in base.css, which would otherwise hide our decorative empty bg div.
+   The Figma export has its blue/purple tint baked in, so we use the
+   photo directly without a CSS gradient overlay. */
+.looq-page--story .looq-page__photo-bg { display:block; position:absolute; inset:0;
+  background-image: var(--story-photo);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events:none; }
+.looq-page--story .looq-page__inner { position:relative; padding:87px 18px 60px; z-index:1; }
+.looq-page--story .looq-page__back { display:inline-flex; align-items:center; justify-content:center;
+  width:23px; height:23px; margin:0 0 38px; padding:0; }
+.looq-page--story .looq-page__title { margin:0 0 24px; padding:0;
+  font-family:var(--font-display, 'ABC Repro Ultra', sans-serif); font-weight:950;
+  font-size:40px; line-height:1; color:#edfc4d; text-transform:uppercase; }
+.looq-page--story .looq-page__title--mid { margin:48px 0 24px; }
+.looq-page--story .looq-page__lede { margin:0 0 24px; padding:0;
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif); font-weight:900;
+  font-size:13px; line-height:1.15; color:#fff; }
+.looq-page--story .looq-page__lede strong { font-weight:900; color:#fff; }
+.looq-page--story .looq-page__copy p { margin:0 0 16px; padding:0;
+  font-family:var(--font-body, 'PP Radio Grotesk', sans-serif); font-weight:400;
+  font-size:13px; line-height:24px; color:#fff; }
+.looq-page--story .looq-page__copy mark { background:transparent; color:#edfc4d; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "LOOQ Our Story",
+  "settings": [],
+  "presets": [{ "name": "LOOQ Our Story", "category": "LOOQ" }]
+}
+{% endschema %}

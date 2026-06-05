@@ -1,0 +1,171 @@
+{%- comment -%}
+  LOOQ — All Products collection page (Figma 112:2433)
+  Same visual language as home `looq-the-goods` but with more products per
+  tab + numbered pagination "1 2" at the bottom (matches Figma).
+
+  Tabs: BÖDI WÖSH / BÖDI LÖSHN / HĀND WÖSH — click to switch (no swipe).
+
+  Per-handle preselection: visiting /collections/hand-wash auto-selects HW tab.
+{%- endcomment -%}
+
+{%- liquid
+  assign default_tab = 'bw'
+  assign h = collection.handle | default: ''
+  if h == 'hand-wash' or h == 'hand-wosh'
+    assign default_tab = 'hw'
+  elsif h == 'body-lotion' or h == 'bodi-loshn'
+    assign default_tab = 'bl'
+  endif
+
+  assign limit = section.settings.limit | default: 12
+-%}
+
+<section class="looq-goods looq-goods--collection" data-section-id="{{ section.id }}">
+  <div class="looq-goods__inner">
+
+    <div class="looq-goods__top">
+      <h2 class="looq-goods__headline">
+        <span>{{ section.settings.headline_part1 | default: 'THE' }}</span>
+        <span>{{ section.settings.headline_part2 | default: 'GOODS.' }}</span>
+      </h2>
+      {%- if section.settings.see_all_url != blank -%}
+        <a class="looq-goods__see-all" href="{{ section.settings.see_all_url }}">
+          {{ section.settings.see_all_label | default: 'SEE ALL' }}
+          <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%}
+      Hardcoded collection lookups for the tab panels — same reason as
+      home Goods section: JSON template `collection` settings don't
+      resolve cleanly. Direct collections['handle'] always works.
+    {%- endcomment -%}
+    {%- assign bw_handle = section.settings.collection_bw_handle | default: 'body-wash' -%}
+    {%- assign bl_handle = section.settings.collection_bl_handle | default: 'body-lotion' -%}
+    {%- assign hw_handle = section.settings.collection_hw_handle | default: 'hand-wash' -%}
+    {% render 'looq-goods-tabs',
+      bw_collection: collections[bw_handle],
+      bl_collection: collections[bl_handle],
+      hw_collection: collections[hw_handle],
+      limit: limit,
+      default_tab: default_tab
+    %}
+
+    {%- comment -%}
+      Pagination — uses the active tab's collection size. Switching tabs in
+      the UI is JS-only and doesn't change the URL, so pagination always
+      reflects the *default* tab's count on initial load. Acceptable for now;
+      richer per-tab pagination can come later.
+    {%- endcomment -%}
+    {%- assign active_collection = section.settings.collection_bw -%}
+    {%- if default_tab == 'bl' -%}{%- assign active_collection = section.settings.collection_bl -%}{%- endif -%}
+    {%- if default_tab == 'hw' -%}{%- assign active_collection = section.settings.collection_hw -%}{%- endif -%}
+
+    {%- if active_collection != blank and active_collection.products_count > limit -%}
+      {%- assign total_pages = active_collection.products_count | divided_by: limit -%}
+      {%- assign remainder = active_collection.products_count | modulo: limit -%}
+      {%- if remainder > 0 -%}
+        {%- assign total_pages = total_pages | plus: 1 -%}
+      {%- endif -%}
+      {%- assign current_page_num = paginate.current_page | default: 1 -%}
+      <nav class="looq-goods-pagination" aria-label="Pagination">
+        {%- for i in (1..total_pages) -%}
+          {%- if i == current_page_num -%}
+            <span class="looq-goods-pagination__link is-active" aria-current="page">{{ i }}</span>
+          {%- else -%}
+            <a class="looq-goods-pagination__link" href="?page={{ i }}">{{ i }}</a>
+          {%- endif -%}
+        {%- endfor -%}
+      </nav>
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% stylesheet %}
+.looq-goods--collection { padding-top: 38px; padding-bottom: 80px; }
+
+.looq-goods-pagination {
+  display: flex; justify-content: center; align-items: center; gap: 24px;
+  margin-top: 56px;
+}
+.looq-goods-pagination__link {
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 400;
+  font-size: 13px; line-height: 1.06;
+  letter-spacing: 1.56px;
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+.looq-goods-pagination__link:hover { color: rgba(255, 255, 255, 0.85); }
+.looq-goods-pagination__link.is-active {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+{% endstylesheet %}
+
+{% javascript %}
+if (!customElements.get('looq-goods-tabs')) {
+  class LooqGoodsTabs extends HTMLElement {
+    connectedCallback() {
+      this.tabs   = this.querySelectorAll('.looq-goods-tabs__tab');
+      this.panels = this.querySelectorAll('.looq-goods-tabs__panel');
+      this.tabs.forEach((tab) => {
+        tab.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.setActive(tab.dataset.target);
+        });
+      });
+    }
+    setActive(id) {
+      this.tabs.forEach((t) => {
+        const on = t.dataset.target === id;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      this.panels.forEach((p) => {
+        p.classList.toggle('is-active', p.dataset.id === id);
+      });
+    }
+  }
+  customElements.define('looq-goods-tabs', LooqGoodsTabs);
+}
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "LOOQ All Products",
+  "tag": "section",
+  "class": "section--looq-collection-tabs",
+  "settings": [
+    { "type": "header", "content": "Headline" },
+    { "type": "text", "id": "headline_part1", "label": "Headline line 1", "default": "THE" },
+    { "type": "text", "id": "headline_part2", "label": "Headline line 2", "default": "GOODS." },
+    { "type": "header", "content": "Top-right link (optional)" },
+    { "type": "text", "id": "see_all_label", "label": "Label",  "default": "SEE ALL" },
+    { "type": "url",  "id": "see_all_url",   "label": "Link" },
+    { "type": "header", "content": "Products" },
+    { "type": "range", "id": "limit", "label": "Products per page per tab", "min": 6, "max": 24, "step": 2, "default": 12 },
+    { "type": "header", "content": "Tab collections" },
+    { "type": "collection", "id": "collection_bw", "label": "BÖDI WÖSH collection" },
+    { "type": "collection", "id": "collection_bl", "label": "BÖDI LÖSHN collection" },
+    { "type": "collection", "id": "collection_hw", "label": "HĀND WÖSH collection" }
+  ],
+  "presets": [
+    {
+      "name": "LOOQ All Products",
+      "category": "LOOQ",
+      "settings": {
+        "collection_bw": "body-wash",
+        "collection_bl": "body-lotion",
+        "collection_hw": "hand-wash"
+      }
+    }
+  ]
+}
+{% endschema %}

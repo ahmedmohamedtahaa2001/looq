@@ -1,0 +1,16 @@
+{
+  "order": [
+    "main"
+  ],
+  "sections": {
+    "main": {
+      "settings": {
+        "hero_filename": "looq-hero-hw.jpg",
+        "marquee_phrase_a": "also called yours",
+        "marquee_phrase_b": "just hands wash",
+        "products_per_page": 12
+      },
+      "type": "looq-collection-type"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{%- comment -%}
+  Render a plain-text metafield as structured HTML.
+
+  - Lines starting with bullet markers (•, -, *) get wrapped as <li>
+    inside <ul>. Consecutive bullet lines share one <ul>.
+  - Other non-empty lines become <p> paragraphs.
+  - Blank lines act as separators (close open lists, end paragraphs).
+
+  Input:
+    - content: string (multi_line_text_field value)
+
+  Use:
+    {% render 'looq-format-rich-text', content: my_metafield_value %}
+{%- endcomment -%}
+
+{%- if content != blank -%}
+  {%- assign lines = content | newline_to_br | split: '<br />' -%}
+  {%- assign in_list = false -%}
+  {%- for raw_line in lines -%}
+    {%- assign line = raw_line | strip -%}
+    {%- if line == blank -%}
+      {%- if in_list -%}</ul>{%- assign in_list = false -%}{%- endif -%}
+    {%- else -%}
+      {%- assign first_char = line | slice: 0, 1 -%}
+      {%- if first_char == '•' or first_char == '-' or first_char == '*' -%}
+        {%- unless in_list -%}<ul>{%- assign in_list = true -%}{%- endunless -%}
+        {%- assign cleaned = line | remove_first: '• ' | remove_first: '•' | remove_first: '- ' | remove_first: '-' | remove_first: '* ' | remove_first: '*' | strip -%}
+        <li>{{ cleaned }}</li>
+      {%- else -%}
+        {%- if in_list -%}</ul>{%- assign in_list = false -%}{%- endif -%}
+        <p>{{ line }}</p>
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- if in_list -%}</ul>{%- endif -%}
+{%- endif -%}

@@ -1,0 +1,78 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "LOOQ Footer",
+  "type": "footer",
+  "sections": {
+    "footer": {
+      "type": "looq-footer",
+      "blocks": {
+        "b1": {
+          "type": "column",
+          "settings": {
+            "heading": "Info",
+            "items": "Terms of Service\nShipping Policy\nPrivacy Policy\nRefund Policy"
+          }
+        },
+        "b2": {
+          "type": "column",
+          "settings": {
+            "heading": "Contact Us:",
+            "items": "info@looqcosmetics.com\nTel: +20 2 2435 2672 \nResponse Time:\n24–48 hours\nCairo, Egypt"
+          }
+        },
+        "b3": {
+          "type": "column",
+          "settings": {
+            "heading": "Need Help?",
+            "items": "Our Story\nBusiness\nConnect\nFAQ"
+          }
+        },
+        "b4": {
+          "type": "social",
+          "settings": {
+            "platform": "Facebook",
+            "url": "https://www.facebook.com/share/14bRbY1vs3i/?mibextid=wwXlfr"
+          }
+        },
+        "b5": {
+          "type": "social",
+          "settings": {
+            "platform": "Instagram",
+            "url": "https://www.instagram.com/looqcosmetics"
+          }
+        },
+        "b6": {
+          "type": "social",
+          "settings": {
+            "platform": "TikTok",
+            "url": "https://www.tiktok.com/@looqcosmetics"
+          }
+        }
+      },
+      "block_order": [
+        "b1",
+        "b2",
+        "b3",
+        "b4",
+        "b5",
+        "b6"
+      ],
+      "settings": {
+        "copy_line1": "Copyright © 2026 LOOQ Inc.",
+        "copy_line2": "All rights reserved.",
+        "powered": ""
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

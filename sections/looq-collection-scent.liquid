@@ -1,0 +1,216 @@
+{%- comment -%}
+  LOOQ — Per-scent collection page (Velvet Rush / Vanilla Breeze / Gummy Yummy / Strawberry Fluff)
+  Figma references: 79:675 (VR), 79:751 (VB), 80:806 (GY), 76:534 (SF)
+
+  Layout:
+    1. Solid color hero region: scent.swatch_color background
+       - Back arrow at top-left
+       - BIG TITLE in scent.accent_color (light pink for dark bg / blue or purple for light bg)
+       - Tagline below title in white
+    2. Marquee strip (scent-tinted) with italic "scent name" + "also called yours" + infinity icons
+    3. Scent-color body, 2-col grid of products (scent's collection.products)
+
+  This single section serves all 4 scents. Visual data (colors, name,
+  tagline) comes from the scent metaobject linked to the collection
+  (matched by collection.handle == scent.handle).
+{%- endcomment -%}
+
+{%- liquid
+  assign limit = section.settings.products_per_page | default: 12
+
+  # Hardcoded scent visual data per handle. Centralized in this section
+  # rather than reading `shop.metaobjects.scent` because the latter
+  # depends on storefront access scope and namespace setup. Easy to
+  # repaint by editing this block; the 4 scents are stable.
+  assign scent_name = collection.title
+  assign scent_tagline = collection.description | strip_html
+  assign scent_swatch = '#3559ef'
+  assign scent_accent = '#ffcaf8'
+
+  case collection.handle
+    when 'velvet-rush'
+      assign scent_swatch = '#6749c4'
+      assign scent_accent = '#ffcaf8'
+      assign scent_tagline = 'Rich, smooth, addictive. Your skin will thank you.'
+    when 'vanilla-breeze'
+      assign scent_swatch = '#ebd35d'
+      assign scent_accent = '#2f50d9'
+      assign scent_tagline = 'Warm, creamy, soft. Like a deep exhale.'
+    when 'gummy-yummy'
+      assign scent_swatch = '#61dddb'
+      assign scent_accent = '#6749c4'
+      assign scent_tagline = 'Fun, fruity, unexpected. The one no one saw coming.'
+    when 'strawberry-fluff'
+      assign scent_swatch = '#ed3ea3'
+      assign scent_accent = '#ffcaf8'
+      assign scent_tagline = 'Sweet, playful, electric. Happiness in a bottle.'
+  endcase
+-%}
+
+<section class="looq-collection-scent" data-section-id="{{ section.id }}"
+         style="--scent-bg: {{ scent_swatch }}; --scent-title: {{ scent_accent }};">
+  <header class="looq-collection-scent__hero">
+    <a class="looq-collection-scent__back" href="{{ routes.root_url }}" aria-label="Back to home">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+        <path d="M9 3l-4 4 4 4"/>
+      </svg>
+    </a>
+    <h1 class="looq-collection-scent__title">
+      {%- assign words = scent_name | split: ' ' -%}
+      {%- for word in words -%}<span>{{ word | upcase }}</span>{%- endfor -%}
+    </h1>
+    {%- if scent_tagline != blank -%}
+      <p class="looq-collection-scent__tagline">{{ scent_tagline }}</p>
+    {%- endif -%}
+  </header>
+
+  <div class="looq-collection-scent__marquee" aria-hidden="true">
+    <div class="looq-collection-scent__marquee-track">
+      {%- for i in (1..10) -%}
+        <span class="looq-collection-scent__marquee-text">{{ scent_name | downcase }}</span>
+        <img class="looq-collection-scent__marquee-icon" src="{{ 'looq-marquee-icon.png' | asset_url }}" width="12" height="6" alt="">
+        <span class="looq-collection-scent__marquee-text">also called yours</span>
+        <img class="looq-collection-scent__marquee-icon" src="{{ 'looq-marquee-icon.png' | asset_url }}" width="12" height="6" alt="">
+      {%- endfor -%}
+    </div>
+  </div>
+
+  <div class="looq-collection-scent__body">
+    <div class="looq-collection-scent__grid">
+      {%- paginate collection.products by limit -%}
+        {%- comment -%} Sort current page by price ascending (cheapest → bundles last) {%- endcomment -%}
+        {%- assign sorted_products = collection.products | sort: 'price' -%}
+        {%- for product in sorted_products -%}
+          {% render 'looq-product-card-grid', product: product %}
+        {%- endfor -%}
+
+        {%- if paginate.pages > 1 -%}
+          {%- assign current_str = paginate.current_page | append: '' -%}
+          <nav class="looq-goods-pagination" aria-label="Pagination">
+            {%- for part in paginate.parts -%}
+              {%- if part.is_link -%}
+                <a class="looq-goods-pagination__link" href="{{ part.url }}">{{ part.title }}</a>
+              {%- elsif part.title == current_str -%}
+                <span class="looq-goods-pagination__link is-active" aria-current="page">{{ part.title }}</span>
+              {%- else -%}
+                <span class="looq-goods-pagination__link">{{ part.title }}</span>
+              {%- endif -%}
+            {%- endfor -%}
+          </nav>
+        {%- endif -%}
+      {%- endpaginate -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+.looq-collection-scent {
+  /* Full-bleed section: hero + marquee span the viewport edge-to-edge.
+     The product grid below is constrained to 390px via __body. */
+  position: relative;
+  width: 100%; margin: 0 auto;
+  background: var(--scent-bg, #3559ef);
+  min-height: 100vh;
+}
+.looq-collection-scent__body {
+  width: 100%; max-width: 390px; margin: 0 auto;
+}
+.looq-collection-scent__hero,
+.looq-collection-scent__marquee {
+  max-width: none;
+}
+
+.looq-collection-scent__hero {
+  /* 87px top padding so back arrow + title sit below the 77px header overlay */
+  position: relative;
+  padding: 87px 21px 24px;
+}
+.looq-collection-scent__back {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 23px; height: 23px;
+  margin-bottom: 0;
+}
+/* Use container query units so font-size scales with the section width
+   (which is locked at max-width: 390px), NOT the browser viewport.
+   Previously used vw, which on desktop (1200px window) computed 12vw =
+   144px — far too big for the 390px section, causing "STRAWBERRY" to
+   overflow off the right edge. */
+.looq-collection-scent { container-type: inline-size; }
+
+.looq-collection-scent__title {
+  margin: 0 0 16px;
+  padding: 0;
+  font-family: var(--font-display);
+  font-weight: 950;
+  font-size: 4.2rem;
+  line-height: 0.92;
+  color: var(--scent-title, #ffcaf8);
+  text-transform: uppercase;
+}
+.looq-collection-scent__title span {
+  display: block;
+  white-space: nowrap;     /* never break mid-word ("STRAWBER / RY") */
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.looq-collection-scent__tagline {
+  margin: 8px 0 0; padding: 0;
+  font-family: var(--font-body, 'PP Radio Grotesk', sans-serif);
+  font-weight: 400; font-size: 13px; line-height: 1.4;
+  color: #ffffff;
+}
+
+.looq-collection-scent__marquee {
+  width: 100%; height: 29px;
+  background: rgba(255, 255, 255, 0.18);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  overflow: hidden; display: flex; align-items: center;
+}
+.looq-collection-scent__marquee-track {
+  display: inline-flex; align-items: center;
+  gap: 33px; padding-inline: 33px;
+  height: 100%; white-space: nowrap;
+  animation: looq-collection-scent-marquee 28s linear infinite;
+}
+.looq-collection-scent__marquee-text {
+  font-family: var(--font-italic-display, 'Migra Italic', serif);
+  font-style: italic; font-weight: 200;
+  font-size: 12px; line-height: 1; color: var(--scent-title, #ffffff);
+  flex-shrink: 0;
+}
+.looq-collection-scent__marquee-icon {
+  display: block; width: 12px; height: 6px; aspect-ratio: 2/1;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+  opacity: 0.85;
+}
+@keyframes looq-collection-scent-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.looq-collection-scent__body {
+  padding: 32px 19px 80px;
+}
+.looq-collection-scent__grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 11px;
+  width: 100%;
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "LOOQ Collection Scent",
+  "tag": "section",
+  "class": "section--looq-collection-scent",
+  "settings": [
+    { "type": "range", "id": "products_per_page", "label": "Products per page", "min": 4, "max": 24, "step": 2, "default": 12 }
+  ],
+  "presets": [
+    { "name": "LOOQ Collection Scent", "category": "LOOQ" }
+  ]
+}
+{% endschema %}
+
+{%- comment -%} resync 1778146806 {%- endcomment -%}

@@ -1,0 +1,89 @@
+/* LOOQ — design tokens
+ * Single source of truth for colors, type, spacing.
+ * Values verified against Figma file VYJH5mRt1C5tMTNeDlq7BY.
+ *
+ * Loaded after fonts.css.liquid in theme.liquid:
+ *   {{ 'tokens.css.liquid' | asset_url | stylesheet_tag }}
+ *
+ * TODO when more sections sampled: dark BG color, additional grays,
+ * product-card surface color, button colors, border radii.
+ */
+
+:root {
+  /* ─── Brand colors (verified) ─────────────────────────────── */
+  --color-fg:           #ffffff;          /* Headline white */
+  --color-body:         #c4c4c4;          /* Body prose gray (115:4543) */
+  --color-accent:       #edfc4d;          /* LOOQ lime-yellow — hero "FIT", body highlights, "THE GOODS" */
+  --color-near-black:   #1e1e1f;          /* Marquee text + border, on yellow */
+  --color-on-accent:    rgba(0, 0, 0, 0.69);   /* OUR STORY button text on yellow chip */
+  --color-cta-faded:    rgba(255, 255, 255, 0.7);  /* SHOP NOW button text on dark chip */
+
+  /* Translucent button surfaces (overlay style — sit on hero photo) */
+  --color-btn-dark:     rgba(11, 57, 25, 0.66);    /* SHOP NOW chip — forest green @ 66% */
+  --color-btn-accent:   rgba(237, 252, 77, 0.54);  /* OUR STORY chip — brand yellow @ 54% */
+
+  /* TODO: confirm site BG (likely black or near-black behind hero) */
+  --color-bg:           #000000;          /* Placeholder — verify */
+
+  /* ─── Section backgrounds (colored blocks layered over body) ─── */
+  --color-section-blue:    #3559ef;       /* The Goods + Best Sellers (Rectangle 2, 101:2101) */
+  --color-section-purple:  #8556e0;       /* Bundles inner stripe (101:2321) */
+  --color-section-pink:    #ed3ea3;       /* Dealz CTA pills */
+
+  /* ─── Product accent colors (per-card title + dot) ─── */
+  --color-product-purple:  #6749c4;       /* HĀND WÖSH (also Pick-Your-Vibe, Best-Sellers headline) */
+  --color-product-blue:    #2f50d9;       /* BÖDI WÖSH */
+  --color-product-teal:    #3eb4b3;       /* BÖDI LÖSHN */
+  --color-product-neutral: #1e1e1e;       /* Sets / Bundles (no flavor accent) */
+
+  /* ─── Card surfaces ─── */
+  --color-card-translucent: rgba(255, 255, 255, 0.85);   /* Goods cards: white@85% over blue */
+  --color-card-purple-tint: rgba(103, 73, 196, 0.13);    /* Best-Sellers cards */
+
+  /* ─── Typography roles ────────────────────────────────────── */
+  --font-display:        'ABC Repro Ultra', 'Lifta', 'Impact', sans-serif;
+  --font-product:        'PP Radio Grotesk', system-ui, sans-serif;       /* weight 900 */
+  --font-body:           'PP Radio Grotesk', system-ui, sans-serif;       /* weight 400 */
+  --font-italic-display: 'Migra Italic', 'PP Radio Grotesk', serif;       /* weight 200 italic */
+  --font-stencil:        'Lifta', 'PP Radio Grotesk', sans-serif;         /* weight 900 — usage TBD */
+
+  /* ─── Type sizes (mobile-first, base = 390px viewport) ────── */
+  --fs-display-mega:     40px;            /* REFUSING TO FIT IN, ALSO CALLED YOURS, THE GOODS */
+  --fs-display-lg:       36px;            /* STRAWBERRY FLUFF flavors */
+  --fs-headline:         32px;            /* DISRUPTIVE / YOUTHFUL / UNEXPECTED — TBD verify */
+  --fs-body:             13px;            /* Hero body para */
+  --fs-button:           12px;            /* SHOP NOW */
+  --fs-caption:          10px;            /* Product strip captions (VANILLA BREEZE 10px) */
+
+  /* ─── Type tracking ───────────────────────────────────────── */
+  --tracking-button:     3.96px;          /* SHOP NOW — extreme tracking, brand signature */
+  --tracking-tight:      -0.02em;
+  --tracking-normal:     0;
+
+  /* ─── Type leading ────────────────────────────────────────── */
+  --lh-display:          1;               /* leading-none — all display headlines */
+  --lh-body:             25px;            /* Absolute leading from Figma */
+  --lh-button:           25px;
+
+  /* ─── Layout ──────────────────────────────────────────────── */
+  --container-mobile:    390px;           /* Figma artboard width */
+  --gutter:              16px;            /* Inferred from x=16 padding pattern (text-x=16, x=19, x=20) */
+
+  /* ─── Breakpoints (TODO: confirm with desktop mocks) ──────── */
+  --bp-tablet:           768px;
+  --bp-desktop:          1024px;
+  --bp-wide:             1440px;
+}
+
+/* ─── LOOQ section reset ─────────────────────────────────────
+ * Kill Dawn / browser default link styling within all our sections.
+ * Wrapped in :where() so the rule has 0 specificity — any class-level
+ * color/text-decoration in the section's scoped stylesheet wins.
+ * ────────────────────────────────────────────────────────── */
+:where(.looq-header, .looq-hero, .looq-goods, .looq-bestsellers,
+       .looq-pyv, .looq-dealz, .looq-bundles, .looq-vibe,
+       .looq-reviews, .looq-newsletter, .looq-footer,
+       .looq-menu) a {
+  text-decoration: none;
+  color: inherit;
+}

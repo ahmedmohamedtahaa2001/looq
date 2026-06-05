@@ -1,0 +1,12 @@
+{
+  "sections": {
+    "main": {
+      "type": "looq-policy-page",
+      "settings": {
+        "title_line_1": "REFUND",
+        "title_line_2": "POLICY"
+      }
+    }
+  },
+  "order": ["main"]
+}

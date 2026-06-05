@@ -1,0 +1,82 @@
+{%- comment -%}
+  LOOQ — FAQ page (Figma 110:2373, 390 × 1143)
+  Pattern A: orange hero + Q&A list.
+{%- endcomment -%}
+
+<section class="looq-page looq-page--faq" data-section-id="{{ section.id }}">
+  <div class="looq-page__hero">
+    <div class="looq-page__watermark" aria-hidden="true">{% render 'looq-infinity' %}</div>
+    <h1 class="looq-page__title">FAQ</h1>
+  </div>
+
+  <div class="looq-page__body">
+    <h2 class="looq-page__heading">EVERYTHING<br>YOU NEED<br>TO KNOW</h2>
+
+    <h3 class="looq-page__q">Are LOOQ products suitable for daily use?</h3>
+    <p>Yes. All <mark>LOOQ</mark> products are designed for everyday use and formulated to be <mark>gentle, effective, and easy</mark> to incorporate into your daily routine.</p>
+
+    <h3 class="looq-page__q">Are LOOQ products cruelty-free?</h3>
+    <p>Yes. <mark>LOOQ</mark> products are not tested on animals.</p>
+
+    <h3 class="looq-page__q">What skin types are LOOQ products suitable for?</h3>
+    <p>Our products are designed to work well with most skin types. If you have <mark>sensitive skin or allergies</mark>, we always recommend checking the ingredient list before use.</p>
+
+    <h3 class="looq-page__q">How should I store LOOQ products?</h3>
+    <p>Store products in a <mark>cool, dry place</mark> away from direct sunlight to maintain their quality and fragrance.</p>
+
+    <h2 class="looq-page__section-heading">Orders</h2>
+
+    <h3 class="looq-page__q">Where can I buy LOOQ products?</h3>
+    <p>You can purchase <mark>LOOQ</mark> products through our official website and through selected retail partners.</p>
+
+    <h3 class="looq-page__q">Can I modify or cancel my order?</h3>
+    <p>If your order has not yet been processed or shipped, please contact support <mark>as soon as possible</mark> and we will do our best to assist.</p>
+
+    <h3 class="looq-page__q">How can I track my order?</h3>
+    <p>Once your order is shipped, you will receive a tracking link by <mark>email or message</mark> so you can follow your delivery.</p>
+  </div>
+</section>
+
+{% stylesheet %}
+.looq-page { width:100%; max-width:390px; margin:0 auto; background:#fff; }
+.looq-page--faq { --page-accent:#ff5c00; }
+.looq-page__hero { position:relative; overflow:hidden; }
+.looq-page__watermark {
+  /* Watermark uses CSS mask-image of the LOOQ ∞ icon — color property
+     drives the tint via the masked element's background-color: currentColor.
+     420×230 keeps the icon's natural 453:249 aspect ratio. White at 18%
+     alpha sits on top of the colored hero as a darker tonal layer. */
+  position:absolute; right:-60px; top:50%; transform:translateY(-50%);
+  width:420px; height:230px; pointer-events:none; user-select:none;
+  color: rgba(255, 255, 255, 0.18);
+}
+.looq-page__hero { width:100%; height:279px; background:var(--page-accent);
+  display:flex; align-items:center;
+  padding:77px 19px 0; }
+.looq-page__title { margin:0; padding:0;
+  font-family:var(--font-display, 'ABC Repro Ultra', sans-serif); font-weight:950;
+  font-size:45px; white-space:nowrap; line-height:1; color:#fff; text-transform:uppercase; }
+.looq-page__body { padding:24px 19px 36px; }
+.looq-page__heading { margin:0 0 24px; padding:0;
+  font-family:var(--font-display, 'ABC Repro Ultra', sans-serif); font-weight:950;
+  font-size:32px; line-height:1; color:#1e1e1e; text-transform:uppercase; }
+.looq-page__section-heading { margin:32px 0 12px; padding:0;
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif); font-weight:900;
+  font-size:15px; line-height:25px; color:#1e1e1e; }
+.looq-page__q { margin:18px 0 4px; padding:0;
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif); font-weight:900;
+  font-size:13px; line-height:25px; color:var(--page-accent); }
+.looq-page__body p { margin:0 0 12px; padding:0;
+  font-family:var(--font-body, 'PP Radio Grotesk', sans-serif); font-weight:400;
+  font-size:13px; line-height:25px; color:#1e1e1e; }
+.looq-page__body mark { background:transparent; color:var(--page-accent); }
+.looq-page__title { white-space:nowrap; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "LOOQ FAQ",
+  "settings": [],
+  "presets": [{ "name": "LOOQ FAQ", "category": "LOOQ" }]
+}
+{% endschema %}

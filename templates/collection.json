@@ -1,0 +1,19 @@
+{
+  "sections": {
+    "tabs": {
+      "type": "looq-collection-tabs",
+      "settings": {
+        "headline_part1": "THE",
+        "headline_part2": "GOODS.",
+        "see_all_label": "SEE ALL",
+        "limit": 12,
+        "collection_bw": "shopify://collections/body-wash",
+        "collection_bl": "shopify://collections/body-lotion",
+        "collection_hw": "shopify://collections/hand-wash"
+      }
+    }
+  },
+  "order": [
+    "tabs"
+  ]
+}

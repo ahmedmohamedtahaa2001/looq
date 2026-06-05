@@ -1,0 +1,21 @@
+{%- comment -%}
+  LOOQ ∞ watermark — the actual brand-supplied peanut/infinity mark
+  (assets/looq-infinity-mark.png — black silhouette, 453×249).
+
+  Uses CSS mask-image so the icon shape is "cut out" from the
+  background-color. The parent's `color` property drives the visible
+  tint via `background-color: currentColor`. That keeps the one-snippet
+  / per-page-tint pattern working with no JS or filter chains.
+{%- endcomment -%}
+<span class="looq-infinity" style="--looq-infinity-mark: url('{{ 'looq-infinity-mark.png' | asset_url }}');" aria-hidden="true"></span>
+
+{% stylesheet %}
+.looq-infinity {
+  display: block;
+  width: 100%; height: 100%;
+  background-color: currentColor;
+  -webkit-mask: var(--looq-infinity-mark) no-repeat center / contain;
+          mask: var(--looq-infinity-mark) no-repeat center / contain;
+  pointer-events: none; user-select: none;
+}
+{% endstylesheet %}

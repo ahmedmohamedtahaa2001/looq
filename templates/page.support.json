@@ -1,0 +1,8 @@
+{
+  "sections": {
+    "main": {
+      "type": "looq-page-support"
+    }
+  },
+  "order": ["main"]
+}

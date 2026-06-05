@@ -1,0 +1,582 @@
+{%- comment -%}
+  LOOQ — UGC videos section ("LOOQ IN REAL LIFE")
+  Horizontal scroll-snap carousel of vertical 9:16 video cards. Each card
+  has a video (click-to-play), an optional linked product preview below
+  with scent dots + star rating.
+
+  Source: Figma frame 'LOOQ IN REAL LIFE' (above STAY AHEAD OF THE VIBE).
+  Block schema lets merchandisers add as many UGC entries as they want
+  via Theme Editor, with native Shopify file picker for the video, image
+  picker for the poster, and product picker for the linked product card.
+{%- endcomment -%}
+
+<section class="looq-ugc" data-section-id="{{ section.id }}">
+  <header class="looq-ugc__head">
+    <h2 class="looq-ugc__title">
+      <span class="looq-ugc__title-1">{{ section.settings.title_brand | default: 'LOOQ' }}</span>
+      <span class="looq-ugc__title-2">{{ section.settings.title_rest | default: 'IN REAL LIFE' }}</span>
+    </h2>
+    <p class="looq-ugc__tagline">{{ section.settings.tagline | default: 'Real people. Real routines. Real good smells.' }}</p>
+  </header>
+
+  <div class="looq-ugc__carousel" data-ugc-carousel>
+    <div class="looq-ugc__track" data-ugc-track>
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'video' -%}
+          {%- comment -%}
+            Resolve linked product from settings. Accepts EITHER a product picker
+            value OR a plain handle string (`product_handle` setting), with the
+            handle path being the source of truth because `type: product` on this
+            theme has been silently returning blank. all_products[handle] is the
+            deterministic lookup against the published product map.
+          {%- endcomment -%}
+          {%- assign linked_product = block.settings.product -%}
+          {%- if linked_product == blank and block.settings.product_handle != blank -%}
+            {%- assign linked_product = all_products[block.settings.product_handle] -%}
+          {%- endif -%}
+          {%- assign rating = block.settings.rating | default: 5 -%}
+          <article class="looq-ugc__card" data-ugc-card {{ block.shopify_attributes }}>
+            <div class="looq-ugc__video-wrap">
+              <video
+                class="looq-ugc__video"
+                data-ugc-video
+                playsinline
+                muted
+                preload="none"
+                controlslist="nodownload nofullscreen noremoteplayback"
+                disablepictureinpicture
+                {% if block.settings.poster != blank %}poster="{{ block.settings.poster }}"{% endif %}
+                {% if block.settings.loop %}loop{% endif %}>
+                {%- if block.settings.video_url != blank -%}
+                  <source src="{{ block.settings.video_url }}" type="video/mp4">
+                {%- endif -%}
+              </video>
+              <button type="button" class="looq-ugc__play" data-ugc-play aria-label="Play video">
+                <svg class="looq-ugc__play-icon" width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                  <circle cx="24" cy="24" r="23" fill="rgba(255,255,255,0.92)"/>
+                  <path d="M19 16l14 8-14 8V16z" fill="#1e1e1e"/>
+                </svg>
+              </button>
+              <button type="button" class="looq-ugc__toggle" data-ugc-toggle aria-label="Pause / play video">
+                <svg class="looq-ugc__toggle-play" width="18" height="18" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+                <svg class="looq-ugc__toggle-pause" width="18" height="18" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+                  <rect x="6" y="5" width="4" height="14"/>
+                  <rect x="14" y="5" width="4" height="14"/>
+                </svg>
+              </button>
+              <button type="button" class="looq-ugc__mute" data-ugc-mute aria-label="Toggle sound">
+                <svg class="looq-ugc__mute-icon-on" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                  <line x1="23" y1="9" x2="17" y2="15"/>
+                  <line x1="17" y1="9" x2="23" y2="15"/>
+                </svg>
+                <svg class="looq-ugc__mute-icon-off" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                </svg>
+              </button>
+            </div>
+
+            {%- comment -%}
+              Hardcoded product info — cloned 1:1 from the live looqcosmetics.com
+              UGC section. The dynamic `linked_product` lookup (type: product) has
+              been silently returning blank on this theme, which dropped the entire
+              title/dots/stars block. We resolve the handle from whatever is
+              available and render against a hardcoded title + scent-dot + rating
+              map so every card matches the reference site regardless of the lookup.
+            {%- endcomment -%}
+            {%- assign p_handle = linked_product.handle | default: block.settings.product_handle | downcase | strip -%}
+            {%- assign p_url = linked_product.url -%}
+            {%- if p_url == blank and p_handle != blank -%}{%- assign p_url = '/products/' | append: p_handle -%}{%- endif -%}
+
+            {%- comment -%} Title map cloned from looqcosmetics.com. {%- endcomment -%}
+            {%- assign p_display = linked_product.title | upcase -%}
+            {%- case p_handle -%}
+              {%- when 'bodi-loshn-set-of-3' -%}{%- assign p_display = 'BÖDI LÖSHN SET OF 3' -%}
+              {%- when 'hand-wosh-set-of-2' -%}{%- assign p_display = 'HĀND WÖSH SET OF 2' -%}
+              {%- when 'bodi-wosh-set-of-3' -%}{%- assign p_display = 'BÖDI WÖSH SET OF 3' -%}
+              {%- when 'bodi-set' -%}{%- assign p_display = 'THE FÜLL SET' -%}
+              {%- when 'bodi-loshn-set-of-2' -%}{%- assign p_display = 'BÖDI LÖSHN SET OF 2' -%}
+              {%- when 'hand-wosh-bodi-loshn-set' -%}{%- assign p_display = 'HĀND WÖSH & BÖDI LÖSHN SET' -%}
+              {%- when 'the-bathtub-set' -%}{%- assign p_display = 'THE BATHTUB SET' -%}
+            {%- endcase -%}
+
+            {%- if p_url != blank or p_display != blank -%}
+              <a class="looq-ugc__product" href="{{ p_url | default: '#' }}">
+                <div class="looq-ugc__product-title">{{ p_display }}</div>
+                {%- comment -%} Scent dots — hardcoded 4-color set, cloned from the reference site. {%- endcomment -%}
+                <div class="looq-ugc__product-dots" aria-hidden="true">
+                  <span class="looq-ugc__dot" style="background:#ebd35d;"></span>
+                  <span class="looq-ugc__dot" style="background:#6749c4;"></span>
+                  <span class="looq-ugc__dot" style="background:#ed3ea3;"></span>
+                  <span class="looq-ugc__dot" style="background:#61dddb;"></span>
+                </div>
+                {%- comment -%} Stars — hardcoded 5/5 filled, cloned from the reference site. {%- endcomment -%}
+                <div class="looq-ugc__stars" aria-label="Rating: 5 out of 5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#1e1e1e" aria-hidden="true">
+                    <path d="M12 2.5l2.94 5.96 6.56.95-4.75 4.63 1.12 6.54L12 17.5l-5.87 3.08 1.12-6.54L2.5 9.41l6.56-.95L12 2.5z"/>
+                  </svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#1e1e1e" aria-hidden="true">
+                    <path d="M12 2.5l2.94 5.96 6.56.95-4.75 4.63 1.12 6.54L12 17.5l-5.87 3.08 1.12-6.54L2.5 9.41l6.56-.95L12 2.5z"/>
+                  </svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#1e1e1e" aria-hidden="true">
+                    <path d="M12 2.5l2.94 5.96 6.56.95-4.75 4.63 1.12 6.54L12 17.5l-5.87 3.08 1.12-6.54L2.5 9.41l6.56-.95L12 2.5z"/>
+                  </svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#1e1e1e" aria-hidden="true">
+                    <path d="M12 2.5l2.94 5.96 6.56.95-4.75 4.63 1.12 6.54L12 17.5l-5.87 3.08 1.12-6.54L2.5 9.41l6.56-.95L12 2.5z"/>
+                  </svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#1e1e1e" aria-hidden="true">
+                    <path d="M12 2.5l2.94 5.96 6.56.95-4.75 4.63 1.12 6.54L12 17.5l-5.87 3.08 1.12-6.54L2.5 9.41l6.56-.95L12 2.5z"/>
+                  </svg>
+                </div>
+              </a>
+            {%- endif -%}
+          </article>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    {%- if section.blocks.size > 1 -%}
+      <div class="looq-ugc__dots-pagination" role="tablist" aria-label="Video carousel pagination">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'video' -%}
+            <button type="button" class="looq-ugc__pag-dot{% if forloop.first %} is-active{% endif %}"
+                    data-ugc-dot="{{ forloop.index0 }}"
+                    role="tab" aria-label="Slide {{ forloop.index }}"></button>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+.looq-ugc {
+  width: 100%; margin: 0 auto;
+  background: #fff;
+  padding: 28px 0 36px;
+  container-type: inline-size;
+}
+.looq-ugc__head { padding: 0 21px; }
+
+/* Headline — Figma node 101:2189
+   Both lines 45px ABC Repro Ultra (Ultra weight 950), line-height 1.
+   LOOQ in #3559ef; IN REAL LIFE in #1e1e1e. Same size — color is the
+   only differentiator (not size as I'd previously assumed). */
+.looq-ugc__title {
+  margin: 0 0 8px; padding: 0;
+  font-family: var(--font-display, 'ABC Repro Ultra', sans-serif);
+  font-weight: 950;
+  font-size: 45px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+.looq-ugc__title-1 { display: block; color: #3559ef; }
+.looq-ugc__title-2 { display: block; color: #1e1e1e; }
+
+/* Tagline — Figma node 389:877
+   13px PP Radio Grotesk Regular, line-height 25px, color rgba(0,0,0,0.54). */
+.looq-ugc__tagline {
+  margin: 0 0 22px; padding: 0;
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 400; font-size: 13px; line-height: 25px;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+/* ── Card per Figma node 396:905 ──────────────────────────────
+   Card: 250×470, bg rgba(53,89,239,0.25) (light blue tint),
+         border-radius 25, box-shadow 6/7/8.9 rgba(0,0,0,0.25)
+   Image area: 250×378 at top (mask cropped at bottom inside card)
+   Play btn: 60×60 centered horizontally at left:95 (=(250-60)/2) top:160
+   Title:    PP Radio Grotesk Black 13px at left:16 top:394
+   Dots:     14×14 at top:414, x=16, 33, 50 (17px stride)
+   Stars:    71×18 at left:16 top:435
+─────────────────────────────────────────────────────────────── */
+.looq-ugc__carousel { position: relative; padding-top: 12px; }
+.looq-ugc__track {
+  display: flex;
+  gap: 14px;
+  padding: 0 70px 30px;         /* (390 - 250)/2 = 70 — centers a 250px card; 30px bottom keeps the shadow visible */
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.looq-ugc__track::-webkit-scrollbar { display: none; }
+.looq-ugc__card {
+  flex: 0 0 250px;              /* Figma exact */
+  height: 470px;
+  scroll-snap-align: center;
+  position: relative;
+  background: rgba(53, 89, 239, 0.25);
+  border-radius: 25px;
+  box-shadow: 6px 7px 8.9px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  transform: scale(0.86);
+  opacity: 0.6;
+  transition: transform 280ms ease, opacity 280ms ease;
+}
+.looq-ugc__card.is-active { transform: scale(1); opacity: 1; }
+
+.looq-ugc__video-wrap {
+  position: absolute;
+  left: 0; top: 0;
+  width: 250px; height: 378px;
+  overflow: hidden;
+  background: transparent;
+}
+.looq-ugc__video {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+/* ── UGC VIDEO CONTROLS ──────────────────────────────────────────
+   State is driven by two classes on .looq-ugc__card:
+     .is-playing  → video is playing  (hide center play, show toggle + mute)
+     .is-unmuted  → sound is on        (swap the mute icon)
+─────────────────────────────────────────────────────────────────── */
+
+/* Large center play button — visible when paused/not started, hidden while playing */
+.looq-ugc__play {
+  position: absolute;
+  left: 95px; top: 160px;       /* Figma exact — center of image area */
+  width: 60px; height: 60px;
+  background: transparent; border: 0; padding: 0;
+  cursor: pointer; z-index: 3;
+  transition: opacity 200ms ease, transform 200ms ease;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.18));
+}
+.looq-ugc__play:hover { transform: scale(1.06); }
+.looq-ugc__play svg { width: 100%; height: 100%; display: block; }
+.looq-ugc__card.is-playing .looq-ugc__play { opacity: 0; pointer-events: none; }
+
+/* Small pause toggle — bottom-left, only while playing */
+.looq-ugc__toggle {
+  position: absolute;
+  left: 12px; bottom: 12px;
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  border: 0; padding: 0; border-radius: 50%;
+  cursor: pointer; z-index: 3;
+  opacity: 0; pointer-events: none;
+  transition: opacity 200ms ease;
+}
+.looq-ugc__card.is-playing .looq-ugc__toggle { opacity: 1; pointer-events: auto; }
+.looq-ugc__toggle:hover { background: rgba(0, 0, 0, 0.75); }
+.looq-ugc__toggle svg { width: 18px; height: 18px; display: block; }
+.looq-ugc__toggle-pause { display: none; }
+.looq-ugc__card.is-playing .looq-ugc__toggle-play  { display: none; }
+.looq-ugc__card.is-playing .looq-ugc__toggle-pause { display: block; }
+
+/* Mute toggle: bottom-right of the video wrap, only visible while playing.
+   Icon swap controlled by the `is-unmuted` class on the card. */
+.looq-ugc__mute {
+  position: absolute;
+  right: 12px; bottom: 12px;
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  border: 0; padding: 0; border-radius: 50%;
+  cursor: pointer; z-index: 3;
+  opacity: 0; pointer-events: none;
+  transition: opacity 200ms ease;
+}
+.looq-ugc__card.is-playing .looq-ugc__mute { opacity: 1; pointer-events: auto; }
+.looq-ugc__mute:hover { background: rgba(0, 0, 0, 0.75); }
+.looq-ugc__mute-icon-off { display: none; }
+.looq-ugc__card.is-unmuted .looq-ugc__mute-icon-on  { display: none; }
+.looq-ugc__card.is-unmuted .looq-ugc__mute-icon-off { display: block; }
+
+/* Product info block in the lower 92px of the card (not a separate floating card) */
+.looq-ugc__product {
+  position: absolute;
+  left: 16px; top: 394px;       /* title pinned per Figma */
+  right: 16px;
+  text-decoration: none;
+  color: #1e1e1e;
+}
+.looq-ugc__product-title {
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 900; font-size: 13px; line-height: 1;
+  color: #1e1e1e;
+  text-transform: uppercase;
+  margin: 0;
+}
+.looq-ugc__product-dots {
+  position: absolute; left: 0; top: 20px;    /* 414 - 394 = 20 from title */
+  display: flex; gap: 3px;                    /* stride 17 (14 width + 3 gap) */
+}
+.looq-ugc__dot {
+  display: inline-block; width: 14px; height: 14px; border-radius: 50%;
+}
+.looq-ugc__stars {
+  position: absolute; left: 0; top: 41px;     /* 435 - 394 = 41 from title */
+  display: flex; gap: 2px;
+}
+.looq-ugc__stars svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+.looq-ugc__dots-pagination {
+  display: flex; justify-content: center; gap: 8px;
+  margin-top: 20px;
+}
+.looq-ugc__pag-dot {
+  width: 8px; height: 8px; padding: 0;
+  border: 0; border-radius: 50%;
+  background: rgba(30, 30, 30, 0.22);
+  cursor: pointer;
+  transition: background 200ms ease, transform 200ms ease;
+}
+.looq-ugc__pag-dot.is-active {
+  background: #3559ef;        /* brand blue per Figma — was purple */
+  transform: scale(1.25);
+}
+{% endstylesheet %}
+
+<script>
+(function(){
+  document.querySelectorAll('[data-ugc-carousel]:not([data-ugc-init])').forEach(function(carousel){
+    try {
+    carousel.setAttribute('data-ugc-init', '1');
+    var track = carousel.querySelector('[data-ugc-track]');
+    var dots = carousel.querySelectorAll('[data-ugc-dot]');
+    var cards = carousel.querySelectorAll('[data-ugc-card]');
+    if (!track) return;
+
+    // Large center play button: starts playback. Pauses any other playing
+    // video in this carousel first, then marks THIS card .is-playing — the
+    // CSS hides the center play and reveals the bottom toggle + mute buttons.
+    // Video starts muted (autoplay-safe); the mute button turns sound on.
+    carousel.querySelectorAll('[data-ugc-play]').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.preventDefault();
+        var card = btn.closest('[data-ugc-card]');
+        var video = card && card.querySelector('[data-ugc-video]');
+        if (!video) return;
+        // Pause all other videos in this carousel first
+        carousel.querySelectorAll('[data-ugc-video]').forEach(function(v){
+          if (v !== video && !v.paused) {
+            v.pause();
+            v.closest('[data-ugc-card]').classList.remove('is-playing');
+          }
+        });
+        card.classList.add('is-playing');
+        video.play().catch(function(){
+          // Playback rejected — fall back to an explicitly muted retry
+          video.muted = true;
+          card.classList.remove('is-unmuted');
+          video.play();
+        });
+      });
+    });
+
+    // Small bottom-left toggle: pause / resume the current video.
+    carousel.querySelectorAll('[data-ugc-toggle]').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var card = btn.closest('[data-ugc-card]');
+        var video = card && card.querySelector('[data-ugc-video]');
+        if (!video) return;
+        if (video.paused) {
+          video.play();
+          card.classList.add('is-playing');
+        } else {
+          video.pause();
+          card.classList.remove('is-playing');
+        }
+      });
+    });
+
+    // Mute toggle button — flips video.muted and the card's `is-unmuted`
+    // class. The CSS swaps the muted / sound-on SVG icon based on it.
+    carousel.querySelectorAll('[data-ugc-mute]').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var card = btn.closest('[data-ugc-card]');
+        var video = card && card.querySelector('[data-ugc-video]');
+        if (!video) return;
+        video.muted = !video.muted;
+        card.classList.toggle('is-unmuted', !video.muted);
+      });
+    });
+
+    // When a (non-looping) video finishes, reset to the paused state so the
+    // large center play button reappears.
+    carousel.querySelectorAll('[data-ugc-video]').forEach(function(v){
+      v.addEventListener('ended', function(){
+        var card = v.closest('[data-ugc-card]');
+        if (card) card.classList.remove('is-playing');
+      });
+    });
+
+    // Pagination dot click → scroll to card (and restart the auto-advance timer)
+    dots.forEach(function(dot){
+      dot.addEventListener('click', function(){
+        var i = parseInt(dot.dataset.ugcDot, 10);
+        goToCard(i);
+        // The pointerdown cooldown (below) pauses & resumes auto-advance,
+        // so a dot click stays on the chosen card before rotation resumes.
+      });
+    });
+
+    // Active card + dot updates on scroll. The centered card gets is-active
+    // (which CSS scales up + un-fades), all others get the dim/scale-down state.
+    var activeIdx = 0;
+    function updateActive() {
+      var center = track.scrollLeft + track.clientWidth / 2;
+      var nearestIdx = 0, nearestDist = Infinity;
+      cards.forEach(function(c, i){
+        var cardCenter = c.offsetLeft + c.offsetWidth / 2 - track.offsetLeft;
+        var d = Math.abs(cardCenter - center);
+        if (d < nearestDist) { nearestDist = d; nearestIdx = i; }
+      });
+      activeIdx = nearestIdx;
+      cards.forEach(function(c, i){ c.classList.toggle('is-active', i === nearestIdx); });
+      dots.forEach(function(d, i){ d.classList.toggle('is-active', i === nearestIdx); });
+    }
+
+    // Smoothly center a card by index. The native smooth scroll + the
+    // is-active CSS transition (scale/opacity) make the hand-off look fluid.
+    function goToCard(i) {
+      var card = cards[i];
+      if (card) track.scrollTo({ left: card.offsetLeft - track.offsetLeft, behavior: 'smooth' });
+    }
+
+    var ticking = false;
+    track.addEventListener('scroll', function(){
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function(){ updateActive(); ticking = false; });
+    });
+    // ── Auto-advance ────────────────────────────────────────────────
+    // A single 4s timer advances to the next card (wrapping after the
+    // last). The move is a smooth scroll via goToCard(); the is-active
+    // scale/opacity CSS transition does the visible work, so the hand-off
+    // looks animated rather than jumpy. Several guards keep it from ever
+    // fighting the viewer:
+    //   • a video is playing in this carousel  → let them watch
+    //   • the pointer is over the carousel       → they're reading it
+    //   • they just swiped / tapped / clicked    → cool down, then resume
+    //   • the tab is hidden                       → don't scroll offscreen
+    //   • prefers-reduced-motion is set           → respect the OS choice
+    var AUTO_MS     = 4000;   // each card's time on screen
+    var RESUME_MS   = 8000;   // quiet period after a manual interaction
+    var PAUSE_MS    = 2000;   // dwell on a video's last frame before resuming
+    var autoTimer   = null;
+    var resumeTimer = null;
+    var hovering    = false;
+    var reduceMotion = window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function aVideoIsPlaying() {
+      var playing = false;
+      carousel.querySelectorAll('[data-ugc-video]').forEach(function(v){
+        if (!v.paused && !v.ended && v.currentTime > 0) playing = true;
+      });
+      return playing;
+    }
+
+    function autoTick() {
+      console.log('[UGC] autoTick fired, activeIdx:', activeIdx);
+      if (cards.length < 2) return;
+      // Skip (but keep the timer alive) while the viewer is engaged — the
+      // very next tick advances once they've moved on.
+      if (hovering || aVideoIsPlaying() || document.hidden) return;
+      goToCard((activeIdx + 1) % cards.length);
+    }
+
+    function startAuto() {
+      console.log('[UGC] startAuto called, reduceMotion:', reduceMotion);
+      if (autoTimer || cards.length < 2) return;
+      autoTimer = setInterval(autoTick, AUTO_MS);
+    }
+    function stopAuto() {
+      if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+    }
+    // Stop now and queue a single resume `delay` ms later. A newer call
+    // always wins, so rapid interactions collapse into one cooldown.
+    function pauseThenResume(delay) {
+      stopAuto();
+      if (resumeTimer) clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(function(){ resumeTimer = null; startAuto(); }, delay);
+    }
+
+    // Pause while the pointer hovers the carousel; resume when it leaves.
+    carousel.addEventListener('mouseenter', function(){ hovering = true; stopAuto(); });
+    carousel.addEventListener('mouseleave', function(){ hovering = false; startAuto(); });
+
+    // Any manual navigation (tap, drag, swipe, wheel, dot click) pauses the
+    // rotation, which then resumes after a quiet RESUME_MS so it never yanks
+    // the card out from under the viewer mid-read.
+    function onManualInteract(){ pauseThenResume(RESUME_MS); }
+    carousel.addEventListener('pointerdown', onManualInteract);
+    track.addEventListener('wheel',     onManualInteract, { passive: true });
+    track.addEventListener('touchmove', onManualInteract, { passive: true });
+
+    // Freeze the instant a video starts (capture phase — media events don't
+    // bubble). When it pauses or ends, dwell on the frame, then resume.
+    carousel.addEventListener('play', function(){
+      stopAuto();
+      if (resumeTimer) { clearTimeout(resumeTimer); resumeTimer = null; }
+    }, true);
+    carousel.addEventListener('pause', function(){ pauseThenResume(PAUSE_MS); }, true);
+    carousel.addEventListener('ended', function(){ pauseThenResume(PAUSE_MS); }, true);
+
+    // Don't burn cycles (or scroll offscreen) while the tab is hidden.
+    document.addEventListener('visibilitychange', function(){
+      if (document.hidden) stopAuto(); else startAuto();
+    });
+
+    // Initial run + center the first card.
+    requestAnimationFrame(function(){
+      if (cards.length > 0) {
+        var first = cards[0];
+        track.scrollLeft = first.offsetLeft - track.offsetLeft - (track.clientWidth - first.offsetWidth) / 2;
+      }
+      updateActive();
+      startAuto();
+    });
+    } catch(e) {
+      console.error('[UGC Carousel] Init error:', e);
+    }
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "UGC Videos",
+  "tag": "section",
+  "class": "section--looq-ugc",
+  "settings": [
+    { "type": "text", "id": "title_brand", "label": "Title — brand word (blue)", "default": "LOOQ" },
+    { "type": "text", "id": "title_rest",  "label": "Title — rest (black)",       "default": "IN REAL LIFE" },
+    { "type": "text", "id": "tagline",     "label": "Tagline", "default": "Real people. Real routines. Real good smells." }
+  ],
+  "blocks": [
+    {
+      "type": "video",
+      "name": "UGC video",
+      "settings": [
+        { "type": "url",      "id": "video_url", "label": "Video file URL (.mp4)",
+          "info": "Upload an MP4 to Shopify Files (Admin → Content → Files) and paste the URL here." },
+        { "type": "url", "id": "poster", "label": "Poster image URL (still frame)",
+          "info": "Paste a Shopify CDN image URL or any public image URL." },
+        { "type": "checkbox", "id": "loop",       "label": "Loop video", "default": false },
+        { "type": "product",  "id": "product",    "label": "Linked product (picker — preferred)" },
+        { "type": "text",     "id": "product_handle", "label": "Linked product handle (fallback)",
+          "info": "Use the product handle (e.g. bodi-set) — used when the picker above returns blank." },
+        { "type": "text",     "id": "scent_dots", "label": "Scent dots (comma-separated)",
+          "default": "vanilla,velvet,strawberry,gummy",
+          "info": "vanilla / velvet / strawberry / gummy" },
+        { "type": "range",    "id": "rating",     "label": "Star rating", "min": 1, "max": 5, "step": 1, "default": 5 }
+      ]
+    }
+  ],
+  "presets": [{ "name": "UGC Videos", "category": "LOOQ" }]
+}
+{% endschema %}

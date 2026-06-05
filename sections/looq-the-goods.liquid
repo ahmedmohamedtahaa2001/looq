@@ -1,0 +1,277 @@
+{%- comment -%}
+  LOOQ — The Goods section (home page)
+  Tabs: BÖDI WÖSH / BÖDI LÖSHN / HĀND WÖSH (click to switch — no swipe).
+  Tab nav + panels rendered by snippets/looq-goods-tabs.liquid.
+  Figma reference frame: 101:2106..2120 (home goods, 6-card grid).
+{%- endcomment -%}
+
+<section class="looq-goods" data-section-id="{{ section.id }}">
+  <div class="looq-goods__inner">
+
+    {% comment %} Headline + SEE ALL link {% endcomment %}
+    <div class="looq-goods__top">
+      <h2 class="looq-goods__headline">
+        <span>{{ section.settings.headline_part1 | default: 'THE' }}</span>
+        <span>{{ section.settings.headline_part2 | default: 'GOODS.' }}</span>
+      </h2>
+      {%- if section.settings.see_all_url != blank or section.settings.see_all_label != blank -%}
+        <a class="looq-goods__see-all" href="{{ section.settings.see_all_url | default: '#' }}">
+          {{ section.settings.see_all_label | default: 'SEE ALL' }}
+          <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%}
+      Hardcoded collection handles. JSON-template `collection` settings
+      come through to Liquid as `shopify://collections/<handle>` URL
+      strings (not Collection objects), and `collections[that_url]`
+      doesn't resolve. Direct `collections['handle']` always works.
+      Merchants can change which products show by adding/removing
+      products from these 3 collections in Shopify admin.
+    {%- endcomment -%}
+    {%- assign bw_handle = section.settings.collection_bw_handle | default: 'body-wash' -%}
+    {%- assign bl_handle = section.settings.collection_bl_handle | default: 'body-lotion' -%}
+    {%- assign hw_handle = section.settings.collection_hw_handle | default: 'hand-wash' -%}
+    {% render 'looq-goods-tabs',
+      bw_collection: collections[bw_handle],
+      bl_collection: collections[bl_handle],
+      hw_collection: collections[hw_handle],
+      limit: section.settings.limit,
+      default_tab: 'bw'
+    %}
+  </div>
+</section>
+
+{% stylesheet %}
+.looq-goods {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  background: var(--color-section-blue, #3559ef);
+  /* Top padding 87 = 77px transparent header overlay + 10px breathing room.
+     Matches the other sections (Our Story, collection/product/static pages)
+     that already clear the header. Without this, 'THE GOODS' title + tabs
+     sit under the hamburger / LOOQ logo / cart icons. */
+  padding: 87px 0 32px;
+  color: var(--color-fg, #fff);
+}
+.looq-goods__inner { position: relative; padding-inline: 19px; }
+
+.looq-goods__top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px;
+}
+.looq-goods__headline {
+  margin: 0; padding: 0;
+  font-family: var(--font-display, 'ABC Repro Ultra', sans-serif);
+  font-weight: 950;
+  font-size: var(--fs-display-mega, 40px);
+  line-height: var(--lh-display, 1);
+  color: var(--color-accent, #edfc4d);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.looq-goods__headline span { display: block; }
+
+.looq-goods__see-all {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 16px;
+  color: var(--color-fg, #fff);
+  font-family: var(--font-body, 'PP Radio Grotesk', sans-serif);
+  font-weight: 400;
+  font-size: var(--fs-button, 12px);
+  letter-spacing: var(--tracking-button, 3.96px);
+  text-transform: uppercase;
+}
+.looq-goods__see-all svg { display: block; }
+
+/* Tab nav (replaces .looq-goods__pills) */
+.looq-goods-tabs { display: block; }
+.looq-goods-tabs__nav {
+  margin-top: 28px;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding-inline: 24px;
+}
+.looq-goods-tabs__tab {
+  display: block; flex: 0 0 auto;
+  background: transparent; border: 0; padding: 0;
+  font-family: var(--font-body, 'PP Radio Grotesk', sans-serif);
+  font-weight: 400;
+  font-size: 13px; line-height: 1.06;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 1.56px;
+  text-align: center; text-transform: uppercase;
+  cursor: pointer; transition: color 150ms ease;
+}
+.looq-goods-tabs__tab span { display: block; }
+.looq-goods-tabs__tab.is-active { color: var(--color-fg, #fff); }
+.looq-goods-tabs__tab:hover:not(.is-active) { color: rgba(255, 255, 255, 0.85); }
+
+.looq-goods-tabs__divider {
+  margin: 14px 0 16px;
+  border: 0; height: 1px;
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.looq-goods-tabs__panels { display: block; }
+.looq-goods-tabs__panel { display: none; }
+.looq-goods-tabs__panel.is-active {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px;
+  width: 100%;
+}
+.looq-goods-tabs__empty {
+  grid-column: 1 / -1;
+  text-align: center; padding: 48px 16px;
+  font-family: var(--font-body, 'PP Radio Grotesk', sans-serif);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Card layout */
+.product-card-grid {
+  display: block; position: relative;
+  width: 100%; max-width: 171px;
+  height: 234px;
+  background: var(--color-card-translucent, rgba(255, 255, 255, 0.85));
+  text-decoration: none;
+  color: var(--color-product-neutral, #1e1e1e);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  overflow: hidden;
+}
+.product-card-grid:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); }
+
+.product-card-grid__media {
+  position: absolute;
+  left: 0; right: 0; top: 6px;
+  height: 154px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 4px 8px 0;
+}
+.product-card-grid__media img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+}
+
+.product-card-grid__info {
+  position: absolute;
+  left: 12px; right: 10px; bottom: 12px;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 8px;
+}
+
+.product-card-grid__heading {
+  display: flex; flex-direction: column; gap: 3px;
+  flex: 1 1 auto; min-width: 0;
+}
+.product-card-grid__title {
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 900;
+  font-size: 14px; line-height: 1;
+  color: var(--card-accent, var(--color-product-neutral, #1e1e1e));
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+.product-card-grid__subtitle {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-body, 'PP Radio Grotesk', sans-serif);
+  font-weight: 400;
+  font-size: 8px; line-height: 1;
+  color: rgba(30, 30, 30, 0.66);
+  text-transform: uppercase;
+  letter-spacing: 0.55px;
+}
+.product-card-grid__subtitle--set {
+  font-size: 7px;
+  letter-spacing: 0.4px;
+}
+.product-card-grid__dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--card-dot, var(--card-accent, var(--color-product-neutral, #1e1e1e)));
+  flex-shrink: 0;
+}
+.product-card-grid__price {
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 900;
+  font-size: 14px; line-height: 1;
+  color: var(--color-product-neutral, #1e1e1e);
+  margin-top: 2px;
+}
+
+.product-card-grid__actions {
+  display: flex; align-items: center; gap: 6px;
+  flex: 0 0 auto;
+}
+.product-card-grid__action {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px;
+  background: transparent; border: 0; padding: 0;
+  color: var(--color-product-neutral, #1e1e1e);
+  cursor: pointer;
+}
+.product-card-grid__action .icon { width: 16px; height: 16px; }
+{% endstylesheet %}
+
+{% javascript %}
+if (!customElements.get('looq-goods-tabs')) {
+  class LooqGoodsTabs extends HTMLElement {
+    connectedCallback() {
+      this.tabs   = this.querySelectorAll('.looq-goods-tabs__tab');
+      this.panels = this.querySelectorAll('.looq-goods-tabs__panel');
+      this.tabs.forEach((tab) => {
+        tab.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.setActive(tab.dataset.target);
+        });
+      });
+    }
+    setActive(id) {
+      this.tabs.forEach((t) => {
+        const on = t.dataset.target === id;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      this.panels.forEach((p) => {
+        p.classList.toggle('is-active', p.dataset.id === id);
+      });
+    }
+  }
+  customElements.define('looq-goods-tabs', LooqGoodsTabs);
+}
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "The Goods",
+  "tag": "section",
+  "class": "section--looq-goods",
+  "settings": [
+    { "type": "header", "content": "Headline" },
+    { "type": "text", "id": "headline_part1", "label": "Headline line 1", "default": "THE" },
+    { "type": "text", "id": "headline_part2", "label": "Headline line 2", "default": "GOODS." },
+    { "type": "header", "content": "See all" },
+    { "type": "text", "id": "see_all_label", "label": "Label",  "default": "SEE ALL" },
+    { "type": "url",  "id": "see_all_url",   "label": "Link" },
+    { "type": "header", "content": "Products per tab" },
+    { "type": "range", "id": "limit", "label": "Products per tab", "min": 2, "max": 12, "step": 2, "default": 6 },
+    { "type": "header", "content": "Tab collections" },
+    { "type": "collection", "id": "collection_bw", "label": "BÖDI WÖSH collection" },
+    { "type": "collection", "id": "collection_bl", "label": "BÖDI LÖSHN collection" },
+    { "type": "collection", "id": "collection_hw", "label": "HĀND WÖSH collection" }
+  ],
+  "presets": [
+    {
+      "name": "The Goods",
+      "category": "LOOQ",
+      "settings": {
+        "collection_bw": "body-wash",
+        "collection_bl": "body-lotion",
+        "collection_hw": "hand-wash"
+      }
+    }
+  ]
+}
+{% endschema %}

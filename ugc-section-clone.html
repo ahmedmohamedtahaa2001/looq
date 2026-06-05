@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LOOQ — UGC Videos Section (Clone)</title>
+  <style>
+    /* ---- Tokens the original section relies on (provided here so the clone is self-contained) ---- */
+    :root {
+      --font-display: "ABC Repro Ultra", "Arial Black", system-ui, sans-serif;
+      --font-product: "PP Radio Grotesk", "Helvetica Neue", Arial, sans-serif;
+      --font-body: var(--font-product);
+      --looq-container-tablet: 720px;
+      --looq-container-desktop: 1200px;
+      --looq-container-wide: 1400px;
+      --looq-gutter-desktop: 40px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f2f2f2; }
+
+    /* ================= LOOQ UGC SECTION (verbatim from live site) ================= */
+    .looq-ugc { width: 100%; max-width: 390px; margin: 0px auto; background: rgb(255, 255, 255); padding: 28px 0px 36px; container-type: inline-size; }
+    .looq-ugc__head { padding: 0px 21px; }
+    .looq-ugc__title { margin: 0px 0px 8px; padding: 0px; font-family: var(--font-display, "ABC Repro Ultra", sans-serif); font-weight: 950; font-size: 45px; line-height: 1; text-transform: uppercase; letter-spacing: -0.5px; }
+    .looq-ugc__title-1 { display: block; color: rgb(53, 89, 239); }
+    .looq-ugc__title-2 { display: block; color: rgb(30, 30, 30); }
+    .looq-ugc__tagline { margin: 0px 0px 22px; padding: 0px; font-family: var(--font-product, "PP Radio Grotesk", sans-serif); font-weight: 400; font-size: 13px; line-height: 25px; color: rgba(0, 0, 0, 0.54); }
+    .looq-ugc__carousel { position: relative; padding-top: 12px; }
+    .looq-ugc__track { display: flex; gap: 14px; padding: 0px 70px 30px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+    .looq-ugc__track::-webkit-scrollbar { display: none; }
+    .looq-ugc__card { flex: 0 0 250px; height: 470px; scroll-snap-align: center; position: relative; background: rgba(53, 89, 239, 0.25); border-radius: 25px; box-shadow: rgba(0, 0, 0, 0.25) 6px 7px 8.9px; overflow: hidden; transform: scale(0.86); opacity: 0.6; transition: transform 0.28s, opacity 0.28s; }
+    .looq-ugc__card.is-active { transform: scale(1); opacity: 1; }
+    .looq-ugc__video-wrap { position: absolute; left: 0px; top: 0px; width: 250px; height: 378px; overflow: hidden; background: transparent; }
+    .looq-ugc__video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .looq-ugc__play { position: absolute; left: 95px; top: 160px; width: 60px; height: 60px; background: transparent; border: 0px; padding: 0px; cursor: pointer; z-index: 2; transition: opacity 0.2s, transform 0.2s; filter: drop-shadow(rgba(0, 0, 0, 0.18) 0px 4px 10px); }
+    .looq-ugc__play:hover { transform: scale(1.06); }
+    .looq-ugc__play svg { width: 100%; height: 100%; display: block; }
+    .looq-ugc__video-wrap.is-started .looq-ugc__play { display: none; }
+    .looq-ugc__toggle { position: absolute; left: 12px; bottom: 12px; width: 36px; height: 36px; display: none; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.55); border: 0px; padding: 0px; border-radius: 50%; cursor: pointer; z-index: 3; }
+    .looq-ugc__video-wrap.is-started .looq-ugc__toggle { display: inline-flex; }
+    .looq-ugc__toggle:hover { background: rgba(0, 0, 0, 0.75); }
+    .looq-ugc__toggle-pause, .looq-ugc__video-wrap.is-playing .looq-ugc__toggle-play { display: none; }
+    .looq-ugc__video-wrap.is-playing .looq-ugc__toggle-pause { display: block; }
+    .looq-ugc__mute { position: absolute; right: 12px; bottom: 12px; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.55); border: 0px; padding: 0px; border-radius: 50%; cursor: pointer; z-index: 3; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .looq-ugc__video-wrap.is-playing .looq-ugc__mute { opacity: 1; pointer-events: auto; }
+    .looq-ugc__mute:hover { background: rgba(0, 0, 0, 0.75); }
+    .looq-ugc__mute-icon-off, .looq-ugc__video-wrap.is-muted .looq-ugc__mute-icon-on { display: none; }
+    .looq-ugc__video-wrap.is-muted .looq-ugc__mute-icon-off { display: block; }
+    .looq-ugc__product { position: absolute; left: 16px; top: 394px; right: 16px; text-decoration: none; color: rgb(30, 30, 30); }
+    .looq-ugc__product-title { font-family: var(--font-product, "PP Radio Grotesk", sans-serif); font-weight: 900; font-size: 13px; line-height: 1; color: rgb(30, 30, 30); text-transform: uppercase; margin: 0px; }
+    .looq-ugc__product-dots { position: absolute; left: 0px; top: 20px; display: flex; gap: 3px; }
+    .looq-ugc__dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%; }
+    .looq-ugc__stars { position: absolute; left: 0px; top: 41px; display: flex; gap: 2px; }
+    .looq-ugc__stars svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .looq-ugc__dots-pagination { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+    .looq-ugc__pag-dot { width: 8px; height: 8px; padding: 0px; border: 0px; border-radius: 50%; background: rgba(30, 30, 30, 0.22); cursor: pointer; transition: background 0.2s, transform 0.2s; }
+    .looq-ugc__pag-dot.is-active { background: rgb(53, 89, 239); transform: scale(1.25); }
+
+    @media (min-width: 768px) {
+      .looq-ugc { max-width: none !important; padding: 64px 0px !important; }
+      .looq-ugc__head { max-width: var(--looq-container-desktop); margin: 0px auto !important; padding: 0 var(--looq-gutter-desktop) !important; }
+      .looq-ugc__title { font-size: clamp(56px, 5.5vw, 80px) !important; line-height: 1 !important; }
+      .looq-ugc__carousel { max-width: var(--looq-container-desktop); margin: 0px auto !important; }
+      .looq-ugc__track { padding: 0 var(--looq-gutter-desktop) 30px !important; gap: 24px !important; }
+      .looq-ugc__card { width: 300px !important; flex: 0 0 300px !important; height: 565px !important; transform: none !important; opacity: 1 !important; }
+      .looq-ugc__video-wrap { width: 100% !important; height: calc(100% - 92px) !important; }
+      .looq-ugc__play { left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; }
+      .looq-ugc__product { top: auto !important; bottom: 60px !important; }
+      .looq-ugc__card:hover { transition: transform 220ms; transform: translateY(-4px) !important; }
+    }
+    @media (min-width: 1280px) {
+      .looq-ugc__head, .looq-ugc__carousel { max-width: var(--looq-container-wide) !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <section class="looq-ugc" data-section-id="ugc-videos-clone">
+    <header class="looq-ugc__head">
+      <h2 class="looq-ugc__title">
+        <span class="looq-ugc__title-1">LOOQ</span>
+        <span class="looq-ugc__title-2">IN REAL LIFE</span>
+      </h2>
+      <p class="looq-ugc__tagline">Real people. Real routines. Real good smells.</p>
+    </header>
+
+    <div class="looq-ugc__carousel" data-ugc-carousel>
+      <div class="looq-ugc__track" data-ugc-track>
+        <!-- cards injected by script from UGC_CARDS -->
+      </div>
+      <div class="looq-ugc__dots-pagination" role="tablist" aria-label="Video carousel pagination">
+        <!-- pagination dots injected by script -->
+      </div>
+    </div>
+  </section>
+
+  <script>
+  // ---- Card data (matches the live LOOQ "IN REAL LIFE" section) ----
+  var UGC_CARDS = [
+    { title: "BÖDI LÖSHN SET OF 3", href: "https://looqcosmetics.com/products/bodi-loshn-set-of-3",
+      poster: "https://cdn.shopify.com/s/files/1/0662/3635/0573/files/IMG_0571.jpg?v=1779259830",
+      src: "https://cdn.shopify.com/videos/c/vp/53a7443d55ee48eeba3949aecbef320f/53a7443d55ee48eeba3949aecbef320f.SD-480p-0.9Mbps-84524050.mp4" },
+    { title: "HĀND WÖSH SET OF 2", href: "https://looqcosmetics.com/products/hand-wosh-set-of-2", active: true,
+      poster: "https://cdn.shopify.com/s/files/1/0662/3635/0573/files/IMG_1137.jpg?v=1779259832",
+      src: "https://cdn.shopify.com/videos/c/vp/0ea43c6bdc684d9e840b173d4433f291/0ea43c6bdc684d9e840b173d4433f291.SD-480p-0.9Mbps-84524055.mp4" },
+    { title: "BÖDI WÖSH SET OF 3", href: "https://looqcosmetics.com/products/bodi-wosh-set-of-3",
+      poster: "https://cdn.shopify.com/s/files/1/0662/3635/0573/files/IMG_3004.jpg?v=1779259834",
+      src: "https://cdn.shopify.com/videos/c/vp/73f43e4e5d7d47bf9bd84920ccd448a4/73f43e4e5d7d47bf9bd84920ccd448a4.SD-480p-0.9Mbps-84524057.mp4" },
+    { title: "THE FÜLL SET", href: "https://looqcosmetics.com/products/bodi-set",
+      poster: "https://cdn.shopify.com/s/files/1/0662/3635/0573/files/IMG_5099.jpg?v=1779259836",
+      src: "https://cdn.shopify.com/videos/c/vp/92982d7ad92d48778fc4fdef8c9d461f/92982d7ad92d48778fc4fdef8c9d461f.SD-480p-0.9Mbps-84524064.mp4" },
+    { title: "BÖDI LÖSHN SET OF 2", href: "https://looqcosmetics.com/products/bodi-loshn-set-of-2",
+      poster: "https://cdn.shopify.com/s/files/1/0662/3635/0573/files/IMG_8249.jpg?v=1779259839",
+      src: "https://cdn.shopify.com/videos/c/vp/a2b70dac973842d4bb6a3de6d8432ab2/a2b70dac973842d4bb6a3de6d8432ab2.SD-480p-0.9Mbps-84524071.mp4" },
+    { title: "HĀND WÖSH & BÖDI LÖSHN SET", href: "https://looqcosmetics.com/products/hand-wosh-bodi-loshn-set",
+      poster: "https://cdn.shopify.com/s/files/1/0662/3635/0573/files/looq_reel.jpg?v=1779259841",
+      src: "https://cdn.shopify.com/videos/c/vp/79c9cbeb61434707bb663c213023375f/79c9cbeb61434707bb663c213023375f.SD-480p-0.9Mbps-84524078.mp4" }
+  ];
+
+  var STAR = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#1e1e1e" aria-hidden="true"><path d="M12 2.5l2.94 5.96 6.56.95-4.75 4.63 1.12 6.54L12 17.5l-5.87 3.08 1.12-6.54L2.5 9.41l6.56-.95L12 2.5z"></path></svg>';
+
+  function buildCard(c) {
+    return '' +
+      '<article class="looq-ugc__card' + (c.active ? ' is-active' : '') + '" data-ugc-card>' +
+        '<div class="looq-ugc__video-wrap">' +
+          '<video class="looq-ugc__video" data-ugc-video playsinline muted preload="none" ' +
+            'controlslist="nodownload nofullscreen noremoteplayback" disablepictureinpicture ' +
+            'poster="' + c.poster + '"><source src="' + c.src + '" type="video/mp4"></video>' +
+          '<button type="button" class="looq-ugc__play" data-ugc-play aria-label="Play video">' +
+            '<svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">' +
+              '<circle cx="24" cy="24" r="23" fill="rgba(255,255,255,0.92)"></circle>' +
+              '<path d="M19 16l14 8-14 8V16z" fill="#1e1e1e"></path></svg>' +
+          '</button>' +
+          '<button type="button" class="looq-ugc__toggle" data-ugc-toggle aria-label="Play / Pause video">' +
+            '<svg class="looq-ugc__toggle-play" width="18" height="18" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>' +
+            '<svg class="looq-ugc__toggle-pause" width="18" height="18" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><rect x="6" y="5" width="4" height="14"></rect><rect x="14" y="5" width="4" height="14"></rect></svg>' +
+          '</button>' +
+          '<button type="button" class="looq-ugc__mute" data-ugc-mute aria-label="Toggle sound">' +
+            '<svg class="looq-ugc__mute-icon-on" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>' +
+            '<svg class="looq-ugc__mute-icon-off" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>' +
+          '</button>' +
+        '</div>' +
+        '<a class="looq-ugc__product" href="' + c.href + '">' +
+          '<div class="looq-ugc__product-title">' + c.title + '</div>' +
+          '<div class="looq-ugc__product-dots" aria-hidden="true">' +
+            '<span class="looq-ugc__dot" style="background:#ebd35d;"></span>' +
+            '<span class="looq-ugc__dot" style="background:#6749c4;"></span>' +
+            '<span class="looq-ugc__dot" style="background:#ed3ea3;"></span>' +
+            '<span class="looq-ugc__dot" style="background:#61dddb;"></span>' +
+          '</div>' +
+          '<div class="looq-ugc__stars" aria-label="Rating: 5 out of 5">' + STAR + STAR + STAR + STAR + STAR + '</div>' +
+        '</a>' +
+      '</article>';
+  }
+
+  // Render cards + pagination dots
+  (function render(){
+    var track = document.querySelector('[data-ugc-track]');
+    var pag = document.querySelector('.looq-ugc__dots-pagination');
+    track.innerHTML = UGC_CARDS.map(buildCard).join('');
+    pag.innerHTML = UGC_CARDS.map(function(c, i){
+      return '<button type="button" class="looq-ugc__pag-dot' + (c.active ? ' is-active' : '') +
+        '" data-ugc-dot="' + i + '" role="tab" aria-label="Slide ' + (i + 1) + '"></button>';
+    }).join('');
+  })();
+
+  // ================= Carousel behavior (verbatim logic from the live site) =================
+  (function(){
+    document.querySelectorAll('[data-ugc-carousel]:not([data-ugc-init])').forEach(function(carousel){
+      carousel.setAttribute('data-ugc-init', '1');
+      var track = carousel.querySelector('[data-ugc-track]');
+      var dots = carousel.querySelectorAll('[data-ugc-dot]');
+      var cards = carousel.querySelectorAll('[data-ugc-card]');
+      if (!track) return;
+
+      // Shared play routine: pauses every other clip, marks this one as
+      // started (so the big centered play is replaced by the small bottom-left
+      // toggle) and playing, then plays. Custom controls only (no native
+      // controls bar) so fullscreen / download / PiP never appear.
+      function startPlay(wrap, video){
+        carousel.querySelectorAll('[data-ugc-video]').forEach(function(v){
+          if (v !== video && !v.paused) {
+            v.pause();
+            v.closest('.looq-ugc__video-wrap').classList.remove('is-playing');
+          }
+        });
+        wrap.classList.add('is-started', 'is-playing');
+        video.muted = false;
+        video.play().catch(function(){
+          // Autoplay blocked — fall back to muted playback
+          video.muted = true;
+          video.play();
+        });
+      }
+
+      // Big centered play button — first start only.
+      carousel.querySelectorAll('[data-ugc-play]').forEach(function(btn){
+        btn.addEventListener('click', function(e){
+          e.preventDefault();
+          var wrap = btn.closest('.looq-ugc__video-wrap');
+          var video = wrap.querySelector('[data-ugc-video]');
+          if (video) startPlay(wrap, video);
+        });
+      });
+
+      // Small bottom-left toggle — flips play/pause from the same spot.
+      carousel.querySelectorAll('[data-ugc-toggle]').forEach(function(btn){
+        btn.addEventListener('click', function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          var wrap = btn.closest('.looq-ugc__video-wrap');
+          var video = wrap.querySelector('[data-ugc-video]');
+          if (!video) return;
+          if (video.paused) {
+            startPlay(wrap, video);
+          } else {
+            video.pause();
+            wrap.classList.remove('is-playing');
+          }
+        });
+      });
+
+      // Mute toggle button — toggles video.muted and swaps SVG icon state
+      // via the parent's `is-muted` class. The CSS shows on/off icons
+      // based on this class.
+      carousel.querySelectorAll('[data-ugc-mute]').forEach(function(btn){
+        btn.addEventListener('click', function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          var wrap = btn.closest('.looq-ugc__video-wrap');
+          var video = wrap && wrap.querySelector('[data-ugc-video]');
+          if (!video) return;
+          video.muted = !video.muted;
+          wrap.classList.toggle('is-muted', video.muted);
+        });
+      });
+
+      // Pagination dot click → scroll to card
+      dots.forEach(function(dot){
+        dot.addEventListener('click', function(){
+          var i = parseInt(dot.dataset.ugcDot, 10);
+          var card = cards[i];
+          if (card) track.scrollTo({ left: card.offsetLeft - track.offsetLeft, behavior: 'smooth' });
+        });
+      });
+
+      // Active card + dot updates on scroll. The centered card gets is-active
+      // (which CSS scales up + un-fades), all others get the dim/scale-down state.
+      function updateActive() {
+        var center = track.scrollLeft + track.clientWidth / 2;
+        var nearestIdx = 0, nearestDist = Infinity;
+        cards.forEach(function(c, i){
+          var cardCenter = c.offsetLeft + c.offsetWidth / 2 - track.offsetLeft;
+          var d = Math.abs(cardCenter - center);
+          if (d < nearestDist) { nearestDist = d; nearestIdx = i; }
+        });
+        cards.forEach(function(c, i){ c.classList.toggle('is-active', i === nearestIdx); });
+        dots.forEach(function(d, i){ d.classList.toggle('is-active', i === nearestIdx); });
+      }
+
+      var ticking = false;
+      track.addEventListener('scroll', function(){
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function(){ updateActive(); ticking = false; });
+      });
+      // Initial run + scroll to first card centered
+      requestAnimationFrame(function(){
+        if (cards.length > 0) {
+          var first = cards[0];
+          track.scrollLeft = first.offsetLeft - track.offsetLeft - (track.clientWidth - first.offsetWidth) / 2;
+        }
+        updateActive();
+      });
+    });
+  })();
+  </script>
+</body>
+</html>

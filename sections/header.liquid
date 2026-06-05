@@ -1,0 +1,160 @@
+{%- comment -%}
+  LOOQ — Header (replaces Dawn's default header).
+  Renders at the top of every page via sections/header-group.json.
+  Schema preserves Dawn's setting IDs so existing header-group customizations
+  in the Shopify admin don't generate validation errors after this swap.
+{%- endcomment -%}
+
+{%- comment -%}
+  Apply .looq-header--on-light tint when the page is rendered against a
+  white/light background that makes the default white header icons invisible.
+  Triggers on:
+    - all /products/* pages (white top half above the colored info panel)
+    - /pages/best-sellers + /pages/dealz-stealz (white grid listing pages)
+  Liquid `template` returns 'product.<suffix>', 'page.<suffix>', etc.
+{%- endcomment -%}
+{%- assign t = template | downcase -%}
+{%- assign on_light = false -%}
+{%- if t contains 'product' -%}{%- assign on_light = true -%}
+{%- elsif t contains 'best-sellers' or t contains 'dealz-stealz' -%}{%- assign on_light = true -%}
+{%- endif -%}
+<header class="looq-header{% if on_light %} looq-header--on-light{% endif %}" role="banner" data-section-id="{{ section.id }}">
+  <nav class="looq-header__nav" aria-label="Primary">
+    <button type="button" class="looq-header__btn looq-header__btn--menu looq-header__burger"
+            data-menu-trigger aria-label="Open menu"
+            aria-controls="looq-menu" aria-expanded="false">
+      <img src="{{ 'looq-nav-menu.png' | asset_url }}" alt="" width="27" height="27">
+    </button>
+
+    <a class="looq-header__logo" href="{{ routes.root_url }}" aria-label="LOOQ home">
+      <img src="{{ 'looq-logo.png' | asset_url }}" alt="LOOQ" width="51" height="51">
+    </a>
+
+    <div class="looq-header__actions" style="display:inline-flex; align-items:center;">
+      <a class="looq-header__btn looq-header__btn--cart" href="{{ routes.cart_url }}" aria-label="Cart">
+        <img src="{{ 'looq-nav-cart.png' | asset_url }}" alt="" width="33" height="33">
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  /* When the user has scrolled past the top, the header gains a white
+     background and the icons invert to LOOQ blue. Toggled by a single
+     class — .looq-header--scrolled — so it composes cleanly with the
+     Liquid-set .looq-header--on-light (used on product / listing pages
+     where the page is white at scroll-top as well). */
+  (function () {
+    var header = document.querySelector('.looq-header');
+    if (!header) return;
+    var raf = 0;
+    function sync() {
+      raf = 0;
+      if (window.scrollY > 40) header.classList.add('looq-header--scrolled');
+      else header.classList.remove('looq-header--scrolled');
+    }
+    function onScroll() {
+      if (raf) return;
+      raf = requestAnimationFrame(sync);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    sync();
+  })();
+</script>
+
+{% stylesheet %}
+/* Header section wrapper sits above the next section visually but takes
+   no vertical space — negative margin pulls the hero up to y=0 so the
+   header overlays the hero photo. */
+/* Sticky header: bar stays at the top of the viewport while the user
+   scrolls. The negative bottom margin still applies so the first paint
+   visually overlays the hero photo (no white gap above the hero). */
+/* Header gets the HIGHEST possible z-index by default so the hero marquee,
+   product overlays, etc. can't render above it. Dawn's base.css sets
+   .section-header { z-index: 3 } with equal specificity but later in
+   cascade order; !important + max-int guarantees the header always wins
+   over normal page content. */
+/* HOMEPAGE ONLY: sticky header that overlays the hero (the negative margin
+   pulls the hero up to the viewport top). On every other template the header
+   is static and scrolls away with the page — see the rule directly below. */
+.template-index .section-header { position:sticky !important; top:0 !important; z-index:2147483647 !important; margin-bottom:-77px; }
+.section-header { position:static; z-index:2147483647; }
+
+/* EXCEPTION: when the menu drawer or cart drawer is OPEN, lower the header
+   so the drawer overlay covers it. Detected via :has() on the document
+   root checking the drawer's aria-hidden state. Without this exception,
+   the maxed-out header z-index would sit ON TOP of the drawer overlay
+   and the drawer couldn't visually cover it. */
+:root:has(.looq-menu[aria-hidden="false"]) .section-header,
+:root:has(.looq-cart[aria-hidden="false"]) .section-header {
+  z-index: 1 !important;
+}
+.looq-header { width:100%; margin:0 auto;
+  background:transparent; border:0; }
+.looq-header__nav { display:flex; align-items:center; justify-content:space-between;
+  height:51px; padding:13px 23px; box-sizing:content-box; }
+.looq-header__btn { display:inline-flex; align-items:center; justify-content:center;
+  background:transparent; border:0; padding:0; cursor:pointer; }
+.looq-header__btn:focus-visible { outline:2px solid #edfc4d; outline-offset:2px; }
+.looq-header__btn--menu img { width:27px; height:27px; display:block; }
+.looq-header__btn--cart img { width:33px; height:33px; display:block; }
+.looq-header__logo { display:inline-flex; }
+.looq-header__logo img { width:51px; height:51px; display:block; }
+
+/* `--on-light` is set by Liquid on always-white pages (product, listing).
+   `--scrolled` is set by JS on every page once the user scrolls past 40px.
+   Both produce the same visual: white opaque header bar with LOOQ-blue
+   icons (achieved by filter-inverting the white PNG masks). */
+.looq-header--on-light,
+.looq-header--scrolled {
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+.looq-header--on-light img,
+.looq-header--scrolled img {
+  filter: brightness(0) saturate(100%) invert(28%) sepia(96%) saturate(3036%) hue-rotate(228deg) brightness(94%) contrast(96%);
+}
+/* Smooth the transition so the bar fades to white instead of snapping */
+.looq-header { transition: background-color 220ms ease, box-shadow 220ms ease; }
+.looq-header img { transition: filter 220ms ease; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header",
+  "settings": [
+    { "type": "select", "id": "logo_position", "options": [
+        { "value": "top-left", "label": "Top left" },
+        { "value": "top-center", "label": "Top center" },
+        { "value": "middle-left", "label": "Middle left" },
+        { "value": "middle-center", "label": "Middle center" }
+      ], "default": "middle-left", "label": "Desktop logo position" },
+    { "type": "select", "id": "mobile_logo_position", "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ], "default": "center", "label": "Mobile logo position" },
+    { "type": "link_list", "id": "menu", "label": "Menu" },
+    { "type": "select", "id": "menu_type_desktop", "options": [
+        { "value": "dropdown", "label": "Dropdown" },
+        { "value": "mega", "label": "Mega menu" },
+        { "value": "drawer", "label": "Drawer" }
+      ], "default": "dropdown", "label": "Desktop menu type" },
+    { "type": "select", "id": "sticky_header_type", "options": [
+        { "value": "none", "label": "None" },
+        { "value": "on-scroll-up", "label": "On scroll up" },
+        { "value": "always", "label": "Always" },
+        { "value": "reduce-logo-size", "label": "On scroll up, reduce logo size" }
+      ], "default": "on-scroll-up", "label": "Sticky header" },
+    { "type": "checkbox", "id": "show_line_separator", "default": true, "label": "Show line separator" },
+    { "type": "color_scheme", "id": "color_scheme", "default": "scheme-1", "label": "Color scheme" },
+    { "type": "color_scheme", "id": "menu_color_scheme", "default": "scheme-1", "label": "Menu color scheme" },
+    { "type": "checkbox", "id": "enable_country_selector", "default": true, "label": "Country selector" },
+    { "type": "checkbox", "id": "enable_language_selector", "default": true, "label": "Language selector" },
+    { "type": "checkbox", "id": "enable_customer_avatar", "default": true, "label": "Customer avatar" },
+    { "type": "range", "id": "margin_bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 0, "label": "Bottom margin" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 50, "step": 2, "unit": "px", "default": 20, "label": "Top padding" },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 50, "step": 2, "unit": "px", "default": 20, "label": "Bottom padding" }
+  ]
+}
+{% endschema %}

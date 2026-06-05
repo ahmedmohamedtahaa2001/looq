@@ -1,0 +1,10 @@
+{%- comment -%}
+  Eyebrow + display headline pair used at the top of every section.
+  Inputs: eyebrow, headline_html, eyebrow_color, headline_color
+{%- endcomment -%}
+<header class="section-eyebrow">
+  {%- if eyebrow != blank -%}
+    <p class="section-eyebrow__top" {% if eyebrow_color %}style="color:{{ eyebrow_color }}"{% endif %}>{{ eyebrow }}</p>
+  {%- endif -%}
+  <h2 class="section-eyebrow__headline" {% if headline_color %}style="color:{{ headline_color }}"{% endif %}>{{ headline_html }}</h2>
+</header>

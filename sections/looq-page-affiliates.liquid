@@ -1,0 +1,106 @@
+{%- comment -%}
+  LOOQ — Affiliates page (Figma 76:498, 390 × 1085)
+  Pattern B: pink hero + body + lists + bottom marquee.
+{%- endcomment -%}
+
+<section class="looq-page looq-page--affiliates" data-section-id="{{ section.id }}">
+  <div class="looq-page__hero">
+    <div class="looq-page__watermark" aria-hidden="true">{% render 'looq-infinity' %}</div>
+    <h1 class="looq-page__title">AFFILIATES</h1>
+  </div>
+
+  <div class="looq-page__body">
+    <h2 class="looq-page__heading">Turn <mark>LOOQ</mark><br>into your side<br><mark>business.</mark></h2>
+
+    <p>Sell <mark>LOOQ</mark> your way and earn money through your <mark>own channels.</mark></p>
+    <p>The <mark>LOOQ</mark> Affiliate Program is for individuals who want to resell LOOQ products and earn extra income.</p>
+    <p>You can sell through <mark>social media, personal networks, small shops, or online platforms.</mark></p>
+    <p>No large investment. No complicated setup. Just real products and a simple way to earn.</p>
+
+    <h3 class="looq-page__list-heading">This is for:</h3>
+    <ul>
+      <li>Individuals looking for a side income</li>
+      <li>Creators and influencers</li>
+      <li>Community sellers and resellers</li>
+    </ul>
+
+    <h3 class="looq-page__list-heading">What you get:</h3>
+    <ul>
+      <li>Access to <mark>LOOQ</mark> products at special affiliate prices</li>
+      <li>Freedom to sell through your own channels</li>
+      <li>A clear earning structure</li>
+      <li>Ongoing support from the <mark>LOOQ</mark> team</li>
+    </ul>
+
+    <p class="looq-page__cta-text">Fill in your details below to join the LOOQ Affiliate Program.</p>
+  </div>
+
+  <div class="looq-page__marquee" aria-hidden="true">
+    <div class="looq-page__marquee-track">
+      {%- for i in (1..16) -%}
+        <span class="looq-page__marquee-text">also called yours</span>
+        <img class="looq-page__marquee-icon" src="{{ 'looq-marquee-icon.png' | asset_url }}" width="12" height="6" alt="">
+        <span class="looq-page__marquee-text">affiliates</span>
+        <img class="looq-page__marquee-icon" src="{{ 'looq-marquee-icon.png' | asset_url }}" width="12" height="6" alt="">
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {% render 'looq-business-form', form_type: 'affiliates' %}
+</section>
+
+{% stylesheet %}
+.looq-page { width:100%; max-width:390px; margin:0 auto; background:#fff; }
+.looq-page--affiliates { --page-accent:#ed3ea3; }
+.looq-page__hero { position:relative; overflow:hidden; }
+.looq-page__watermark {
+  position:absolute; right:-40%; top:50%; transform:translateY(-50%);
+  width:420px; height:190px; pointer-events:none; user-select:none;
+  color: rgba(0, 0, 0, 0.12);
+}
+.looq-page__hero { width:100%; height:200px; background:var(--page-accent);
+  display:flex; align-items:center;
+  padding:77px 23px 0; }
+.looq-page__title { margin:0; padding:0;
+  font-family:var(--font-display); font-weight:950;
+  font-size:58px; white-space:nowrap; line-height:1; color:#fff; text-transform:uppercase; letter-spacing:-1px; }
+.looq-page__body { padding:22px 18px 36px; }
+.looq-page__heading { margin:0 0 24px; padding:0;
+  font-family:var(--font-display); font-weight:950;
+  font-size:32px; line-height:1; color:#1e1e1e; text-transform:uppercase; }
+.looq-page__heading mark { background:transparent; color:var(--page-accent); }
+.looq-page__list-heading { margin:24px 0 4px; padding:0;
+  font-family:var(--font-product); font-weight:900;
+  font-size:13px; line-height:25px; color:var(--page-accent); }
+.looq-page__body p { margin:0 0 16px; padding:0;
+  font-family:var(--font-body); font-weight:400;
+  font-size:13px; line-height:25px; color:#1e1e1e; }
+.looq-page__body p mark { background:transparent; color:var(--page-accent); }
+.looq-page__body ul { margin:0 0 12px; padding:0 0 0 19px;
+  font-family:var(--font-body); font-weight:400;
+  font-size:13px; line-height:25px; color:#1e1e1e; }
+.looq-page__body ul mark { background:transparent; color:var(--page-accent); }
+.looq-page__cta-text { font-family:var(--font-product) !important; font-weight:900 !important;
+  color:var(--page-accent) !important; margin-top:24px !important; }
+
+.looq-page__marquee { width:100%; height:25px; background:var(--page-accent);
+  border-top:1px solid rgba(0,0,0,0.3); border-bottom:1px solid rgba(0,0,0,0.3);
+  overflow:hidden; display:flex; align-items:center; }
+.looq-page__marquee-track { display:inline-flex; align-items:center;
+  gap:33px; padding-inline:33px; height:100%; white-space:nowrap;
+  animation:looq-page-marquee 28s linear infinite; }
+.looq-page__marquee-text { font-family:var(--font-italic-display); font-style:italic;
+  font-weight:200; font-size:12px; line-height:1; color:#fff; flex-shrink:0; }
+.looq-page__marquee-icon { display:block; width:12px; height:6px; aspect-ratio:2/1;
+  flex-shrink:0; filter:brightness(0) invert(1); }
+@keyframes looq-page-marquee { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+.looq-page__title { white-space:nowrap; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "LOOQ Affiliates",
+  "settings": [],
+  "presets": [{ "name": "LOOQ Affiliates", "category": "LOOQ" }]
+}
+{% endschema %}

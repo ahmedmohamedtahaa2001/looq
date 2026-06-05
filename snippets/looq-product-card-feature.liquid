@@ -1,0 +1,96 @@
+{%- comment -%}
+  Product card — horizontal feature variant (354×220)
+  Used by: sections/best-sellers.liquid
+
+  Layout: photo on LEFT, title + 4 variant dots + ingredient list in the
+  MIDDLE/RIGHT, price BOTTOM-LEFT (under the photo), actions BOTTOM-RIGHT.
+
+  Inputs:
+    - product:  Shopify Product object (live data)
+                Reads metafield `custom.ingredient_list` for the bullet list
+    - demo:     hash for theme-editor preview
+                { title_line_1, title_line_2, ingredients (csv), image, price }
+{%- endcomment -%}
+
+{%- liquid
+  if product != blank and product != nil
+    assign p_url    = product.url
+    assign p_title  = product.title | upcase
+    assign p_price  = product.price | money_without_trailing_zeros
+    assign p_image  = product.featured_image | image_url: width: 240
+    assign p_alt    = product.featured_image.alt | default: product.title
+    assign raw_ings = product.metafields.custom.ingredient_list.value | default: ''
+    assign p_ings   = raw_ings | split: ','
+    assign title_words = p_title | split: ' '
+    assign t1 = title_words | slice: 0, 2 | join: ' '
+    assign t2 = title_words | slice: 2, 10 | join: ' '
+  elsif card_t1 != blank
+    assign t1     = card_t1
+    assign t2     = card_t2 | default: ''
+    assign p_url  = card_url   | default: '#'
+    assign p_price = card_price | default: ''
+    assign p_image = card_image | asset_url
+    assign p_alt   = card_t1
+    assign p_ings  = card_ingredients | default: '' | split: ','
+  else
+    assign t1     = demo.title_line_1 | default: 'THE FÜLL'
+    assign t2     = demo.title_line_2 | default: 'SET'
+    assign p_url  = demo.url   | default: '#'
+    assign p_price = demo.price | default: 'LE 450'
+    assign p_image = demo.image | default: 'looq-bs-product-1.png' | asset_url
+    assign p_alt   = demo.alt   | default: t1
+    assign p_ings  = demo.ingredients | default: 'BÖDI WÖSH,HĀND WÖSH,BÖDI LÖSHN' | split: ','
+  endif
+
+  # First available variant for the cart icon's AJAX add-to-cart.
+  assign p_variant_id = ''
+  if product != blank and product != nil
+    assign p_variant_id = product.selected_or_first_available_variant.id
+  endif
+-%}
+
+<a class="product-card-feature" href="{{ p_url }}" aria-label="{{ t1 }} {{ t2 }}">
+  <div class="product-card-feature__media">
+    <img src="{{ p_image }}" alt="{{ p_alt | escape }}" loading="lazy">
+  </div>
+
+  <div class="product-card-feature__info">
+    <h3 class="product-card-feature__title">
+      <span class="product-card-feature__title-line">{{ t1 }}</span>
+      {%- if t2 != blank -%}<span class="product-card-feature__title-line">{{ t2 }}</span>{%- endif -%}
+    </h3>
+
+    {%- comment -%}
+      Scent dots used to sit inline at the end of title line 2, which made
+      long titles (HĀND WÖSH & BÖDI LÖSHN SET) overflow the right edge of
+      the card. Moved into a dedicated row below the title so they always
+      stay inside the card regardless of title length.
+    {%- endcomment -%}
+    <span class="product-card-feature__variants" aria-hidden="true">
+      <span class="product-card-feature__dot" style="background:#edfc4d"></span>
+      <span class="product-card-feature__dot" style="background:#6749c4"></span>
+      <span class="product-card-feature__dot" style="background:#ed3ea3"></span>
+      <span class="product-card-feature__dot" style="background:#3eb4b3"></span>
+    </span>
+
+    <p class="product-card-feature__ingredients">
+      {%- for ing in p_ings -%}
+        {%- assign clean = ing | strip | upcase -%}
+        {%- if forloop.first == false %}<span class="product-card-feature__sep" aria-hidden="true">●</span>{% endif -%}
+        {{ clean }}
+      {%- endfor -%}
+    </p>
+  </div>
+
+  <span class="product-card-feature__price">{{ p_price }}</span>
+
+  <div class="product-card-feature__actions">
+    {%- comment -%} Eye / quick-view removed per UX cleanup. Cart icon is a
+      <button> with data-add-to-cart so the delegated cart-drawer JS picks
+      it up and AJAX-adds the first available variant. {%- endcomment -%}
+    <button type="button" class="product-card-feature__action"
+            data-add-to-cart
+            data-variant-id="{{ p_variant_id }}"
+            aria-label="Add to cart">{% render 'looq-icon-cart' %}</button>
+  </div>
+</a>

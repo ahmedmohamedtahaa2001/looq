@@ -1,0 +1,192 @@
+{%- comment -%}
+  Product page accordion — Description / Key Benefits / How to Use /
+  What's Inside / Stuff to Know / Product Details.
+
+  ─────────────────────────────────────────────────────────────────────
+  DATA SOURCE: 100% Shopify product data (no hardcoded content).
+  Each section renders ONLY if its source has a value. Products without
+  data populated show an empty accordion (no sections rendered).
+  ─────────────────────────────────────────────────────────────────────
+    Description       → product.description (Shopify built-in)
+    Key Benefits      → product.metafields.custom.key_benefits
+    How to Use        → product.metafields.custom.how_to_use
+    What's Inside     → product.metafields.custom.ingredient_list
+                        (existing key already in use by looq-product-card-feature)
+    Stuff to Know     → product.metafields.custom.warnings
+    Product Details   → product.metafields.custom.product_details
+
+  ─────────────────────────────────────────────────────────────────────
+  SHOPIFY ADMIN SETUP (one-time per metafield key):
+  ─────────────────────────────────────────────────────────────────────
+  Settings → Custom data → Products → Add definition:
+    Namespace:    custom
+    Key:          key_benefits | how_to_use | ingredient_list | warnings | product_details
+    Type:         Rich text  (supports lists, bold, headings)
+    Storefronts:  Read enabled
+
+    NOTE: ingredient_list is the EXISTING key already used by the
+    product-card-feature snippet for the product card's ingredient row.
+    Reusing it here means populating it once in Admin serves both
+    contexts (card list + accordion "What's Inside" body).
+
+  After setup, edit any product in Shopify Admin → scroll to Metafields
+  → fill in the relevant rich-text field. Description uses the
+  standard Shopify product description field (no metafield setup needed).
+
+  A product with NO description and NO metafields populated will show
+  no accordion sections at all -- which is intentional, per the
+  "empty rather than fallback" policy.
+  ─────────────────────────────────────────────────────────────────────
+
+  Inputs:
+    - product (required): Shopify Product object
+{%- endcomment -%}
+
+{%- comment -%}
+  Metafield key resolution -- tries multiple possible key spellings
+  because Shopify auto-converts metafield LABELS to keys differently
+  across stores. "What's Inside" might be `whats_inside`, `what_s_inside`,
+  `inside`, or the legacy `ingredient_list`. The first non-blank wins.
+
+  As of the LOOQ Admin (image #190), the metafield labels visible are:
+    Tagline / Product Details / What's Inside / Stuff to Know /
+    Key Benefits / How to Use
+{%- endcomment -%}
+{%- liquid
+  assign desc_html = product.description
+
+  assign benefits_html = product.metafields.custom.key_benefits
+
+  assign how_html = product.metafields.custom.how_to_use
+
+  # "What's Inside" -- try every plausible key Shopify may have generated
+  assign inside_html = product.metafields.custom.whats_inside
+  if inside_html == blank
+    assign inside_html = product.metafields.custom.what_s_inside
+  endif
+  if inside_html == blank
+    assign inside_html = product.metafields.custom.ingredient_list
+  endif
+  if inside_html == blank
+    assign inside_html = product.metafields.custom.ingredients
+  endif
+
+  # "Stuff to Know" -- try plausible keys
+  assign warnings_html = product.metafields.custom.stuff_to_know
+  if warnings_html == blank
+    assign warnings_html = product.metafields.custom.warnings
+  endif
+
+  assign details_html = product.metafields.custom.product_details
+-%}
+
+<section class="looq-accordion" aria-label="Product details">
+  {%- if desc_html != blank -%}
+    <details class="looq-accordion__item" open>
+      <summary class="looq-accordion__summary">Description<span class="looq-accordion__icon" aria-hidden="true"></span></summary>
+      <div class="looq-accordion__body">{{ desc_html }}</div>
+    </details>
+  {%- endif -%}
+  {%- if benefits_html != blank -%}
+    <details class="looq-accordion__item">
+      <summary class="looq-accordion__summary">Key Benefits<span class="looq-accordion__icon" aria-hidden="true"></span></summary>
+      <div class="looq-accordion__body">{% render 'looq-format-rich-text', content: benefits_html %}</div>
+    </details>
+  {%- endif -%}
+  {%- if how_html != blank -%}
+    <details class="looq-accordion__item">
+      <summary class="looq-accordion__summary">How to Use<span class="looq-accordion__icon" aria-hidden="true"></span></summary>
+      <div class="looq-accordion__body">{% render 'looq-format-rich-text', content: how_html %}</div>
+    </details>
+  {%- endif -%}
+  {%- if inside_html != blank -%}
+    <details class="looq-accordion__item">
+      <summary class="looq-accordion__summary">What&rsquo;s Inside<span class="looq-accordion__icon" aria-hidden="true"></span></summary>
+      <div class="looq-accordion__body">{% render 'looq-format-rich-text', content: inside_html %}</div>
+    </details>
+  {%- endif -%}
+  {%- if warnings_html != blank -%}
+    <details class="looq-accordion__item">
+      <summary class="looq-accordion__summary">Stuff to Know<span class="looq-accordion__icon" aria-hidden="true"></span></summary>
+      <div class="looq-accordion__body">{% render 'looq-format-rich-text', content: warnings_html %}</div>
+    </details>
+  {%- endif -%}
+  {%- if details_html != blank -%}
+    <details class="looq-accordion__item">
+      <summary class="looq-accordion__summary">Product Details<span class="looq-accordion__icon" aria-hidden="true"></span></summary>
+      <div class="looq-accordion__body">{% render 'looq-format-rich-text', content: details_html %}</div>
+    </details>
+  {%- endif -%}
+</section>
+
+{% stylesheet %}
+.looq-accordion {
+  width: 100%; max-width: 390px; margin: 0 auto;
+  background: #fff;
+  padding: 4px 17px 24px;
+  border-top: 1px solid rgba(30,30,30,0.08);
+}
+.looq-accordion__item {
+  border-bottom: 1px solid rgba(30,30,30,0.12);
+}
+.looq-accordion__item:last-child {
+  border-bottom: 0;
+}
+.looq-accordion__summary {
+  list-style: none;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 0;
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 900;
+  font-size: 16px; line-height: 1.2;
+  color: #1e1e1e;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+.looq-accordion__summary::-webkit-details-marker { display: none; }
+.looq-accordion__summary::after { display: none; }
+.looq-accordion__icon {
+  position: relative;
+  display: inline-block;
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+}
+.looq-accordion__icon::before,
+.looq-accordion__icon::after {
+  content: '';
+  position: absolute;
+  background: #1e1e1e;
+  transition: transform 200ms ease;
+}
+.looq-accordion__icon::before {
+  left: 0; top: 50%;
+  width: 18px; height: 2px;
+  transform: translateY(-50%);
+}
+.looq-accordion__icon::after {
+  left: 50%; top: 0;
+  width: 2px; height: 18px;
+  transform: translateX(-50%);
+}
+details[open] .looq-accordion__icon::after {
+  transform: translateX(-50%) scaleY(0);
+}
+.looq-accordion__body {
+  padding: 0 0 18px;
+  font-family: var(--font-body, 'PP Radio Grotesk', sans-serif);
+  font-weight: 400;
+  font-size: 13px; line-height: 22px;
+  color: #1e1e1e;
+}
+.looq-accordion__body p { margin: 0 0 12px; padding: 0; }
+.looq-accordion__body p:last-child { margin-bottom: 0; }
+.looq-accordion__body strong { font-weight: 900; }
+.looq-accordion__body em { font-family: var(--font-italic-display, 'Migra Italic', serif); font-style: italic; }
+.looq-accordion__body ul {
+  margin: 0; padding: 0 0 0 18px;
+  list-style: disc;
+}
+.looq-accordion__body ul li { margin: 0 0 6px; padding: 0; }
+.looq-accordion__body ul li:last-child { margin-bottom: 0; }
+{% endstylesheet %}

@@ -1,0 +1,129 @@
+{%- comment -%}
+  LOOQ — Creators page (Figma 100:1506, 390 × 1256)
+  Pattern A: teal hero + 3 feature lists + CTA.
+  Updated to canonical version per direct Figma link.
+{%- endcomment -%}
+
+<section class="looq-page looq-page--creators" data-section-id="{{ section.id }}">
+  <div class="looq-page__hero">
+    <div class="looq-page__watermark" aria-hidden="true">{% render 'looq-infinity' %}</div>
+    <h1 class="looq-page__title">LOOQ<br>CREATORS.</h1>
+  </div>
+
+  <div class="looq-page__body">
+    <h2 class="looq-page__heading">This is not<br>just a creator<br>program.</h2>
+    <p class="looq-page__eyebrow-mini">THIS IS LOOQ CREATORS.</p>
+
+    <p>We're building a community of creators who don't just post — they create <mark>moments, trends, and real content</mark> that people actually feel.</p>
+    <p>If you love content, aesthetics, storytelling, and being part of something growing fast… you're in the right place.</p>
+
+    <h3 class="looq-page__list-heading">What you get:</h3>
+    <ul>
+      <li>PR packages &amp; <mark>exclusive product drops</mark> before anyone else</li>
+      <li><mark>Giveaways</mark> you can share with your audience</li>
+      <li>Personal <mark>promo codes</mark> to earn and grow with us</li>
+      <li><mark>Invites</mark> to <mark>LOOQ</mark> events, dinners, and private hangouts</li>
+      <li>Opportunities to be <mark>featured on our platforms</mark></li>
+      <li>First access to new <mark>launches, collabs, and limited drops</mark></li>
+    </ul>
+
+    <h3 class="looq-page__list-heading">What we're looking for:</h3>
+    <p>Creators who are <mark>real</mark>.</p>
+    <p>Not forced. Not scripted. Not trying too hard.</p>
+
+    <h3 class="looq-page__list-heading">We care about:</h3>
+    <ul>
+      <li>Your vibe</li>
+      <li>Your content style</li>
+      <li>Your personality</li>
+      <li>And how you <mark>connect</mark> with people</li>
+    </ul>
+
+    <p class="looq-page__italic">Not just your followers.</p>
+
+    <p>If you can create content that feels natural, fun, and actually watchable — <mark>we want you with us.</mark></p>
+    <p>This is where creators grow with the brand.</p>
+    <p>This is where content turns into something bigger.</p>
+
+    <p class="looq-page__cta-text">Join LOOQ Creators</p>
+  </div>
+
+  <div class="looq-page__marquee" aria-hidden="true">
+    <div class="looq-page__marquee-track">
+      {%- for i in (1..16) -%}
+        <span class="looq-page__marquee-text">also called yours</span>
+        <img class="looq-page__marquee-icon" src="{{ 'looq-marquee-icon.png' | asset_url }}" width="12" height="6" alt="">
+        <span class="looq-page__marquee-text">creators</span>
+        <img class="looq-page__marquee-icon" src="{{ 'looq-marquee-icon.png' | asset_url }}" width="12" height="6" alt="">
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {% render 'looq-business-form', form_type: 'creators' %}
+</section>
+
+{% stylesheet %}
+.looq-page { width:100%; max-width:390px; margin:0 auto; background:#fff; }
+.looq-page--creators { --page-accent:#3eb4b3; }
+.looq-page__hero { position:relative; overflow:hidden; }
+.looq-page__watermark {
+  /* Watermark uses CSS mask-image of the LOOQ ∞ icon — color property
+     drives the tint via the masked element's background-color: currentColor.
+     420×230 keeps the icon's natural 453:249 aspect ratio. White at 18%
+     alpha sits on top of the colored hero as a darker tonal layer. */
+  position:absolute; right:-60px; top:50%; transform:translateY(-50%);
+  width:420px; height:230px; pointer-events:none; user-select:none;
+  color: rgba(255, 255, 255, 0.18);
+}
+.looq-page__hero { width:100%; height:279px; background:var(--page-accent);
+  display:flex; align-items:center;
+  padding:77px 19px 0; }
+.looq-page__title { margin:0; padding:0;
+  font-family:var(--font-display, 'ABC Repro Ultra', sans-serif); font-weight:950;
+  font-size:45px; white-space:nowrap; line-height:1; color:#fff; text-transform:uppercase; }
+.looq-page__body { padding:22px 19px 36px; }
+.looq-page__heading { margin:0 0 12px; padding:0;
+  font-family:var(--font-display, 'ABC Repro Ultra', sans-serif); font-weight:950;
+  font-size:32px; line-height:1; color:#1e1e1e; text-transform:uppercase; }
+.looq-page__body .looq-page__eyebrow-mini { margin:0 0 24px; padding:0;
+  font-family:var(--font-display, 'ABC Repro Ultra', sans-serif); font-weight:950;
+  font-size:17px; line-height:1; color:var(--page-accent); text-transform:uppercase; }
+.looq-page__list-heading { margin:24px 0 4px; padding:0;
+  font-family:var(--font-product); font-weight:900;
+  font-size:13px; line-height:25px; color:#1e1e1e; }
+.looq-page__body p { margin:0 0 12px; padding:0;
+  font-family:var(--font-body); font-weight:400;
+  font-size:13px; line-height:25px; color:#1e1e1e; }
+.looq-page__italic { font-family:var(--font-italic-display) !important;
+  font-style:italic; color:#1e1e1e !important; }
+.looq-page__cta-text { margin-top:24px !important;
+  font-family:var(--font-product) !important; font-weight:900 !important;
+  color:var(--page-accent) !important; }
+.looq-page__body ul { margin:0 0 12px; padding:0 0 0 19px;
+  font-family:var(--font-body); font-weight:400;
+  font-size:13px; line-height:25px; color:#1e1e1e; }
+.looq-page__body mark { background:transparent; color:var(--page-accent); }
+.looq-page__title { white-space:nowrap; }
+
+/* Marquee strip between body content and application form
+   (same pattern as affiliates / retailers / distribution pages) */
+.looq-page__marquee { width:100%; height:25px; background:var(--page-accent);
+  border-top:1px solid rgba(0,0,0,0.3); border-bottom:1px solid rgba(0,0,0,0.3);
+  overflow:hidden; display:flex; align-items:center; }
+.looq-page__marquee-track { display:inline-flex; align-items:center;
+  gap:33px; padding-inline:33px; height:100%; white-space:nowrap;
+  animation:looq-page-marquee-creators 28s linear infinite; }
+.looq-page__marquee-text { font-family:var(--font-italic-display); font-style:italic;
+  font-weight:200; font-size:12px; line-height:1; color:#fff; flex-shrink:0; }
+.looq-page__marquee-icon { display:block; width:12px; height:6px; aspect-ratio:2/1;
+  flex-shrink:0; filter:brightness(0) invert(1); }
+@keyframes looq-page-marquee-creators { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "LOOQ Creators",
+  "settings": [],
+  "presets": [{ "name": "LOOQ Creators", "category": "LOOQ" }]
+}
+{% endschema %}

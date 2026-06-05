@@ -1,0 +1,1652 @@
+{%- comment -%}
+  LOOQ — Desktop + Tablet responsive layer (CANONICAL)
+  ──────────────────────────────────────────────────────────────
+  Mobile-first. Every section's own {% raw %}{% stylesheet %}{% endraw %} block ships the
+  authoritative mobile rules at ≤767px. This snippet adds progressive
+  enhancements at three breakpoints. Mobile risk is near zero because
+  none of these selectors apply below 768px.
+
+  Breakpoints:
+    Tablet   ≥ 768px  (container 720px, intermediate grids)
+    Desktop  ≥ 1024px (container 1200px, full layouts)
+    Wide     ≥ 1280px (container max 1280px)
+
+  Architecture rules:
+    1. Sections are full-bleed (no max-width on the section root) so
+       colored backgrounds + hero photos reach the viewport edges.
+       Content inside is clamped via the inner wrapper (`__inner`,
+       `__list`, `__body`, etc.) at the container width.
+    2. Sections with absolute-positioned children (hero, dealz) scale
+       by adjusting parent dimensions and a few child `top:` values —
+       low-risk, the mobile coordinates stay untouched.
+    3. Bundles is the one exception: at ≥1024px its absolute children
+       are flipped to `position: static` and laid out via flex inside
+       a 3-up grid. See the BUNDLES block below for the rationale.
+    4. Drawer-style navigation is preserved at every viewport per the
+       brand requirement. The drawer sheet widens to ~480px on desktop;
+       the burger trigger never disappears.
+{%- endcomment -%}
+
+<style data-looq-desktop>
+:root {
+  --looq-container-mobile:  390px;
+  --looq-container-tablet:  720px;
+  --looq-container-desktop: 1200px;
+  --looq-container-wide:    1280px;
+  --looq-gutter-desktop:    48px;
+}
+
+/* ============================================================
+   TABLET — ≥ 768px
+   Intermediate step: 2 → 3-col grids, wider containers, but the
+   layout is still recognizably "tall column with extra room".
+   ============================================================ */
+@media (min-width: 768px) {
+
+  /* ── HEADER + DRAWER ──────────────────────────────── */
+  /* Header bar widens, burger + cart + logo grow ~15% */
+  .looq-header { max-width: var(--looq-container-tablet); }
+  .looq-header__nav { padding: 16px 28px; }
+  /* Drawer sheet bumps to 380px (between mobile 302 and desktop 480) */
+  .looq-menu__sheet { max-width: 380px; }
+
+  /* ── HERO ─────────────────────────────────────────── */
+  .looq-hero { max-width: none !important; }
+  .looq-hero__slider { height: 560px !important; }
+  .looq-hero__bottom { height: 400px !important; }
+  .looq-hero__headline-1 { font-size: clamp(56px, 8vw, 96px) !important; }
+  .looq-hero__headline-2 { font-size: clamp(48px, 6vw, 80px) !important; }
+
+  /* ── BEST SELLERS ─────────────────────────────────── */
+  .looq-bestsellers { max-width: none !important; overflow: visible !important; }
+  .looq-bestsellers__inner { max-width: var(--looq-container-tablet); margin: 0 auto !important; }
+  .looq-bestsellers__list {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 32px !important;
+  }
+  .looq-bestsellers__list .product-card-feature {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+
+  /* ── THE GOODS ────────────────────────────────────── */
+  .looq-goods { max-width: none !important; }
+  .looq-goods__inner { max-width: var(--looq-container-tablet); margin: 0 auto !important; }
+  .looq-goods-tabs__nav { justify-content: center !important; gap: 28px; }
+  .looq-goods-tabs__panel.is-active {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 18px !important;
+    padding: 0 !important;
+  }
+  .looq-goods-tabs__panel.is-active .product-card-grid { width: 100% !important; }
+
+  /* ── PICK YOUR VIBE — stripes stay vertical, each full-bleed ── */
+  .looq-pyv { max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  .looq-pyv__inner { padding: 0 !important; max-width: none !important; }
+  .looq-pyv__headline { max-width: var(--looq-container-tablet); margin: 0 auto !important; padding: 0 28px !important; }
+  .looq-pyv__list { margin: 0 !important; padding: 0 !important; }
+  .looq-pyv__stripe { width: 100% !important; min-width: 0 !important; max-width: none !important; height: 220px !important; }
+  /* Stripe inner content stays at the constrained container so text doesn't
+     drift to the far edge on wide screens. */
+  .looq-pyv__link { max-width: var(--looq-container-tablet); margin: 0 auto !important; padding: 0 28px !important; }
+  .looq-pyv__title { font-size: clamp(48px, 6vw, 64px) !important; }
+
+  /* ── DEALZ & STEALZ — 2-col split ─────────────────── */
+  .looq-dealz { max-width: var(--looq-container-tablet); }
+
+  /* ── BUNDLES — 2-col grid at tablet ───────────────── */
+  .looq-bundles { max-width: var(--looq-container-tablet); padding: 48px 28px !important; }
+  .looq-bundles__list {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 24px !important;
+  }
+  /* Tablet still wants the structural override (see DESKTOP block) so
+     cards reflow into the grid cleanly. */
+  .looq-bundles__card { position: relative !important; width: 100% !important; height: auto !important; min-height: 180px;
+                        display: flex !important; flex-direction: column !important;
+                        padding: 24px 20px 20px !important; box-sizing: border-box; }
+  .looq-bundles__media,
+  .looq-bundles__badge,
+  .looq-bundles__title,
+  .looq-bundles__subtitle,
+  .looq-bundles__price-row,
+  .looq-bundles__add { position: static !important; left: auto !important; top: auto !important; }
+  .looq-bundles__media { width: 100% !important; height: 160px !important; margin-bottom: 12px !important; order: 0; }
+  .looq-bundles__badge { display: inline-flex !important; align-self: flex-start; margin-bottom: 8px !important; order: 1; }
+  .looq-bundles__title { white-space: normal !important; margin-bottom: 8px !important; order: 2; }
+  .looq-bundles__subtitle { white-space: normal !important; margin-bottom: 12px !important; order: 3; }
+  .looq-bundles__price-row { margin-bottom: 14px !important; order: 4; }
+  .looq-bundles__add { align-self: flex-start !important; order: 5; }
+
+  /* ── UGC ──────────────────────────────────────────── */
+  .looq-ugc { max-width: none !important; }
+  .looq-ugc__head { max-width: var(--looq-container-tablet); margin: 0 auto !important; }
+  .looq-ugc__carousel { max-width: var(--looq-container-tablet); margin: 0 auto !important; }
+  .looq-ugc__track { padding: 0 28px 30px !important; gap: 20px !important; }
+
+  /* ── NEWSLETTER ───────────────────────────────────── */
+  .looq-newsletter { max-width: var(--looq-container-tablet); padding: 56px 28px !important; }
+  .looq-newsletter__inner { padding: 0 !important; }
+  .looq-newsletter__headline { font-size: clamp(72px, 9vw, 96px) !important; }
+
+  /* ── FOOTER ───────────────────────────────────────── */
+  .looq-footer { max-width: var(--looq-container-tablet); }
+  .looq-footer__cols { flex-direction: row !important; gap: 32px; }
+  .looq-footer__col { border-bottom: 0 !important; flex: 1; }
+  .looq-footer__heading { cursor: default; pointer-events: none; }
+  .looq-footer__chev { display: none !important; }
+  .looq-footer__col .looq-footer__items { display: flex !important; }
+}
+
+/* ============================================================
+   DESKTOP — ≥ 768px (covers tablets too)
+   Full desktop layouts. Section backgrounds are full-bleed; content
+   clamps to the 1200px container. Lowered from 1024px so tablets
+   (iPad portrait 768px, etc.) get the same desktop experience as
+   wider screens.
+   ============================================================ */
+@media (min-width: 768px) {
+
+  /* Section roots span the full viewport width so backgrounds reach the
+     edges. Inner content wrappers (`__inner`, `__list`, etc.) cap at
+     1200px and center within. Product + collection pages keep their
+     own internal padding via their section overrides. */
+  .looq-bestsellers,
+  .looq-goods,
+  .looq-dealz,
+  .looq-ugc,
+  .looq-footer,
+  .looq-product,
+  .looq-collection-type,
+  .looq-collection-scent {
+    max-width: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box;
+  }
+
+  /* ── HEADER ───────────────────────────────────────── */
+  /* Full-bleed: burger sits flush-left, cart flush-right at any viewport.
+     The mobile rule clamps to 390px and centers — we explicitly undo that. */
+  .looq-header {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 var(--looq-gutter-desktop) !important;
+    box-sizing: border-box !important;
+  }
+  /* Match the section-header's negative margin to the new header height so
+     the hero overlaps the header completely (no white strip above hero).
+     Desktop nav: 20px top + 60px icon + 20px bottom = 100px total.
+     Mobile rule was -77px (matching the 77px mobile header). */
+  /* Negative margin must match header height to keep the hero touching
+     viewport top. Desktop header: 20px nav padding + 100px logo + 20px
+     nav padding = ~140px total. */
+  .template-index .section-header { margin-bottom: -140px !important; }
+  .looq-header__nav { padding: 20px 0 !important; height: auto !important; }
+  .looq-header__btn--menu img { width: 32px !important; height: 32px !important; }
+  .looq-header__btn--cart img { width: 38px !important; height: 38px !important; }
+  .looq-header__logo img    { width: 100px !important; height: 100px !important; }
+
+  /* ── DRAWER — IDENTICAL TO MOBILE ─────────────────────
+     Per user: the drawer should look exactly like mobile on every viewport.
+     Wider sheets at desktop made justify-content:space-between on each link
+     fling the title + chevron to opposite edges of an 800px row ("HĀND WÖSH"
+     left, "just hand wash" far right). The drawer is fundamentally a compact
+     overlay — sheet width should stay at mobile's 302px regardless of
+     viewport. We intentionally apply NO desktop overrides here. */
+
+  /* ── HERO ─────────────────────────────────────────── */
+  /* Mobile pixel coords (headline at top:639, button at top:775 inside an
+     845px slider) put the text at the very bottom of the photo on every
+     viewport. That works on a tall mobile screen but reads as cramped /
+     misplaced on a desktop banner. Re-anchor everything from the bottom
+     so the stack reads: button (bottom) ← subline ← headline, with
+     bottom values that keep the same visual rhythm regardless of slider
+     height. */
+  .looq-hero { max-width: none !important; padding: 0 !important; }
+  .looq-hero__slider {
+    height: clamp(560px, 70vh, 720px) !important;
+  }
+  .looq-hero__photo { object-position: center 30%; }
+  .looq-hero__headline-1 {
+    top: auto !important;
+    bottom: 200px !important;
+    left: var(--looq-gutter-desktop) !important;
+    right: auto !important;
+    font-size: clamp(64px, 7vw, 128px) !important;
+    line-height: 0.95 !important;
+    max-width: 60% !important;
+    white-space: normal !important;
+  }
+  /* ── HERO BOTTOM ("REFUSING TO FIT IN.") ──────────── */
+  /* Mobile pixel coords place text directly over the close-up face image
+     which makes it hard to read. On desktop: give the section a proper
+     height (560px), zoom out the photo so more context is visible, add
+     a left-aligned text column with a subtle dark gradient overlay so
+     copy reads cleanly against any photo tone. */
+  .looq-hero__bottom {
+    height: 644px !important;          /* +15% over 560px to show more of the photo */
+    position: relative !important;
+  }
+  .looq-hero__lower-bg {
+    object-fit: cover !important;
+    object-position: center top !important;   /* show top of photo, not center */
+  }
+  /* Dark gradient overlay only on the LEFT half so the photo's right
+     side stays visible. Implemented as a ::before pseudo-element on the
+     section so it sits between the photo and the text. */
+  .looq-hero__bottom::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 45%, rgba(0,0,0,0) 65%);
+    z-index: 1;
+    pointer-events: none;
+  }
+  .looq-hero__headline-2 {
+    top: 80px !important;
+    left: var(--looq-gutter-desktop) !important;
+    right: auto !important;
+    max-width: 55% !important;
+    font-size: clamp(56px, 6vw, 88px) !important;
+    line-height: 0.95 !important;
+    z-index: 2 !important;
+  }
+  .looq-hero__body {
+    top: auto !important;
+    bottom: 180px !important;
+    left: var(--looq-gutter-desktop) !important;
+    right: auto !important;
+    max-width: 480px !important;
+    font-size: 17px !important;
+    line-height: 1.55 !important;
+    z-index: 2 !important;
+  }
+  .looq-hero__bottom .looq-hero__btn--accent {
+    top: auto !important;
+    bottom: 80px !important;
+    left: var(--looq-gutter-desktop) !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 16px 32px !important;
+    font-size: 13px !important;
+    letter-spacing: 4px !important;
+    z-index: 2 !important;
+  }
+  .looq-hero__subline {
+    top: auto !important;
+    bottom: 145px !important;
+    left: var(--looq-gutter-desktop) !important;
+    right: auto !important;
+    font-size: 18px !important;
+  }
+  .looq-hero__slide .looq-hero__btn--dark {
+    top: auto !important;
+    bottom: 80px !important;
+    left: var(--looq-gutter-desktop) !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 18px 36px !important;
+    font-size: 13px !important;
+    letter-spacing: 4px !important;
+  }
+
+  /* ── BEST SELLERS — 3-col grid per user request ──── */
+  .looq-bestsellers {
+    max-width: none !important;
+    overflow: visible !important;
+    background: #ffffff;
+  }
+  .looq-bestsellers__inner {
+    max-width: var(--looq-container-desktop);
+    margin: 0 auto !important;
+    /* bottom padding intentionally small: the PYV tile row visually belongs
+       with the trailing "PICK YOUR VIBE." headline, so we tighten the gap
+       between the two sections at their shared boundary. */
+    padding: 64px var(--looq-gutter-desktop) 16px !important;
+  }
+  .looq-bestsellers__top   { margin-bottom: 48px !important; }
+  .looq-bestsellers__list {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 24px !important;
+    padding: 0 !important;
+    margin: 0 0 32px !important;
+  }
+  .looq-bestsellers__list .product-card-feature {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    min-height: 180px !important;
+  }
+  /* Cap headlines so they don't dominate the section.
+     Inline single-line headline on desktop instead of stacked. */
+  .looq-bestsellers__headline-1,
+  .looq-bestsellers__headline-2 { font-size: clamp(56px, 5.5vw, 80px) !important; display: inline !important; }
+  .looq-bestsellers__headline-2 { margin-left: 12px; }
+  /* Trailing PICK YOUR VIBE headline sits ABOVE the PYV tile row below
+     (PYV section's own headline is disabled). Centered so it visually
+     anchors the middle of the full-bleed tile row beneath it. */
+  /* Unified to Best Sellers headline size for consistency across all
+     homepage section headlines. */
+  .looq-bestsellers__pyv {
+    font-size: clamp(56px, 5.5vw, 80px) !important;
+    text-align: left;
+    width: 100% !important;
+    margin-top: 54px !important;
+    margin-bottom: 0 !important;
+  }
+  .looq-bestsellers__pyv span { display: inline !important; margin-right: 12px; }
+
+  /* ── THE GOODS — 4-col grid, 20px gap, bigger cards ──── */
+  .looq-goods {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+  .looq-goods__inner {
+    max-width: var(--looq-container-desktop);
+    margin: 0 auto !important;
+    padding: 80px var(--looq-gutter-desktop) !important;
+  }
+  .looq-goods__top { margin-bottom: 32px !important; align-items: center !important; }
+  /* User-supplied: left-align tab nav + larger gap */
+  .looq-goods-tabs__nav {
+    justify-content: flex-start !important;
+    gap: 40px !important;
+    margin: 32px 0 24px !important;
+    justify-self: start !important;
+    text-align: left !important;
+    padding: 0 !important;
+  }
+  .looq-goods-tabs__tab { font-size: 16px !important; }
+  .looq-goods-tabs__tab span {
+    display: block;
+    justify-self: start;
+  }
+  .looq-goods-tabs__panel.is-active {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 20px !important;
+    padding: 0 !important;
+    justify-items: stretch !important;
+  }
+  /* Portrait card style — applies to The Goods (homepage) AND to every
+     collection page grid. Single shared rule so collection pages render
+     identically to the homepage Goods section. Cart drawer is intentionally
+     NOT included; it keeps its mobile-style compact card. */
+  .looq-goods-tabs__panel.is-active .product-card-grid,
+  .looq-collection-scent__grid .product-card-grid,
+  .looq-collection-type__grid .product-card-grid,
+  .looq-bs-page__grid .product-card-grid,
+  .looq-dealz-page__grid .product-card-grid {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    height: auto !important;
+    aspect-ratio: 3 / 4 !important;
+  }
+  .looq-goods-tabs__panel.is-active .product-card-grid__media,
+  .looq-collection-scent__grid .product-card-grid__media,
+  .looq-collection-type__grid .product-card-grid__media,
+  .looq-bs-page__grid .product-card-grid__media,
+  .looq-dealz-page__grid .product-card-grid__media {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 6% !important;
+    bottom: 28% !important;
+    height: auto !important;
+    aspect-ratio: auto !important;
+    padding: 0 16px !important;
+  }
+  .looq-goods-tabs__panel.is-active .product-card-grid__media img,
+  .looq-collection-scent__grid .product-card-grid__media img,
+  .looq-collection-type__grid .product-card-grid__media img,
+  .looq-bs-page__grid .product-card-grid__media img,
+  .looq-dealz-page__grid .product-card-grid__media img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+  .looq-goods-tabs__panel.is-active .product-card-grid__info,
+  .looq-collection-scent__grid .product-card-grid__info,
+  .looq-collection-type__grid .product-card-grid__info,
+  .looq-bs-page__grid .product-card-grid__info,
+  .looq-dealz-page__grid .product-card-grid__info {
+    left: 16px !important;
+    right: 16px !important;
+    bottom: 16px !important;
+  }
+  .looq-goods-tabs__panel.is-active .product-card-grid__title,
+  .looq-collection-scent__grid .product-card-grid__title,
+  .looq-collection-type__grid .product-card-grid__title,
+  .looq-bs-page__grid .product-card-grid__title,
+  .looq-dealz-page__grid .product-card-grid__title { font-size: 18px !important; }
+  .looq-goods-tabs__panel.is-active .product-card-grid__price,
+  .looq-collection-scent__grid .product-card-grid__price,
+  .looq-collection-type__grid .product-card-grid__price,
+  .looq-bs-page__grid .product-card-grid__price,
+  .looq-dealz-page__grid .product-card-grid__price { font-size: 18px !important; }
+  .looq-goods__headline { font-size: clamp(56px, 5.5vw, 80px) !important; }
+  .looq-goods__headline span { display: inline !important; }
+
+  /* ── PICK YOUR VIBE — 4-col square tiles ──────────── */
+  /* Mobile = vertical stripes. Desktop per user feedback: 4 columns of
+     square tiles side-by-side. Each tile keeps the scent color bg, title,
+     description, and arrow — just rearranged from a row into a square. */
+  .looq-pyv {
+    max-width: none !important;
+    margin: 0 !important;
+    /* No top padding: the PYV tiles should sit just below the trailing
+       "PICK YOUR VIBE." headline rendered by the Best Sellers section,
+       not floating with extra whitespace. */
+    padding: 0 0 32px !important;
+    background: #fff;
+    /* Center the width-capped inner (which holds the row of tiles) within
+       the full-bleed section, so on viewports wider than the container the
+       4 boxes sit centered instead of pinned to the left edge. */
+    display: flex !important;
+    justify-content: center !important;
+  }
+  /* Full-bleed: the row of tiles spans the entire viewport edge-to-edge.
+     The 1200px container is intentionally dropped here — sharp, color-field
+     blocks read better at full viewport width than as a centered widget. */
+  .looq-pyv__inner {
+    max-width: none !important;
+    /* Fill up to the container max-width, then let the section's
+       justify-content:center center the whole block of tiles. */
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  /* Headline centered over the full-bleed tile row. text-align:center is
+     what does the heavy lifting — the 1200px container only constrains the
+     line width so wider viewports don't stretch the headline absurdly. */
+  .looq-pyv__headline {
+    max-width: var(--looq-container-desktop);
+    margin: 0 auto 40px !important;
+    padding: 0 var(--looq-gutter-desktop) !important;
+    font-size: clamp(56px, 5.5vw, 80px) !important;
+    text-align: center !important;
+  }
+  /* Small 12px gap re-introduces a visual seam between tiles so the
+     descriptions/arrows don't read as bleeding into the neighboring tile. */
+  .looq-pyv__list {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    margin: 0 !important;
+    padding: 0 12px !important;
+  }
+  .looq-pyv__stripe {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    aspect-ratio: 1 / 1;        /* square tiles */
+    height: auto !important;
+    position: relative;
+    border-radius: 0;           /* sharp corners */
+    overflow: hidden;
+  }
+  .looq-pyv__link {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 32px 32px 96px !important;
+    height: 100%;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: relative;
+  }
+  /* Title scales with viewport but never breaks a word mid-character.
+     Each word is already wrapped in its own <span> by the Liquid template,
+     so `white-space: nowrap` on the span makes each word atomic — long
+     words like STRAWBERRY stay on one line even when the tile is narrow. */
+  .looq-pyv__title {
+    font-size: clamp(32px, 2.6vw, 44px) !important;
+    line-height: 1 !important;
+    margin: 0 0 12px !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+    hyphens: none !important;
+  }
+  .looq-pyv__title span {
+    display: block !important;
+    white-space: nowrap !important;
+  }
+  /* Description anchored bottom-left of the tile, room reserved on the
+     right for the arrow. left/bottom match the link padding so text
+     starts at the same x as the title above. */
+  .looq-pyv__desc {
+    position: absolute !important;
+    left: 32px !important;
+    right: 80px !important;        /* reserve space for the arrow on the right */
+    bottom: 32px !important;
+    font-size: 14px !important;
+    line-height: 20px !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+  .looq-pyv__arrow {
+    right: 32px !important;
+    bottom: 32px !important;
+    left: auto !important;
+    top: auto !important;
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  /* ── DEALZ & STEALZ — 2-col split, full-bleed bg ──── */
+  /* Two-column grid where each column is independent: the left column is
+     a flex container holding the wrapper's children with tight spacing;
+     the right column is the stage image. No row-distribution math --
+     each column flows its own content. */
+  .looq-dealz {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    column-gap: 80px;
+    align-items: center;
+    max-width: var(--looq-container-desktop) !important;
+    margin: 0 auto !important;
+    padding: 96px var(--looq-gutter-desktop) !important;
+    background: #fff;
+  }
+  .looq-dealz__col-left {
+    display: flex !important;
+    flex-direction: column;
+    gap: 14px;
+    grid-column: 1;
+  }
+  .looq-dealz__eyebrow,
+  .looq-dealz__top,
+  .looq-dealz__subhead,
+  .looq-dealz__perks,
+  .looq-dealz__body { margin: 0 !important; }
+  .looq-dealz__eyebrow { display: block !important; color: #6749c4 !important; margin-bottom: 16px !important; }
+  .looq-dealz__top {
+    margin-bottom: 24px !important;
+    display: flex !important;
+    align-items: flex-end;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  /* Single-line "DEALZ & STEALZ." headline — scales to fit the column.
+     Each span flows inline so "&" no longer triggers an awkward wrap. */
+  .looq-dealz__headline { font-size: clamp(56px, 5.5vw, 80px) !important; line-height: 1 !important; }
+  .looq-dealz__headline span { display: inline !important; margin-right: 12px; white-space: normal !important; }
+  /* Subhead + perks list fill the left column's empty vertical space. */
+  .looq-dealz__subhead {
+    display: block !important;
+    margin: 8px 0 24px !important;
+    font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+    font-weight: 900;
+    font-size: clamp(18px, 1.6vw, 22px);
+    line-height: 1.2;
+    letter-spacing: 1.5px;
+    color: #6749c4;
+    text-transform: uppercase;
+  }
+  .looq-dealz__perks {
+    display: flex !important;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0 0 24px !important;
+    padding: 0;
+    list-style: none;
+  }
+  .looq-dealz__perks li {
+    position: relative;
+    padding-left: 22px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.45;
+    color: #1e1e1e;
+  }
+  .looq-dealz__perks li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 7px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #edfc4d;
+    box-shadow: 0 0 0 2px #6749c4;
+  }
+  .looq-dealz__body { font-size: 16px !important; line-height: 28px !important; max-width: none !important; margin-bottom: 0 !important; }
+  .looq-dealz__stage {
+    grid-column: 2;
+    align-self: center;
+    height: 540px !important;
+    margin: 0 !important;
+    border-radius: 32px;
+  }
+  /* Reposition the absolute children inside the wider desktop stage */
+  .looq-dealz__pills { top: 180px !important; }
+  .looq-dealz__price { top: 372px !important; }
+  .looq-dealz__cta   { top: 416px !important; }
+
+  /* ── BUNDLES — STRUCTURAL OVERRIDE ────────────────── */
+  /* On mobile, every child of `.looq-bundles__card` is `position:absolute`
+     with hand-tuned pixel coordinates against a 351px card. Scaling that
+     wider would require rewriting every coordinate, so on desktop we flip
+     children to `position:static` and let flex flow them naturally inside
+     a 3-column card grid. THIS BLOCK IS A STRUCTURAL OVERRIDE — mobile
+     rules in `sections/looq-bundles.liquid` are intentionally left intact. */
+  .looq-bundles {
+    max-width: none !important;
+    padding: 32px 0 80px !important;
+    background: #fff;
+  }
+  .looq-bundles__list {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 28px !important;
+    align-items: stretch;
+    max-width: var(--looq-container-desktop);
+    margin: 0 auto !important;
+    padding: 0 var(--looq-gutter-desktop) !important;
+  }
+  .looq-bundles__card {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 320px;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 28px 24px 24px !important;
+    border-radius: 18px;
+    box-sizing: border-box;
+  }
+  .looq-bundles__media,
+  .looq-bundles__badge,
+  .looq-bundles__title,
+  .looq-bundles__subtitle,
+  .looq-bundles__price-row,
+  .looq-bundles__add {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+  }
+  .looq-bundles__media {
+    width: 100% !important;
+    height: 200px !important;
+    margin: 0 0 16px !important;
+    order: 0;
+    align-items: center; justify-content: center;
+  }
+  .looq-bundles__badge {
+    display: inline-flex !important;
+    align-self: flex-start;
+    margin-bottom: 10px !important;
+    font-size: 10px !important; height: 22px; padding: 0 10px;
+    order: 1;
+  }
+  .looq-bundles__title {
+    white-space: normal !important;
+    margin: 0 0 8px !important;
+    font-size: 24px !important;
+    order: 2;
+  }
+  .looq-bundles__subtitle {
+    white-space: normal !important;
+    margin: 0 0 14px !important;
+    font-size: 12px !important;
+    order: 3;
+  }
+  .looq-bundles__price-row {
+    margin: auto 0 16px !important;     /* push price + cta to card bottom */
+    gap: 14px;
+    order: 4;
+  }
+  .looq-bundles__price { font-size: 22px !important; }
+  .looq-bundles__add {
+    align-self: flex-start !important;
+    width: auto !important; height: 36px !important;
+    padding: 0 24px !important;
+    font-size: 12px !important;
+    order: 5;
+  }
+
+  /* ── THE VIBE (per-scent collection section) ─────── */
+  .looq-collection-scent {
+    max-width: var(--looq-container-desktop);
+  }
+  .looq-collection-scent__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 32px !important;
+  }
+
+  /* ── THE VIBE — horizontal 3-photo composite ─────── */
+  /* CLEAN REWRITE. Photo renders at natural 1.41:1 aspect (2400x1706
+     desktop file). Captions absolutely overlay the photo box -- each of
+     3 grid cells is bottom-aligned so the caption word + description
+     sit at the bottom of its 1/3 column of the photo. */
+  .looq-vibe {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 var(--looq-gutter-desktop) 64px !important;
+  }
+  .looq-vibe__headline {
+    max-width: var(--looq-container-desktop);
+    margin: 24px auto 0 !important;
+    padding: 0 !important;
+    font-size: clamp(56px, 5.5vw, 80px) !important;
+    line-height: 1 !important;
+    text-align: left;
+    display: block !important;
+    margin-bottom: 30px !important;
+  }
+  .looq-vibe__board {
+    position: relative !important;
+    max-width: var(--looq-container-desktop);
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+  .looq-vibe__board picture { display: block; line-height: 0; }
+  /* The natural source image (2400x1706) has empty regions at both top
+     AND bottom of its canvas with the actual photos centered vertically.
+     - Tight aspect (3/1) crops the box very tight so it only shows the
+       photo content band
+     - object-position: center keeps the photo subjects in the center of
+       the visible window */
+  .looq-vibe__photo {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 3 / 1 !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+    display: block !important;
+  }
+  /* Captions overlay each third of the photo. Re-asserting absolute
+     positioning here because the <picture> sibling wrap can disrupt
+     cascade order in some browsers. */
+  .looq-vibe__captions {
+    position: absolute !important;
+    inset: 0 !important;
+    display: grid !important;
+    grid-template-rows: none !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    pointer-events: none;
+  }
+  .looq-vibe__caption {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: flex-end !important;
+    padding: 0 24px 24px 28px !important;
+  }
+  /* Strong text-shadow so the caption reads against any photo bg */
+  .looq-vibe__word { text-shadow: 0 2px 14px rgba(0,0,0,0.55) !important; }
+  .looq-vibe__desc { text-shadow: 0 1px 10px rgba(0,0,0,0.55) !important; }
+  .looq-vibe__word {
+    font-size: 3.3vw !important;
+    line-height: 1 !important;
+    margin: 0 0 10px !important;
+    display: block !important;
+    /* nowrap forces all three captions to render on a single line each
+       so their baselines align regardless of word length. UNEXPECTED was
+       wrapping to two lines before, which pushed it visually higher than
+       DISRUPTIVE / YOUTHFUL. */
+    white-space: nowrap !important;
+  }
+  /* Third caption ("UNEXPECTED") — desktop-only baseline margin. The
+     mint-green color override now lives outside this media query so
+     mobile + desktop both get it. */
+  .looq-vibe__caption:nth-child(3) .looq-vibe__word {
+    margin-bottom: 30px !important;
+  }
+  /* Dealz & Stealz title in LOOQ purple (overrides the shared light-pink
+     default from the collection-hero rule). Per user image #215. */
+  .looq-dealz-page__title {
+    color: #6749c4 !important;
+  }
+  .looq-vibe__desc { font-size: 13px !important; line-height: 20px !important; max-width: 280px; color: #fff !important; }
+
+  /* ── UGC — full-bleed bg, 300px cards, all scale(1.0) ─ */
+  .looq-ugc {
+    max-width: none !important;
+    padding: 64px 0 !important;
+  }
+  .looq-ugc__head {
+    max-width: var(--looq-container-desktop);
+    margin: 0 auto !important;
+    padding: 0 var(--looq-gutter-desktop) !important;
+  }
+  /* "LOOQ IN REAL LIFE" headline unified to the homepage section size */
+  .looq-ugc__title {
+    font-size: clamp(56px, 5.5vw, 80px) !important;
+    line-height: 1 !important;
+  }
+  .looq-ugc__carousel {
+    max-width: var(--looq-container-desktop);
+    margin: 0 auto !important;
+  }
+  .looq-ugc__track {
+    padding: 0 var(--looq-gutter-desktop) 30px !important;
+    gap: 24px !important;
+  }
+  .looq-ugc__card {
+    width: 300px !important;
+    flex: 0 0 300px !important;
+    height: 565px !important;     /* keep 250:470 ratio of mobile scaled to 300 */
+    transform: none !important;   /* drop the 0.86 inactive scale */
+    opacity: 1 !important;
+  }
+  /* Video wrap is hardcoded to 250px width in mobile CSS; on desktop the
+     card grew to 300px and the wrap didn't, leaving 50px of lavender card
+     background peeking through on the right. Make the wrap percentage-
+     based so it fills whatever card width is in effect. Bottom 92px is
+     intentionally left for the product info block (title + dots + stars). */
+  .looq-ugc__video-wrap {
+    width: 100% !important;
+    height: calc(100% - 92px) !important;
+  }
+  /* Centered play button — mobile had it hardcoded at left:95px (matched
+     a 250px wrap). Move to center via 50%/translate so it works at any
+     wrap size. */
+  .looq-ugc__play {
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  /* Mobile pins .looq-ugc__product at top:394px which sits inside the
+     desktop card's larger video area. Anchor from card bottom so the
+     title + dots + stars land in the 92px lavender strip below the video. */
+  .looq-ugc__product {
+    top: auto !important;
+    bottom: 60px !important;
+  }
+  /* Hover provides the dimming affordance on desktop */
+  .looq-ugc__card:hover { transform: translateY(-4px) !important; transition: transform 220ms ease; }
+
+  /* ── NEWSLETTER — 2-col split, headline left / form right ──── */
+  .looq-newsletter {
+    max-width: none !important;
+    padding: 96px 0 !important;
+    background: #fff;
+  }
+  /* Desktop layout: tall headline on the LEFT spans the entire section
+     height. RIGHT column stacks lede (above) -> form -> footnote (below)
+     so the right side isn't empty above the form. */
+  .looq-newsletter__inner {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    column-gap: 80px;
+    row-gap: 14px;
+    align-items: center;
+    max-width: var(--looq-container-desktop);
+    margin: 0 auto;
+    padding: 0 var(--looq-gutter-desktop) !important;
+  }
+  .looq-newsletter__headline {
+    grid-column: 1;
+    grid-row: 1 / -1;          /* span all three rows on the left */
+    align-self: center;
+    font-size: clamp(64px, 6.5vw, 100px) !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+  }
+  .looq-newsletter__lede {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0 !important;
+    font-size: 16px !important;
+    align-self: end;
+    color: #1e1e1e;
+    text-align: left;
+  }
+  .looq-newsletter__form {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .looq-newsletter__field input { font-size: 16px !important; padding: 18px 20px !important; }
+  .looq-newsletter__submit     { font-size: 14px !important; padding: 20px !important; letter-spacing: 4px !important; }
+  .looq-newsletter__footnote {
+    grid-column: 2;
+    grid-row: 3;
+    text-align: left !important;
+    align-self: start;
+    margin: 0 !important;
+    font-size: 13px;
+    opacity: 0.7;
+  }
+
+  /* ── FOOTER — full-bleed grey bg, inner content centered ── */
+  .looq-footer {
+    max-width: none !important;
+    padding: 56px 0 56px !important;
+  }
+  .looq-footer__inner {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 64px;
+    max-width: var(--looq-container-desktop);
+    margin: 0 auto !important;
+    padding: 0 var(--looq-gutter-desktop) !important;
+  }
+  .looq-footer__brand { margin: 0 !important; grid-column: 1; }
+  .looq-footer__cols  { grid-column: 2; flex-direction: row !important; gap: 48px; margin: 0 !important; }
+  .looq-footer__col   { border-bottom: 0 !important; }
+  .looq-footer__heading { cursor: default; pointer-events: none; padding: 0 0 14px !important; }
+  .looq-footer__chev    { display: none !important; }
+  .looq-footer__col .looq-footer__items { display: flex !important; padding: 0 !important; }
+  .looq-footer__base {
+    grid-column: 1 / -1;
+    padding-top: 32px;
+    border-top: 1px solid rgba(23,23,23,0.12);
+    margin-top: 24px;
+  }
+
+  /* ── PRODUCT pages — Glossier/Aesop pattern ───────── */
+  /* Left column: vertical stack of ALL product images, scrolls with page.
+     Right column: sticky info (title, price, scent picker, ATC, accordion)
+     so the buy controls stay in view while shoppers browse the imagery.
+     Breadcrumbs sit above the 2-col grid. */
+  .looq-product--single,
+  .looq-product--bundle,
+  .looq-product--bathtub {
+    max-width: var(--looq-container-desktop) !important;
+    margin: 0 auto !important;
+    padding: 160px var(--looq-gutter-desktop) 96px !important;
+    /* Desktop product bg. box-shadow + clip-path extends the background
+       to the viewport edges (full-bleed) while keeping the grid content
+       centered at 1200px max-width. Default = translucent pink. */
+    background: #ffbee4a8 !important;
+    box-shadow: 0 0 0 100vmax #ffbee4a8;
+    clip-path: inset(0 -100vmax);
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    grid-template-rows: auto 1fr;
+    column-gap: 64px;
+    row-gap: 24px;
+    align-items: start;
+  }
+  /* Bathtub template uses LOOQ yellow as its background instead of pink. */
+  .looq-product--bathtub {
+    background: #edfc4d !important;
+    box-shadow: 0 0 0 100vmax #edfc4d !important;
+  }
+  /* Breadcrumbs span both columns at the top. */
+  .looq-product--single .looq-product__crumbs,
+  .looq-product--bundle .looq-product__crumbs,
+  .looq-product--bathtub .looq-product__crumbs {
+    display: flex !important;
+    grid-column: 1 / -1;
+    grid-row: 1;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    color: rgba(30, 30, 30, 0.6);
+    text-transform: uppercase;
+  }
+  .looq-product--single .looq-product__crumbs a,
+  .looq-product--bundle .looq-product__crumbs a,
+  .looq-product--bathtub .looq-product__crumbs a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 160ms ease;
+  }
+  .looq-product--single .looq-product__crumbs a:hover,
+  .looq-product--bundle .looq-product__crumbs a:hover,
+  .looq-product--bathtub .looq-product__crumbs a:hover { color: #1e1e1e; }
+  .looq-product--single .looq-product__crumb-current,
+  .looq-product--bundle .looq-product__crumb-current,
+  .looq-product--bathtub .looq-product__crumb-current { color: #1e1e1e; }
+  .looq-product--single .looq-product__crumb-sep,
+  .looq-product--bundle .looq-product__crumb-sep,
+  .looq-product--bathtub .looq-product__crumb-sep {
+    color: rgba(30, 30, 30, 0.35);
+    font-size: 14px;
+  }
+
+  /* MEDIA column: hide the mobile carousel + back button, show the
+     vertical stack of all product images. */
+  .looq-product--single .looq-product__media,
+  .looq-product--bundle .looq-product__media,
+  .looq-product--bathtub .looq-product__media {
+    grid-column: 1;
+    grid-row: 2;
+    background: transparent !important;
+    height: auto !important;
+    padding: 0 !important;
+  }
+  /* Hide ALL mobile-side image elements on desktop. The .looq-product__image
+     fallback renders for single-image products via the section's elsif
+     branch; without hiding it, the image would render twice (once in the
+     fallback + once inside .looq-product__stack which iterates product.images). */
+  .looq-product--single .looq-product__back,
+  .looq-product--bundle .looq-product__back,
+  .looq-product--bathtub .looq-product__back,
+  .looq-product--single .looq-gallery,
+  .looq-product--bundle .looq-gallery,
+  .looq-product--bathtub .looq-gallery,
+  .looq-product--single .looq-product__media > .looq-product__image,
+  .looq-product--bundle .looq-product__media > .looq-product__image,
+  .looq-product--bathtub .looq-product__media > .looq-product__image { display: none !important; }
+  .looq-product--single .looq-product__stack,
+  .looq-product--bundle .looq-product__stack,
+  .looq-product--bathtub .looq-product__stack {
+    display: flex !important;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+  /* Image fills the column edge-to-edge with no background tint or radius.
+     object-fit: cover + aspect-ratio: 4/5 crops the source image's empty
+     margins so the bottle reads larger relative to the visible frame.
+     object-position: center keeps the bottle centered after crop. */
+  .looq-product--single .looq-product__stack img,
+  .looq-product--bundle .looq-product__stack img,
+  .looq-product--bathtub .looq-product__stack img {
+    width: 100% !important;
+    height: auto !important;
+    display: block;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: center;
+    background: transparent !important;
+    border-radius: 0 !important;
+  }
+
+  /* On desktop: show the in-info accordion copy, hide the mobile sibling
+     copy. Both copies render in markup; visibility is toggled per
+     breakpoint so neither context's natural layout is disturbed. */
+  .looq-product__accordion-desktop { display: block !important; }
+  .looq-product__accordion-mobile  { display: none !important; }
+
+  /* Accordion (desktop copy inside info column) inherits the full info-
+     column width and matches the COMPLETE THE SET cross-sell card width. */
+  .looq-product__accordion-desktop .looq-accordion {
+    max-width: none !important;
+    margin: 16px 0 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border-top: 0 !important;
+  }
+
+  /* INFO column: sticky to viewport top while user scrolls through the
+     image stack. align-self:start is what makes sticky behave correctly
+     in a grid (otherwise grid stretches it to full row height). */
+  .looq-product--single .looq-product__info,
+  .looq-product--bundle .looq-product__info,
+  .looq-product--bathtub .looq-product__info {
+    grid-column: 2;
+    grid-row: 2;
+    position: sticky;
+    top: 24px;                                 /* header is now static and scrolls away; small offset from viewport top */
+    align-self: start;
+    background: transparent !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+  }
+  /* Tighten the info-column elements to match the desktop column rhythm */
+  .looq-product--single .looq-product__title,
+  .looq-product--bundle .looq-product__title,
+  .looq-product--bathtub .looq-product__title { font-size: clamp(40px, 4vw, 56px) !important; }
+  .looq-product--single .looq-product__price,
+  .looq-product--bundle .looq-product__price,
+  .looq-product--bathtub .looq-product__price { font-size: 28px !important; }
+  /* Decorative blue tab pill is mobile-only on bathtub too. */
+  .looq-product--bathtub .looq-product__tab { display: none !important; }
+
+  /* Mobile uses 95px top margin on .looq-product__sizes to position it
+     against the pink info card's fixed coordinates. On desktop with
+     natural flex flow, 95px creates a ghost gap above the size picker.
+     20px gives tight breathing room after the title above. */
+  .looq-product--bathtub .looq-product__sizes {
+    margin-top: 20px !important;
+  }
+
+  /* Bundle scent-picker rows: ONE row per option (HĀND WÖSH, BÖDI LÖSHN,
+     etc.) stacked vertically. The mobile rule used a horizontal layout
+     where rows sat side-by-side which broke on desktop. */
+  .looq-product--bundle .looq-product__bundle-grid {
+    display: flex !important;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .looq-product--bundle .looq-product__bundle-row {
+    display: block !important;
+    width: 100%;
+  }
+
+  /* Decorative blue tab at the top of the info card is a mobile-only
+     visual joiner between the photo card and info card. On desktop the
+     info column stands alone -- the tab becomes a floating bar that
+     overlaps the title. Hide on desktop. */
+  .looq-product--single .looq-product__tab,
+  .looq-product--bundle .looq-product__tab { display: none !important; }
+
+  /* ── COLLECTION pages ────────────────────────────── */
+  /* Shared collection-hero presentation across type / scent / dealz pages.
+     Title color falls back through:
+       1. var(--scent-title) — set per-scent on the scent page section,
+          and per-collection on the type page section via metaobject
+       2. #ffcaf8 light pink — universal fallback that reads well on
+          any of the LOOQ accent backgrounds (blue, pink, teal, purple) */
+  .looq-collection-type__title,
+  .looq-collection-scent__title,
+  .looq-dealz-page__title,
+  .looq-bs-page__title {
+    position: absolute;
+    left: var(--looq-gutter-desktop);
+    bottom: 18px;
+    z-index: 2;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-display);
+    font-weight: 950;
+    font-size: 110px;
+    line-height: 110px;
+    color: var(--scent-title, #ffcaf8);
+    text-transform: uppercase;
+  }
+  .looq-collection-type__back,
+  .looq-collection-scent__back,
+  .looq-dealz-page__back,
+  .looq-bs-page__back {
+    position: absolute;
+    left: 30px;
+    top: 140px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 23px;
+  }
+  .looq-collection-type__back svg,
+  .looq-collection-scent__back svg,
+  .looq-dealz-page__back svg,
+  .looq-bs-page__back svg {
+    width: 30px !important;
+    height: 30px !important;
+  }
+  /* Hero containers need position:relative so the absolutely-positioned
+     title + back arrow anchor to the hero band (not the section root).
+     User-tuned: min-height 420px. */
+  .looq-dealz-page__hero,
+  .looq-collection-scent__hero,
+  .looq-collection-type__hero,
+  .looq-bs-page__hero {
+    position: relative !important;
+    min-height: 420px !important;
+    overflow: visible;
+  }
+  /* Override anchor-center from earlier dealz user-supplied snippet */
+  .looq-dealz-page__hero { justify-items: stretch !important; }
+
+  /* Scent page tagline ("Sweet, playful, electric...") flows in normal
+     layout — when the title is absolute-positioned the tagline lands at
+     the top of the hero, awkwardly placed above the title. Hide on
+     desktop; the hero photo + bold title carry the brand message. */
+  .looq-collection-scent__tagline {
+    display: none !important;
+  }
+
+  /* The mobile rules clamp .looq-collection-type__body and
+     .looq-collection-scent__body to max-width: 390px. Without expanding
+     those wrappers, the 4-column grid inside them gets squeezed into
+     390px (≈ 95px per card) -- which is why cards appeared as tiny
+     stacked tiles. Expand the body wrappers to the desktop container. */
+  .looq-collection-type__body,
+  .looq-collection-scent__body {
+    max-width: var(--looq-container-desktop) !important;
+    margin: 0 auto !important;
+    padding: 48px var(--looq-gutter-desktop) 96px !important;
+  }
+  .looq-collection-type__grid,
+  .looq-collection-scent__grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 32px !important;
+  }
+  /* Best-sellers and Dealz pages: same expansion + 4-col grid */
+  .looq-bs-page,
+  .looq-dealz-page {
+    max-width: none !important;
+  }
+  .looq-bs-page__body,
+  .looq-dealz-page__body {
+    max-width: var(--looq-container-desktop) !important;
+    margin: 0 auto !important;
+    padding: 48px var(--looq-gutter-desktop) 96px !important;
+  }
+  .looq-bs-page__grid,
+  .looq-dealz-page__grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 32px !important;
+  }
+  /* User-supplied: dealz page hero spacing + anchor-centered children. */
+  .looq-dealz-page__hero {
+    position: relative;
+    padding: 87px 21px 24px;
+    justify-items: anchor-center;
+    margin-top: 20px;
+  }
+
+  /* ── BUSINESS PAGES (Creators / Retailers / Affiliates / Distribution)
+     All four share the same class structure -- only --page-accent differs.
+     One shared block scales typography, expands the hero to full bleed,
+     and centers form + body content. Mobile rules untouched. */
+  .looq-page--creators,
+  .looq-page--retailers,
+  .looq-page--affiliates,
+  .looq-page--distribution,
+  .looq-page--support,
+  .looq-page--faq,
+  .looq-page--contact {
+    max-width: none !important;
+  }
+  /* Hero band: full-bleed, taller, dramatic typography */
+  .looq-page--creators .looq-page__hero,
+  .looq-page--retailers .looq-page__hero,
+  .looq-page--affiliates .looq-page__hero,
+  .looq-page--distribution .looq-page__hero {
+    height: clamp(320px, 32vw, 420px) !important;
+    padding: 140px var(--looq-gutter-desktop) 32px !important;
+    align-items: center;
+  }
+  .looq-page--creators .looq-page__hero .looq-page__title,
+  .looq-page--retailers .looq-page__hero .looq-page__title,
+  .looq-page--affiliates .looq-page__hero .looq-page__title,
+  .looq-page--distribution .looq-page__hero .looq-page__title {
+    font-size: clamp(72px, 8vw, 144px) !important;
+    line-height: 0.92 !important;
+    max-width: var(--looq-container-desktop);
+    margin: 0 auto !important;
+    /* Match the body's padding-left so the title's first letter aligns
+       with the body's text directly below it. Without this, the title
+       sat 48px left of the body. */
+    padding: 0 var(--looq-gutter-desktop) !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  /* Watermark scaled up + repositioned for the wider hero */
+  .looq-page--creators .looq-page__watermark,
+  .looq-page--retailers .looq-page__watermark,
+  .looq-page--affiliates .looq-page__watermark,
+  .looq-page--distribution .looq-page__watermark {
+    right: -60px !important;
+    width: clamp(480px, 50vw, 760px) !important;
+    height: auto !important;
+    aspect-ratio: 453 / 249;
+  }
+
+  /* Body: centered 1200px container, larger fonts for readable copy */
+  .looq-page--creators .looq-page__body,
+  .looq-page--retailers .looq-page__body,
+  .looq-page--affiliates .looq-page__body,
+  .looq-page--distribution .looq-page__body {
+    max-width: var(--looq-container-desktop) !important;
+    margin: 0 auto !important;
+    padding: 64px var(--looq-gutter-desktop) 80px !important;
+  }
+  .looq-page--creators .looq-page__heading,
+  .looq-page--retailers .looq-page__heading,
+  .looq-page--affiliates .looq-page__heading,
+  .looq-page--distribution .looq-page__heading {
+    font-size: clamp(40px, 4.5vw, 72px) !important;
+    line-height: 1.02 !important;
+    max-width: 900px;
+    margin: 0 0 24px !important;
+  }
+  .looq-page--creators .looq-page__body .looq-page__eyebrow-mini,
+  .looq-page--retailers .looq-page__body .looq-page__eyebrow-mini,
+  .looq-page--affiliates .looq-page__body .looq-page__eyebrow-mini,
+  .looq-page--distribution .looq-page__body .looq-page__eyebrow-mini {
+    font-size: 22px !important;
+    margin: 0 0 36px !important;
+  }
+  .looq-page--creators .looq-page__list-heading,
+  .looq-page--retailers .looq-page__list-heading,
+  .looq-page--affiliates .looq-page__list-heading,
+  .looq-page--distribution .looq-page__list-heading {
+    font-size: 18px !important;
+    line-height: 1.4 !important;
+    margin: 40px 0 12px !important;
+  }
+  .looq-page--creators .looq-page__body p,
+  .looq-page--retailers .looq-page__body p,
+  .looq-page--affiliates .looq-page__body p,
+  .looq-page--distribution .looq-page__body p,
+  .looq-page--creators .looq-page__body ul,
+  .looq-page--retailers .looq-page__body ul,
+  .looq-page--affiliates .looq-page__body ul,
+  .looq-page--distribution .looq-page__body ul {
+    font-size: 17px !important;
+    line-height: 1.6 !important;
+    max-width: 780px;
+    margin-bottom: 16px !important;
+  }
+  .looq-page--creators .looq-page__cta-text,
+  .looq-page--retailers .looq-page__cta-text,
+  .looq-page--affiliates .looq-page__cta-text,
+  .looq-page--distribution .looq-page__cta-text {
+    font-size: 22px !important;
+    margin-top: 48px !important;
+  }
+
+  /* Symmetric vertical rhythm around the marquee strip: equal gap above
+     (body → marquee) and below (marquee → form). */
+  .looq-page--creators .looq-page__body,
+  .looq-page--retailers .looq-page__body,
+  .looq-page--affiliates .looq-page__body,
+  .looq-page--distribution .looq-page__body {
+    padding-bottom: 64px !important;
+  }
+  .looq-page--creators .looq-page__marquee,
+  .looq-page--retailers .looq-page__marquee,
+  .looq-page--affiliates .looq-page__marquee,
+  .looq-page--distribution .looq-page__marquee {
+    margin: 0 !important;
+  }
+  /* Business form: centered narrower column, larger fields, 64px above */
+  .looq-page--creators .looq-busform,
+  .looq-page--retailers .looq-busform,
+  .looq-page--affiliates .looq-busform,
+  .looq-page--distribution .looq-busform {
+    max-width: 720px;
+    margin: 64px auto 0 !important;
+    padding: 0 var(--looq-gutter-desktop) 96px !important;
+  }
+  .looq-page--creators .looq-busform__field input,
+  .looq-page--retailers .looq-busform__field input,
+  .looq-page--affiliates .looq-busform__field input,
+  .looq-page--distribution .looq-busform__field input,
+  .looq-page--creators .looq-busform__field select,
+  .looq-page--retailers .looq-busform__field select,
+  .looq-page--affiliates .looq-busform__field select,
+  .looq-page--distribution .looq-busform__field select,
+  .looq-page--creators .looq-busform__field textarea,
+  .looq-page--retailers .looq-busform__field textarea,
+  .looq-page--affiliates .looq-busform__field textarea,
+  .looq-page--distribution .looq-busform__field textarea {
+    font-size: 16px !important;
+    padding: 14px 18px !important;
+  }
+  .looq-page--creators .looq-busform__label,
+  .looq-page--retailers .looq-busform__label,
+  .looq-page--affiliates .looq-busform__label,
+  .looq-page--distribution .looq-busform__label { font-size: 14px !important; }
+
+  /* ── SUPPORT / FAQ / CONTACT pages -- same scaffolding, different content ── */
+  /* Hero (banner) */
+  .looq-page--support .looq-page__hero,
+  .looq-page--faq .looq-page__hero,
+  .looq-page--contact .looq-page__hero {
+    height: clamp(320px, 32vw, 420px) !important;
+    padding: 140px var(--looq-gutter-desktop) 32px !important;
+    align-items: center;
+  }
+  .looq-page--support .looq-page__hero .looq-page__title,
+  .looq-page--faq .looq-page__hero .looq-page__title,
+  .looq-page--contact .looq-page__hero .looq-page__title {
+    font-size: clamp(72px, 8vw, 144px) !important;
+    line-height: 0.92 !important;
+    max-width: var(--looq-container-desktop);
+    margin: 0 auto !important;
+    padding: 0 var(--looq-gutter-desktop) !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .looq-page--support .looq-page__watermark,
+  .looq-page--faq .looq-page__watermark,
+  .looq-page--contact .looq-page__watermark {
+    right: -60px !important;
+    width: clamp(480px, 50vw, 760px) !important;
+    height: auto !important;
+    aspect-ratio: 453 / 249;
+  }
+
+  /* Body */
+  .looq-page--support,
+  .looq-page--faq,
+  .looq-page--contact {
+    max-width: none !important;
+  }
+  .looq-page--support .looq-page__body,
+  .looq-page--faq .looq-page__body,
+  .looq-page--contact .looq-page__body {
+    max-width: var(--looq-container-desktop) !important;
+    margin: 0 auto !important;
+    padding: 64px var(--looq-gutter-desktop) 80px !important;
+  }
+  .looq-page--support .looq-page__heading,
+  .looq-page--faq .looq-page__heading,
+  .looq-page--contact .looq-page__heading {
+    font-size: clamp(40px, 4.5vw, 72px) !important;
+    line-height: 1.02 !important;
+    margin: 0 0 24px !important;
+  }
+  .looq-page--support .looq-page__intro,
+  .looq-page--faq .looq-page__intro,
+  .looq-page--contact .looq-page__intro {
+    font-size: 18px !important;
+    line-height: 1.6 !important;
+    max-width: 780px;
+    margin: 0 0 40px !important;
+  }
+  .looq-page--support .looq-page__body p,
+  .looq-page--faq .looq-page__body p,
+  .looq-page--contact .looq-page__body p {
+    font-size: 17px !important;
+    line-height: 1.6 !important;
+    max-width: 780px;
+  }
+
+  /* Support form -- centered narrower column. */
+  .looq-page--support .looq-page__support-form,
+  .looq-page--contact .looq-page__support-form {
+    max-width: 720px;
+    margin: 32px auto 0 !important;
+  }
+  .looq-page--support .looq-page__form-heading,
+  .looq-page--contact .looq-page__form-heading {
+    font-size: 20px !important;
+    margin: 0 0 16px !important;
+  }
+  .looq-page--support .looq-page__field input,
+  .looq-page--support .looq-page__field select,
+  .looq-page--support .looq-page__field textarea,
+  .looq-page--contact .looq-page__field input,
+  .looq-page--contact .looq-page__field select,
+  .looq-page--contact .looq-page__field textarea {
+    font-size: 16px !important;
+    padding: 14px 18px !important;
+  }
+  .looq-page--support .looq-page__submit,
+  .looq-page--contact .looq-page__submit {
+    font-size: 15px !important;
+    padding: 16px 32px !important;
+    letter-spacing: 2px !important;
+  }
+
+  /* Support page's "Additional Help" chip links -- horizontal pills */
+  .looq-page--support .looq-page__chips {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+  .looq-page--support .looq-page__chip {
+    font-size: 14px !important;
+    padding: 12px 24px !important;
+  }
+
+  /* ── POLICY pages (Terms / Shipping / Privacy / Refund) ───
+     One shared section .looq-policy serves all four policy templates.
+     Mobile rules untouched. Single readable column on desktop (better for
+     legal content scanning than newspaper-style multi-column). */
+  .looq-policy { max-width: none !important; }
+  .looq-policy__hero {
+    height: clamp(280px, 28vw, 380px) !important;
+  }
+  .looq-policy__pattern {
+    top: -40px !important;
+    right: -80px !important;
+    width: clamp(520px, 50vw, 800px) !important;
+    height: auto !important;
+    aspect-ratio: 453 / 249;
+  }
+  .looq-policy__back {
+    left: var(--looq-gutter-desktop) !important;
+    top: 120px !important;
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .looq-policy__title {
+    left: 50% !important;
+    transform: translateX(-50%);
+    bottom: 40px !important;
+    max-width: var(--looq-container-desktop);
+    width: 100%;
+    padding: 0 var(--looq-gutter-desktop);
+    font-size: clamp(64px, 8vw, 128px) !important;
+    line-height: 0.92 !important;
+    letter-spacing: -2px !important;
+  }
+  .looq-policy__body {
+    max-width: var(--looq-container-desktop) !important;
+    margin: 0 auto !important;
+    padding: 64px var(--looq-gutter-desktop) 96px !important;
+    font-size: 17px !important;
+    line-height: 1.65 !important;
+  }
+  /* Mobile clamps body children to 349px (matches 390-section narrow
+     readable column). On desktop we let them be wider for fluid reading. */
+  .looq-policy__body > * {
+    max-width: 800px !important;
+  }
+  .looq-policy__body p {
+    font-size: 17px !important;
+    line-height: 1.65 !important;
+    margin: 0 0 18px !important;
+  }
+  .looq-policy__body h2 {
+    font-size: clamp(28px, 2.4vw, 36px) !important;
+    line-height: 1.2 !important;
+    margin: 48px 0 16px !important;
+  }
+  .looq-policy__body h3 {
+    font-size: clamp(20px, 1.6vw, 24px) !important;
+    line-height: 1.2 !important;
+    margin: 36px 0 12px !important;
+  }
+  .looq-policy__body h4 {
+    font-size: 18px !important;
+    line-height: 1.3 !important;
+    margin: 28px 0 8px !important;
+  }
+  .looq-policy__body ul,
+  .looq-policy__body ol {
+    font-size: 17px !important;
+    line-height: 1.65 !important;
+    margin: 0 0 18px !important;
+    padding-left: 24px !important;
+  }
+  .looq-policy__body ul li,
+  .looq-policy__body ol li {
+    margin-bottom: 6px;
+  }
+
+  /* ── OUR STORY page ──────────────────────────────────
+     Full-bleed photo backdrop (continues mobile pattern, scaled to viewport)
+     with text content centered in a 1200px container. Body copy renders
+     in a 2-column newspaper layout for editorial feel. Headlines scaled
+     up dramatically for desktop banner weight. Mobile rules untouched. */
+  .looq-page--story {
+    max-width: none !important;
+    min-height: auto !important;
+  }
+  /* Backdrop fills the entire section (it already does via inset:0;
+     this just confirms the mobile rule survives the wider section). */
+  .looq-page--story .looq-page__photo-bg {
+    background-size: cover;
+    background-position: center 25%;
+  }
+  .looq-page--story .looq-page__inner {
+    max-width: var(--looq-container-desktop);
+    margin: 0 auto !important;
+    padding: 140px var(--looq-gutter-desktop) 120px !important;
+  }
+  .looq-page--story .looq-page__back {
+    position: absolute !important;
+    left: var(--looq-gutter-desktop);
+    top: 120px;
+    width: 32px !important;
+    height: 32px !important;
+    margin: 0 !important;
+  }
+  /* Dramatic display sizing for OUR STORY + THE LOOQ MINDSET headlines */
+  .looq-page--story .looq-page__title {
+    font-size: clamp(80px, 9vw, 160px) !important;
+    line-height: 0.92 !important;
+    margin: 0 0 32px !important;
+  }
+  .looq-page--story .looq-page__title--mid {
+    margin: 96px 0 32px !important;
+  }
+  /* Lede stays a single readable column above the 2-col body */
+  .looq-page--story .looq-page__lede {
+    font-size: clamp(22px, 1.8vw, 28px) !important;
+    line-height: 1.25 !important;
+    max-width: 720px;
+    margin: 0 0 48px !important;
+  }
+  /* Newspaper-style 2-column body. column-count handles balancing.
+     break-inside: avoid on paragraphs prevents awkward mid-paragraph
+     column breaks on short paragraphs. */
+  .looq-page--story .looq-page__copy {
+    column-count: 2;
+    column-gap: 80px;
+    max-width: 1100px;
+  }
+  .looq-page--story .looq-page__copy p {
+    font-size: 17px !important;
+    line-height: 1.65 !important;
+    margin: 0 0 20px !important;
+    break-inside: avoid;
+  }
+  /* Yellow accent highlights scale with body but stay accent color */
+  .looq-page--story .looq-page__copy mark {
+    background: transparent;
+    color: #edfc4d;
+  }
+}
+
+/* ============================================================
+   WIDE — ≥ 1280px
+   Cap container width; bump hero stage; everything else inherits.
+   ============================================================ */
+@media (min-width: 1280px) {
+  /* Inner content wrappers grow to the wide container; section roots
+     stay full-bleed. */
+  .looq-bestsellers__inner,
+  .looq-goods__inner,
+  .looq-ugc__head,
+  .looq-ugc__carousel,
+  .looq-footer__inner,
+  .looq-pyv__inner,
+  .looq-bundles__list,
+  .looq-newsletter__inner,
+  .looq-vibe__board,
+  .looq-vibe__headline,
+  .looq-dealz {
+    max-width: var(--looq-container-wide) !important;
+  }
+  .looq-hero__slider { height: 820px !important; }
+}
+</style>

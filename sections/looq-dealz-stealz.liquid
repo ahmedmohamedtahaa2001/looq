@@ -1,0 +1,193 @@
+{%- comment -%}
+  LOOQ — Dealz & Stealz section
+  Headline + body + lifestyle image bg with 3 stacked rounded category buttons,
+  "FROM LE 450" yellow + italic "also called yours" subline.
+  Source: parent frame 126:5067, image fill 101:2305 (4 8).
+{%- endcomment -%}
+
+<section class="looq-dealz" data-section-id="{{ section.id }}">
+  {%- comment -%}
+    Left-column wrapper. On mobile it's display:contents (transparent to
+    layout) so the original mobile flow is unaffected. On desktop it becomes
+    a flex column so the left items get their own internal flow independent
+    of the right-side stage's height.
+  {%- endcomment -%}
+  <div class="looq-dealz__col-left">
+    <p class="looq-dealz__eyebrow">{{ section.settings.eyebrow | default: 'THE BUNDLES' }}</p>
+
+    <div class="looq-dealz__top">
+      <h2 class="looq-dealz__headline">
+        <span>{{ section.settings.headline_1 | default: 'DEALZ &' }}</span>
+        <span>{{ section.settings.headline_2 | default: 'STEALZ.' }}</span>
+      </h2>
+      <a class="looq-dealz__see-all" href="{{ section.settings.see_all_url | default: '/pages/dealz-stealz' }}">
+        {{ section.settings.see_all_label | default: 'SEE ALL' }}
+        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+
+    {%- comment -%}
+      Subhead + extra bullets render between the headline and body. They're
+      hidden on mobile (where the layout is tight) and shown on desktop to
+      fill the left column's empty space beside the right-side stage image.
+    {%- endcomment -%}
+    <p class="looq-dealz__subhead">{{ section.settings.subhead | default: 'BUNDLE UP. PAY LESS. SMELL MORE.' }}</p>
+
+    <p class="looq-dealz__body">
+      {{ section.settings.body | default: 'Everything you need for a full routine. Body wash, lotion, hand wash — all in one rebellious bundle.' }}
+    </p>
+  </div>
+
+  <div class="looq-dealz__stage">
+    <img class="looq-dealz__bg" src="{{ 'looq-bundles-bg.png' | asset_url }}" alt="" aria-hidden="true">
+
+    <div class="looq-dealz__pills">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'pill' -%}
+          <a class="looq-dealz__pill" href="{{ block.settings.url | default: '#' }}"
+             style="background:{{ block.settings.color }}" {{ block.shopify_attributes }}>
+            {{ block.settings.label }}
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    <p class="looq-dealz__price">{{ section.settings.price | default: 'FROM LE 450' }}</p>
+
+    <a class="looq-dealz__cta" href="{{ section.settings.cta_url | default: '/pages/dealz-stealz' }}">
+      {{ section.settings.cta_label | default: 'SHOP NOW' }}
+    </a>
+  </div>
+</section>
+
+{% stylesheet %}
+.looq-dealz { position:relative; width:100%; margin:0 auto; background:#fff;
+  padding:48px 0 0; color:#1e1e1e; }
+.looq-dealz__eyebrow {
+  display:none; /* Section starts straight at headline per Figma reference */
+  margin:0 16px 18px; padding:0;
+  font-family:var(--font-body); font-weight:400;
+  font-size:13px; line-height:25px; letter-spacing:4.29px;
+  color:rgba(255,255,255,0.71);
+}
+.looq-dealz__top {
+  display:flex; align-items:flex-end; justify-content:space-between; gap:16px;
+  margin:0 16px;
+}
+.looq-dealz__headline {
+  margin:0; padding:0;
+  font-family:var(--font-display); font-weight:950;
+  font-size:45px; line-height:1; color:#6749c4;
+  text-transform:uppercase;
+}
+.looq-dealz__headline span { display:block; }
+.looq-dealz__see-all {
+  display:inline-flex; align-items:center; gap:6px;
+  margin-bottom:6px;
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight:900; font-size:11px; letter-spacing:2.5px;
+  color:#6749c4; text-decoration:none;
+  text-transform:uppercase; white-space:nowrap;
+}
+.looq-dealz__see-all:hover { color:#1e1e1e; }
+.looq-dealz__see-all svg { flex-shrink:0; }
+.looq-dealz__body {
+  margin:24px 16px 0; padding:0;
+  font-family:var(--font-body); font-weight:400;
+  font-size:13px; line-height:25px; color:#1e1e1e;
+  max-width:345px;
+}
+/* Subhead + perks list render on desktop only (see looq-desktop.liquid).
+   Hidden on mobile because the existing tight layout has no room for them. */
+.looq-dealz__subhead, .looq-dealz__perks { display: none; }
+/* The wrapper is transparent to layout on mobile so the existing mobile
+   flow is unchanged. Desktop snippet turns it into a flex column. */
+.looq-dealz__col-left { display: contents; }
+.looq-dealz__stage { position:relative; width:100%; height:500px; margin-top:24px; overflow:hidden; }
+.looq-dealz__bg {
+  position:absolute; top:-85.36%; left:-4.05%;
+  width:104.07%; height:199.72%; max-width:none; z-index:1;
+}
+.looq-dealz__pills {
+  position:absolute; left:0; right:0; top:146px;
+  display:flex; flex-direction:column; gap:14px;
+  align-items:center; z-index:2;
+}
+.looq-dealz__pill {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:238px; height:46px; border-radius:76px;
+  font-family:var(--font-display); font-weight:950;
+  font-size:24px; line-height:1; color:#fff;
+  text-decoration:none; text-transform:uppercase;
+}
+.looq-dealz__pill:nth-child(2) { transform:translateX(11px); }
+.looq-dealz__price {
+  position:absolute; left:50%; top:332px; transform:translateX(-50%);
+  margin:0; padding:0;
+  z-index:2;
+  font-family:var(--font-display); font-weight:950;
+  font-size:24px; line-height:1; color:var(--color-accent, #edfc4d);
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+/* Yellow text vertical breathing room is 20px on each side.
+   Last pill bottom = 312, price top = 332 (20px above the yellow).
+   Price font is 24px (line-height:1) so visual bottom ≈ 356,
+   SHOP NOW top = 376 (20px below). */
+.looq-dealz__cta {
+  position:absolute; left:50%; top:376px;
+  transform:translateX(-50%);
+  z-index:3;
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:180px; height:36px; padding:0 28px;
+  background:#1e1e1e; color:#fff;
+  font-family:var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight:400; font-size:13px; line-height:1;
+  letter-spacing:5px; text-transform:uppercase; text-decoration:none;
+  border-radius:8px;
+  transition:filter 160ms ease;
+}
+.looq-dealz__cta:hover { filter:brightness(1.12); }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Dealz & Stealz",
+  "tag": "section",
+  "class": "section--looq-dealz",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "THE BUNDLES" },
+    { "type": "text", "id": "headline_1", "label": "Headline line 1", "default": "DEALZ &" },
+    { "type": "text", "id": "headline_2", "label": "Headline line 2", "default": "STEALZ." },
+    { "type": "text", "id": "subhead", "label": "Subhead (desktop only)", "default": "BUNDLE UP. PAY LESS. SMELL MORE." },
+    { "type": "textarea", "id": "body", "label": "Body description" },
+    { "type": "text", "id": "price", "label": "Price tag", "default": "FROM LE 450" },
+    { "type": "text", "id": "signature", "label": "Italic subline", "default": "also called yours" },
+    { "type": "text", "id": "cta_label", "label": "Shop CTA label", "default": "SHOP NOW" },
+    { "type": "url",  "id": "cta_url",   "label": "Shop CTA URL" }
+  ],
+  "blocks": [
+    {
+      "type": "pill",
+      "name": "Category pill",
+      "limit": 5,
+      "settings": [
+        { "type": "text",  "id": "label", "label": "Label", "default": "BÖDI WÖSH" },
+        { "type": "color", "id": "color", "label": "Background", "default": "#ed3ea3" },
+        { "type": "url",   "id": "url",   "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "Dealz & Stealz",
+    "category": "LOOQ",
+    "blocks": [
+      { "type": "pill", "settings": { "label": "BÖDI WÖSH", "color": "#ed3ea3" } },
+      { "type": "pill", "settings": { "label": "HĀND WÖSH", "color": "#6749c4" } },
+      { "type": "pill", "settings": { "label": "BÖDI LÖSHN", "color": "#ed3ea3" } }
+    ]
+  }]
+}
+{% endschema %}

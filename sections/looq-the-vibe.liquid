@@ -1,0 +1,94 @@
+{%- comment -%}
+  LOOQ — The Vibe section (rebuild)
+  Figma reference: 101:2281 — single composite image (vibe-composite.png, 926×1797)
+  Headline (THE black + VIBE. purple) above one full-width image with
+  3 absolute text overlays (DISRUPTIVE/YOUTHFUL/UNEXPECTED), each at bottom-left
+  of their natural third of the image.
+{%- endcomment -%}
+
+<section class="looq-vibe" data-section-id="{{ section.id }}">
+  <h2 class="looq-vibe__headline">
+    <span class="looq-vibe__h1">{{ section.settings.headline_1 | default: 'THE ' }}</span><span class="looq-vibe__h2">{{ section.settings.headline_2 | default: 'VIBE.' }}</span>
+  </h2>
+
+  <div class="looq-vibe__board">
+    <picture>
+      <source media="(min-width: 1024px)" srcset="{{ 'looq-vibe-desktop.jpg' | asset_url }}">
+      <img class="looq-vibe__photo"
+           src="{{ 'looq-vibe-composite.png' | asset_url }}"
+           alt="LOOQ vibes — disruptive, youthful, unexpected"
+           width="926" height="1797" loading="lazy">
+    </picture>
+
+    <div class="looq-vibe__captions" aria-hidden="false">
+      {%- for block in section.blocks -%}
+        <div class="looq-vibe__caption" {{ block.shopify_attributes }}>
+          <h3 class="looq-vibe__word" style="color:{{ block.settings.color }}">{{ block.settings.word }}</h3>
+          <p class="looq-vibe__desc">{{ block.settings.description }}</p>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+.looq-vibe { width:100%; margin:0 auto;
+  background:#fff; padding:30px 0 0; }
+.looq-vibe__headline { margin:0 0 16px; padding:0 0 0 22px;
+  font-family:var(--font-display); font-weight:950;
+  font-size:45px; line-height:1; text-transform:uppercase;
+  white-space:nowrap; }
+.looq-vibe__h1 { color:#1e1e1f; }
+.looq-vibe__h2 { color:#6749c4; }
+
+.looq-vibe__board { position:relative; width:100%; }
+.looq-vibe__photo { display:block; width:100%; height:auto; }
+.looq-vibe__captions { position:absolute; inset:0;
+  display:grid; grid-template-rows:1fr 1fr 1fr; }
+.looq-vibe__caption { display:flex; flex-direction:column; justify-content:flex-end;
+  padding:0 0 18px 24px; pointer-events:none; }
+.looq-vibe__word { margin:0 0 6px; padding:0;
+  font-family:var(--font-display); font-weight:950;
+  font-size:36px; line-height:1; text-transform:uppercase;
+  text-shadow:0 2px 14px rgba(0,0,0,0.35); }
+/* Universal override: third caption is mint green on every viewport.
+   Forces the block's white inline style off both mobile and desktop. */
+.looq-vibe__caption:nth-child(3) .looq-vibe__word { color: #85faa9 !important; }
+.looq-vibe__desc { margin:0; padding:0;
+  font-family:var(--font-body); font-weight:400;
+  font-size:13px; line-height:18px; color:#fff;
+  text-shadow:0 1px 8px rgba(0,0,0,0.5); }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "The Vibe",
+  "tag": "section",
+  "class": "section--looq-vibe",
+  "settings": [
+    { "type": "text", "id": "headline_1", "label": "Headline word 1 (black)", "default": "THE " },
+    { "type": "text", "id": "headline_2", "label": "Headline word 2 (purple)", "default": "VIBE." }
+  ],
+  "blocks": [
+    {
+      "type": "vibe",
+      "name": "Vibe overlay",
+      "limit": 3,
+      "settings": [
+        { "type": "text",     "id": "word",        "label": "Word",        "default": "DISRUPTIVE" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "Breaks the rules without asking for permission." },
+        { "type": "color",    "id": "color",       "label": "Word color",  "default": "#ffafd1" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "The Vibe",
+    "category": "LOOQ",
+    "blocks": [
+      { "type": "vibe", "settings": { "word": "DISRUPTIVE", "description": "Breaks the rules without asking for permission.",                    "color": "#ffafd1" } },
+      { "type": "vibe", "settings": { "word": "YOUTHFUL",   "description": "Driven by energy, curiosity, and fearless self-expression.",         "color": "#edfc4d" } },
+      { "type": "vibe", "settings": { "word": "UNEXPECTED", "description": "Always turns left, when others turn right.",                          "color": "#ffffff" } }
+    ]
+  }]
+}
+{% endschema %}

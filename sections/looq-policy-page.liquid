@@ -1,0 +1,142 @@
+{%- comment -%}
+  LOOQ — Policy/Info page section.
+  Pixel-matched to Figma nodes:
+    323:42  Refund Policy
+    323:37  Shipping Policy
+    323:32  Privacy Policy
+    323:4   Terms of Service
+    323:47  Contact Info
+  All share the same layout: blue #3559ef hero (202px) with the LOOQ wavy
+  infinity pattern at ~9% opacity behind, big white display title (45px),
+  white content area below with PP Radio Grotesk Black section headings in
+  blue and Regular body text in #1e1e1e.
+
+  Title is split into 2 lines via the section setting "title_line_1" /
+  "title_line_2". Body content comes from page.content (HTML from the
+  Shopify Admin → Pages editor) OR from a section setting if you want to
+  hardcode it.
+{%- endcomment -%}
+
+<section class="looq-policy" data-section-id="{{ section.id }}">
+  <div class="looq-policy__hero">
+    <div class="looq-policy__pattern" aria-hidden="true">{% render 'looq-infinity' %}</div>
+    <a class="looq-policy__back" href="javascript:history.back()" aria-label="Back">
+      <svg width="23" height="23" viewBox="0 0 23 23" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 6l-6 5.5L14 17"/>
+      </svg>
+    </a>
+    <h1 class="looq-policy__title">
+      <span>{{ section.settings.title_line_1 | default: page.title | upcase }}</span>
+      {%- if section.settings.title_line_2 != blank -%}
+        <span>{{ section.settings.title_line_2 }}</span>
+      {%- endif -%}
+    </h1>
+  </div>
+
+  <div class="looq-policy__body">
+    {{- page.content -}}
+  </div>
+</section>
+
+{% stylesheet %}
+.looq-policy {
+  width: 100%; max-width: 390px; margin: 0 auto;
+  background: #fff;
+}
+
+/* Hero — blue band with wavy pattern, mirrored vertically to read like a
+   skyline of LOOQ ∞ symbols. Title overlay at left with a gentle drop. */
+.looq-policy__hero {
+  position: relative;
+  width: 100%;
+  height: 320px;        /* 243 hero + 77 header overlay clearance, taller per Figma */
+  background: #3559ef;
+  overflow: hidden;
+}
+.looq-policy__pattern {
+  /* ∞ watermark positioned to the right with slight crop -- matches the
+     placement pattern used on the business pages (LOOQ Creators, Retailers,
+     etc.) so policy pages feel consistent with the rest of the LOOQ
+     system. 420×230 keeps the natural 453:249 aspect. Darker tint
+     (black at low alpha) reads as a deeper shade of the page accent. */
+  position: absolute;
+  right: -60px; top: 50%;
+  transform: translateY(-50%);
+  width: 420px; height: 230px;
+  pointer-events: none; user-select: none;
+  color: rgba(0, 0, 0, 0.12);
+}
+.looq-policy__pattern .looq-infinity { width:100%; height:100%; display:block; }
+.looq-policy__back {
+  position: absolute; left: 19px; top: 87px; z-index: 2;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 23px; height: 23px;
+}
+.looq-policy__title {
+  position: absolute; left: 19px; bottom: 28px; margin: 0; padding: 0;
+  font-family: var(--font-display, 'ABC Repro Ultra', sans-serif);
+  font-weight: 950;
+  /* Per Figma: scaled larger so multi-word policy titles (TERMS OF
+     SERVICE, SHIPPING POLICY) read at hero-headline weight. Tight letter-
+     spacing keeps the longest line inside the 390 panel. */
+  font-size: clamp(44px, 15cqw, 58px);
+  line-height: 0.92;
+  letter-spacing: -1px;
+  color: #fff;
+  text-transform: uppercase;
+}
+.looq-policy { container-type: inline-size; }
+.looq-policy__title span { display: block; white-space: nowrap; }
+
+/* Body — section headings in blue + bullets + paragraphs.
+   The page.content from Shopify Admin is plain HTML; this CSS targets
+   whatever common elements the editor produces (h2/h3/strong/ul/p). */
+.looq-policy__body {
+  padding: 24px 19px 40px;
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 25px;
+  color: #1e1e1e;
+}
+.looq-policy__body > * { max-width: 349px; }
+.looq-policy__body p { margin: 0 0 12px; }
+.looq-policy__body p:last-child { margin-bottom: 0; }
+.looq-policy__body h2,
+.looq-policy__body h3,
+.looq-policy__body h4 {
+  margin: 24px 0 0; padding: 0;
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-weight: 900;
+  font-size: 13px;
+  line-height: 25px;
+  color: #3559ef;
+}
+.looq-policy__body strong { color: #3559ef; font-weight: 900; }
+.looq-policy__body a { color: #3559ef; text-decoration: none; font-weight: 900; }
+.looq-policy__body a:hover { text-decoration: underline; }
+.looq-policy__body ul, .looq-policy__body ol {
+  margin: 0 0 12px; padding-left: 19px;
+  display: flex; flex-direction: column; gap: 0;
+}
+.looq-policy__body ul li, .looq-policy__body ol li {
+  line-height: 25px;
+}
+.looq-policy__body ul { list-style: disc; }
+.looq-policy__body ol { list-style: decimal; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Policy / Info page",
+  "tag": "section",
+  "class": "section--looq-policy",
+  "settings": [
+    { "type": "text", "id": "title_line_1", "label": "Title line 1 (uppercase)",
+      "info": "Defaults to the page's title if blank." },
+    { "type": "text", "id": "title_line_2", "label": "Title line 2 (uppercase)",
+      "info": "Optional second line." }
+  ],
+  "presets": [{ "name": "Policy / Info page", "category": "LOOQ" }]
+}
+{% endschema %}

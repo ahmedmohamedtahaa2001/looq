@@ -1,0 +1,107 @@
+{%- comment -%}
+  LOOQ — Best Sellers full listing page
+  Reuses the dealz page pattern: white bg, big purple stacked title,
+  2-col grid of products. Source is the 'best-sellers' collection
+  (manual collection curated by LOOQ).
+{%- endcomment -%}
+
+{%- assign collection_handle = section.settings.collection_handle | default: 'best-sellers' -%}
+{%- assign bestsellers_collection = collections[collection_handle] -%}
+
+<section class="looq-bs-page" data-section-id="{{ section.id }}">
+  <header class="looq-bs-page__hero">
+    <a class="looq-bs-page__back" href="javascript:history.back()" aria-label="Back">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+        <path d="M9 3l-4 4 4 4"/>
+      </svg>
+    </a>
+    <h1 class="looq-bs-page__title">
+      <span>{{ section.settings.title_line_1 | default: 'BEST' }}</span>
+      <span>{{ section.settings.title_line_2 | default: 'SELLERS.' }}</span>
+    </h1>
+  </header>
+
+  <div class="looq-bs-page__body">
+    <div class="looq-bs-page__grid">
+      {%- if bestsellers_collection != blank and bestsellers_collection.products.size > 0 -%}
+        {%- assign sorted = bestsellers_collection.products | sort: 'price' -%}
+        {%- for product in sorted -%}
+          {% render 'looq-product-card-grid', product: product %}
+        {%- endfor -%}
+      {%- else -%}
+        <p class="looq-bs-page__empty">No best sellers featured yet — check back soon.</p>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+.looq-bs-page {
+  width: 100%; max-width: 390px; margin: 0 auto;
+  background: #fff;
+  container-type: inline-size;
+}
+
+.looq-bs-page__hero {
+  /* Same pattern as the per-type / per-scent collection pages: blue band
+     with absolute-positioned back arrow + title. Title stacks 2 lines
+     in light pink with the LOOQ purple bg behind it. */
+  position: relative;
+  width: 100%;
+  height: 270px;
+  background: #6749c4;
+  overflow: hidden;
+}
+.looq-bs-page__back {
+  position: absolute;
+  left: 19px; top: 87px;
+  z-index: 2;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 23px; height: 23px;
+}
+.looq-bs-page__title {
+  position: absolute;
+  left: 21px; bottom: 18px;
+  margin: 0; padding: 0;
+  font-family: var(--font-display, 'ABC Repro Ultra', sans-serif);
+  font-weight: 950;
+  font-size: clamp(40px, 13vw, 72px);
+  line-height: 0.92;
+  text-transform: uppercase;
+  color: #ffcaf8;
+}
+.looq-bs-page__title span { display: block; white-space: nowrap; }
+
+.looq-bs-page__body {
+  padding: 8px 19px 40px;
+}
+.looq-bs-page__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.looq-bs-page__empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 16px;
+  color: rgba(30, 30, 30, 0.6);
+  font-family: var(--font-product, 'PP Radio Grotesk', sans-serif);
+  font-size: 14px;
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Best Sellers page",
+  "tag": "section",
+  "class": "section--looq-bs-page",
+  "settings": [
+    { "type": "text", "id": "title_line_1", "label": "Title line 1", "default": "BEST" },
+    { "type": "text", "id": "title_line_2", "label": "Title line 2", "default": "SELLERS." },
+    { "type": "text", "id": "collection_handle", "label": "Source collection handle",
+      "default": "best-sellers",
+      "info": "Manual collection containing the featured best-seller products." }
+  ],
+  "presets": [{ "name": "Best Sellers page", "category": "LOOQ" }]
+}
+{% endschema %}

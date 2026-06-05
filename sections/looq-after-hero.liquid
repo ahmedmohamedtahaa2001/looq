@@ -1,0 +1,37 @@
+{%- comment -%}
+  LOOQ — After-hero / under-hero desktop image strip.
+  Hidden on mobile (mobile design has no equivalent strip).
+  On ≥ 1024px renders a full-bleed lifestyle image between the hero and
+  the next homepage section. Image is configurable via the section setting
+  so the merchant can swap it without code.
+{%- endcomment -%}
+
+{%- assign img = section.settings.image | default: 'looq-after-hero-desktop.jpg' -%}
+
+<section class="looq-after-hero" data-section-id="{{ section.id }}" aria-hidden="true">
+  {%- if section.settings.image_url != blank -%}
+    <img src="{{ section.settings.image_url }}" alt="" loading="lazy" width="1920" height="1024">
+  {%- else -%}
+    <img src="{{ 'looq-after-hero-desktop.jpg' | asset_url }}" alt="" loading="lazy" width="1920" height="1024">
+  {%- endif -%}
+</section>
+
+{% stylesheet %}
+/* Hidden by default (mobile). The desktop snippet flips this to block at
+   ≥ 1024px. Section deliberately ships no mobile styling. */
+.looq-after-hero { display: none; width: 100%; }
+.looq-after-hero img { display: block; width: 100%; height: auto; object-fit: cover; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "After-hero image",
+  "tag": "section",
+  "class": "section--looq-after-hero",
+  "settings": [
+    { "type": "url", "id": "image_url", "label": "Image URL (desktop only)",
+      "info": "Defaults to looq-after-hero-desktop.jpg. Recommended ratio ~16:9, ≥ 1600px wide. Hidden on mobile." }
+  ],
+  "presets": [{ "name": "After-hero image", "category": "LOOQ" }]
+}
+{% endschema %}

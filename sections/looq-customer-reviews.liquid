@@ -1,0 +1,93 @@
+{%- comment -%}
+  LOOQ — Customer Reviews section (pixel-matched to Figma 101:2187/2188)
+  Headline (CUSTOMER blue + REVIEWS black) + auto-fade slider with blue card,
+  white LOOQ wordmark, italic quote, 5 stars. 3-second per slide cycle.
+{%- endcomment -%}
+
+<section class="looq-reviews" data-section-id="{{ section.id }}">
+  <h2 class="looq-reviews__headline">
+    <span class="looq-reviews__h1">{{ section.settings.headline_1 | default: 'CUSTOMER' }}</span>
+    <span class="looq-reviews__h2">{{ section.settings.headline_2 | default: 'REVIEWS' }}</span>
+  </h2>
+
+  <ul class="looq-reviews__list" role="list">
+    {%- for block in section.blocks -%}
+      <li class="looq-reviews__card" style="background:{{ block.settings.color | default: '#3559ef' }}" {{ block.shopify_attributes }}>
+        <img class="looq-reviews__logo" src="{{ 'looq-reviews-logo.png' | asset_url }}" alt="LOOQ" loading="lazy">
+        <blockquote class="looq-reviews__quote">
+          <span class="looq-reviews__qmark" aria-hidden="true">&ldquo;</span>{{ block.settings.quote }}<span class="looq-reviews__qmark" aria-hidden="true">&rdquo;</span>
+        </blockquote>
+        <img class="looq-reviews__stars" src="{{ 'looq-reviews-stars.png' | asset_url }}" alt="5 out of 5 stars" loading="lazy">
+      </li>
+    {%- endfor -%}
+  </ul>
+</section>
+
+{% stylesheet %}
+.looq-reviews { width:100%; max-width:390px; margin:0 auto; background:#fff; }
+.looq-reviews__headline { margin:0; padding:39px 20px 32px;
+  font-family:var(--font-display); font-weight:950;
+  font-size:45px; line-height:1; text-transform:uppercase; }
+.looq-reviews__h1 { color:#3559ef; display:block; }
+.looq-reviews__h2 { color:#1e1e1e; display:block; }
+
+.looq-reviews__list { position:relative; width:100%; height:229px;
+  list-style:none; margin:0; padding:0; overflow:hidden; }
+.looq-reviews__card { position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:24px; padding:0 30px;
+  opacity:0; animation:looq-reviews-fade 9s infinite ease-in-out; }
+.looq-reviews__card:nth-of-type(1) { animation-delay:0s; }
+.looq-reviews__card:nth-of-type(2) { animation-delay:3s; }
+.looq-reviews__card:nth-of-type(3) { animation-delay:6s; }
+.looq-reviews__card:nth-of-type(4) { animation-delay:9s; }
+.looq-reviews__card:nth-of-type(5) { animation-delay:12s; }
+@keyframes looq-reviews-fade {
+  0% { opacity:0; } 4% { opacity:1; } 33% { opacity:1; } 37% { opacity:0; } 100% { opacity:0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .looq-reviews__card { animation:none; }
+  .looq-reviews__card:nth-of-type(1) { opacity:1; }
+}
+
+.looq-reviews__logo { display:block; width:80px; height:auto; }
+.looq-reviews__quote { margin:0; padding:0; border:0;
+  font-family:var(--font-italic-display); font-style:italic; font-weight:200;
+  font-size:20px; line-height:25px; color:rgba(255,255,255,0.73);
+  text-align:center; max-width:320px; }
+.looq-reviews__qmark { font-style:italic; font-family:var(--font-italic-display);
+  font-weight:200; padding:0 2px; }
+.looq-reviews__stars { display:block; width:110px; height:auto; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Customer Reviews",
+  "tag": "section",
+  "class": "section--looq-reviews",
+  "settings": [
+    { "type": "text", "id": "headline_1", "label": "Headline word 1 (blue)", "default": "CUSTOMER" },
+    { "type": "text", "id": "headline_2", "label": "Headline word 2 (black)", "default": "REVIEWS" }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "limit": 12,
+      "settings": [
+        { "type": "textarea", "id": "quote", "label": "Quote", "default": "This doesn't smell like anything I've tried before." },
+        { "type": "color", "id": "color", "label": "Card background", "default": "#3559ef" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "Customer Reviews",
+    "category": "LOOQ",
+    "blocks": [
+      { "type": "review", "settings": { "quote": "The packaging, the smell, the texture… everything just feels premium.", "color": "#ed3ea3" } },
+      { "type": "review", "settings": { "quote": "My skin feels softer after literally the first use. Didn't think I'd notice a difference this fast.", "color": "#6749c4" } },
+      { "type": "review", "settings": { "quote": "This doesn't smell like anything I've tried before.", "color": "#3559ef" } }
+    ]
+  }]
+}
+{% endschema %}
